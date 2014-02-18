@@ -1,26 +1,29 @@
 # -*- coding: UTF-8 -*-
 
-# TODO: Coding that works better with Pyside
+# TODO: Encoding that works better with Pyside
 
 from PySide import QtCore, QtGui
+import ScenarioData
 
-class MainWindow(QtGui.QMainWindow):
-    def __init__(self, parent=None):
-		super(MainWindow, self).__init__(parent)
+class Editor(QtGui.QMainWindow):
+	def __init__(self, parent=None):
+		super(Editor, self).__init__(parent)
 		self.setWindowTitle("Kiigame - Pelieditori")
-				
+		
 		tabWidget = QtGui.QTabWidget()
 		self.setCentralWidget(tabWidget)
 		
-		tabWidget.addTab(GeneralTab(), "Päänäkymä")
-		tabWidget.addTab(RoomTab(), "Tila")
-
-class GeneralTab(QtGui.QWidget):
-    def __init__(self, parent=None):
-		super(GeneralTab, self).__init__(parent)
+		self.createMainTab()
+		self.createSpaceTab()
+		
+		tabWidget.addTab(self.mainTab, "Päänäkymä")
+		tabWidget.addTab(self.spaceTab, "Tila")
+		
+	def createMainTab(self):
+		self.mainTab = QtGui.QWidget()
 		
 		layout = QtGui.QHBoxLayout()
-		self.setLayout(layout)
+		self.mainTab.setLayout(layout)
 		
 		# Room preview
 		left_frame = QtGui.QWidget(self)
@@ -55,13 +58,11 @@ class GeneralTab(QtGui.QWidget):
 
 		right_frame_layout.addWidget(RoomWidget("Hello world!"))
 
-# TODO: Different for sequences?
-class RoomTab(QtGui.QWidget):
-    def __init__(self, parent=None):
-		super(RoomTab, self).__init__(parent)
+	def createSpaceTab(self):
+		self.spaceTab = QtGui.QWidget()
 
 		layout = QtGui.QHBoxLayout()
-		self.setLayout(layout)
+		self.spaceTab.setLayout(layout)
 
 		# Room
 		left_frame = QtGui.QWidget(self)
@@ -86,16 +87,7 @@ class RoomTab(QtGui.QWidget):
 
 		right_frame_layout.addWidget(SettingsWidget(self))
 
-class SettingsWidget(QtGui.QWidget):
-	def __init__(self, parent=None):
-		super(SettingsWidget, self).__init__(parent)
-		
-		layout = QtGui.QVBoxLayout()
-		self.setLayout(layout)
-
-		layout.addWidget(QtGui.QLabel("Settings"))
-
-# TODO: No need for this to be a class?
+# Room image with caption used in the main view
 class RoomWidget(QtGui.QWidget):
     def __init__(self, caption_text, parent=None):
 		super(RoomWidget, self).__init__(parent)
@@ -119,10 +111,26 @@ class RoomWidget(QtGui.QWidget):
 		
 		layout.addWidget(caption)
 
+# Item and room settings widget
+class SettingsWidget(QtGui.QWidget):
+	def __init__(self, parent=None):
+		super(SettingsWidget, self).__init__(parent)
+		
+		layout = QtGui.QVBoxLayout()
+		self.setLayout(layout)
+
+		layout.addWidget(QtGui.QLabel("Settings"))
+
+class DropDownWidget(QtGui.QWidget):
+	def __init__(self, parent=None)
+		super(SettingsWidget, self).__init__(parent)
+		print "Dropdown widget!"
+
 if __name__ == '__main__':
 	from sys import argv, exit
 
 	app = QtGui.QApplication(argv)
-	mainWindow = MainWindow()
-	mainWindow.show()
+
+	editor = Editor()
+	editor.show()
 	exit(app.exec_())
