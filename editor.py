@@ -122,9 +122,9 @@ class SettingsWidget(QtGui.QWidget):
 		layout.addWidget(QtGui.QLabel("Settings"))
 
 class DropDownWidget(QtGui.QWidget):
-	def __init__(self, parent=None)
+	def __init__(self, parent=None):
 		super(SettingsWidget, self).__init__(parent)
-		print "Dropdown widget!"
+		print("Dropdown widget!")
 
 if __name__ == '__main__':
 	from sys import argv, exit
