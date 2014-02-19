@@ -2,13 +2,16 @@
 
 # TODO: Encoding that works better with Pyside
 
-from PySide import QtCore, QtGui
+from PySide import QtGui
 import ScenarioData
 
 class Editor(QtGui.QMainWindow):
 	def __init__(self, parent=None):
 		super(Editor, self).__init__(parent)
 		self.setWindowTitle("Kiigame - Pelieditori")
+		
+		# TODO: Menubar
+		menubar = self.menuBar()
 		
 		tabWidget = QtGui.QTabWidget()
 		self.setCentralWidget(tabWidget)
@@ -43,17 +46,17 @@ class Editor(QtGui.QMainWindow):
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
 		
+		left_frame_layout.addWidget(RoomWidget("Hello world!"), 0, 0)
 		left_frame_layout.addWidget(RoomWidget("Hello world!"), 1, 0)
+		left_frame_layout.addWidget(RoomWidget("Hello world!"), 0, 1)
 		left_frame_layout.addWidget(RoomWidget("Hello world!"), 1, 1)
-		left_frame_layout.addWidget(RoomWidget("Hello world!"), 2, 0)
-		left_frame_layout.addWidget(RoomWidget("Hello world!"), 2, 1)
 
 		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
 		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
 		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
 		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
 
-		right_frame_layout.addWidget(RoomWidget("Hello world!"))
+		right_frame_layout.addWidget(SettingsWidget())
 
 	def createSpaceTab(self):
 		self.spaceTab = QtGui.QWidget()
@@ -113,10 +116,48 @@ class SettingsWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
 		super(SettingsWidget, self).__init__(parent)
 		
-		layout = QtGui.QVBoxLayout()
+		# TODO: Stop the vertical stretching/padding
+		layout = QtGui.QGridLayout()
 		self.setLayout(layout)
-
-		layout.addWidget(QtGui.QLabel("Settings"))
+		
+		# TODO: Function to change the layout according to what is chosen
+		# These are for the room settings
+		nameLabel = QtGui.QLabel("Nimi")
+		nameEdit = QtGui.QLineEdit("Huone1")
+		# Room image
+		roomImgScene = QtGui.QGraphicsScene(self)
+		roomImgView = QtGui.QGraphicsView(roomImgScene)
+		imgLabel = QtGui.QLabel("Kuva")
+		imgPixmap = QtGui.QPixmap("graphics/shower_room.png").scaledToHeight(150)
+		roomImgScene.addPixmap(imgPixmap)
+		musicLabel = QtGui.QLabel("Musiikki")
+		musicTextEdit = QtGui.QTextEdit()
+		# TODO: QFileDialog to select the music, doesn't work yet
+		musicBtn = QtGui.QPushButton('Selaa...', self)
+		musicBtn.setToolTip('Valitse musiikkitiedosto')
+		musicBtn.resize(musicBtn.sizeHint())
+		musicBtn.clicked.connect(self.showDialog)
+		
+		whereFromLabel = QtGui.QLabel("Mista sinne paasee?")
+		
+		layout.addWidget(nameLabel, 0, 0)
+		layout.addWidget(nameEdit, 0, 1, 1, 2)
+		layout.addWidget(imgLabel, 1, 0)
+		layout.addWidget(roomImgView, 1, 1, 2, 2)
+		layout.addWidget(musicLabel, 4, 0)
+		layout.addWidget(musicTextEdit, 4, 1)
+		layout.addWidget(musicBtn, 4, 2)
+		layout.addWidget(whereFromLabel, 6, 0)
+	
+	def showDialog(self):
+		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
+		'Valitse musiikkitiedosto','/home/', "Musiikkitiedostot (*.mp3 *.ogg)")
+		
+		f = open(fname, 'r')
+		
+		with f:
+			data = f.read()
+			self.musicTextEdit.setText(data)
 
 class DropDownWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
