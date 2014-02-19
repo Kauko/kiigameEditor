@@ -119,6 +119,8 @@ class SettingsWidget(QtGui.QWidget):
 		# TODO: Stop the vertical stretching/padding
 		layout = QtGui.QGridLayout()
 		self.setLayout(layout)
+		self.setSizePolicy(QtGui.QSizePolicy(
+		QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed))
 		
 		# TODO: Function to change the layout according to what is chosen
 		# These are for the room settings
@@ -131,7 +133,7 @@ class SettingsWidget(QtGui.QWidget):
 		imgPixmap = QtGui.QPixmap("graphics/shower_room.png").scaledToHeight(150)
 		roomImgScene.addPixmap(imgPixmap)
 		musicLabel = QtGui.QLabel("Musiikki")
-		musicTextEdit = QtGui.QTextEdit()
+		musicTextEdit = QtGui.QLineEdit("Placeholder.mp3")
 		musicTextEdit.setReadOnly(True)
 		# TODO: QFileDialog to select the music, doesn't work yet
 		musicBtn = QtGui.QPushButton('Selaa...', self)
@@ -149,6 +151,7 @@ class SettingsWidget(QtGui.QWidget):
 		layout.addWidget(musicTextEdit, 4, 1)
 		layout.addWidget(musicBtn, 4, 2)
 		layout.addWidget(whereFromLabel, 6, 0)
+		#layout.setRowStretch(6, 100)
 	
 	def showDialog(self):
 		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
