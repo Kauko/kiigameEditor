@@ -132,6 +132,7 @@ class SettingsWidget(QtGui.QWidget):
 		roomImgScene.addPixmap(imgPixmap)
 		musicLabel = QtGui.QLabel("Musiikki")
 		musicTextEdit = QtGui.QTextEdit()
+		musicTextEdit.setReadOnly(True)
 		# TODO: QFileDialog to select the music, doesn't work yet
 		musicBtn = QtGui.QPushButton('Selaa...', self)
 		musicBtn.setToolTip('Valitse musiikkitiedosto')
@@ -154,7 +155,6 @@ class SettingsWidget(QtGui.QWidget):
 		'Valitse musiikkitiedosto','/home/', "Musiikkitiedostot (*.mp3 *.ogg)")
 		
 		f = open(fname, 'r')
-		
 		with f:
 			data = f.read()
 			self.musicTextEdit.setText(data)
