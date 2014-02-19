@@ -29,4 +29,4 @@ class Room(View):
 		super(Room, self).__init__()
 		self.objectList = []
 		self.background = ""
-		self.comingFrom =
+		self.comingFrom = 

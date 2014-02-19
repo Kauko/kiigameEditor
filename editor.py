@@ -71,7 +71,7 @@ class Editor(QtGui.QMainWindow):
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
 		
-		pixmap = QtGui.QPixmap("intro_5.png")
+		pixmap = QtGui.QPixmap("graphics/intro_5.png")
 		scene.addPixmap(pixmap)
 		
 		left_frame_layout.addWidget(view)
@@ -97,7 +97,7 @@ class RoomWidget(QtGui.QWidget):
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
 		
-		pixmap = QtGui.QPixmap("character_panic.png")
+		pixmap = QtGui.QPixmap("graphics/character_panic.png")
 		scene.addPixmap(pixmap)
 		
 		layout.addWidget(view)
