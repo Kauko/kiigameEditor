@@ -2,7 +2,7 @@
 
 # TODO: Encoding that works better with Pyside
 
-from PySide import QtGui
+from PySide import QtGui, QtCore
 import ScenarioData
 
 class Editor(QtGui.QMainWindow):
@@ -120,18 +120,18 @@ class SettingsWidget(QtGui.QWidget):
 		layout = QtGui.QGridLayout()
 		self.setLayout(layout)
 		self.setSizePolicy(QtGui.QSizePolicy(
-		QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed))
+		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
 		
 		# TODO: Function to change the layout according to what is chosen
 		# These are for the room settings
 		nameLabel = QtGui.QLabel("Nimi")
 		nameEdit = QtGui.QLineEdit("Huone1")
 		# Room image
-		roomImgScene = QtGui.QGraphicsScene(self)
-		roomImgView = QtGui.QGraphicsView(roomImgScene)
-		imgLabel = QtGui.QLabel("Kuva")
-		imgPixmap = QtGui.QPixmap("graphics/shower_room.png").scaledToHeight(150)
-		roomImgScene.addPixmap(imgPixmap)
+		imgTextLabel = QtGui.QLabel("Kuva")
+		imgPixmap = QtGui.QPixmap("graphics/shower_room.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		imgLabel = QtGui.QLabel(self)
+		imgLabel.setPixmap(imgPixmap)
+
 		musicLabel = QtGui.QLabel("Musiikki")
 		musicTextEdit = QtGui.QLineEdit("Placeholder.mp3")
 		musicTextEdit.setReadOnly(True)
@@ -145,8 +145,8 @@ class SettingsWidget(QtGui.QWidget):
 		
 		layout.addWidget(nameLabel, 0, 0)
 		layout.addWidget(nameEdit, 0, 1, 1, 2)
-		layout.addWidget(imgLabel, 1, 0)
-		layout.addWidget(roomImgView, 1, 1, 2, 2)
+		layout.addWidget(imgTextLabel, 1, 0)
+		layout.addWidget(imgLabel, 1, 1, 2, 2)
 		layout.addWidget(musicLabel, 4, 0)
 		layout.addWidget(musicTextEdit, 4, 1)
 		layout.addWidget(musicBtn, 4, 2)
