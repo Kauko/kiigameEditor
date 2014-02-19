@@ -26,22 +26,19 @@ class Editor(QtGui.QMainWindow):
 		self.mainTab.setLayout(layout)
 		
 		# Room preview
-		left_frame = QtGui.QWidget(self)
-		left_frame.setMaximumWidth(500)
+		left_frame = QtGui.QGroupBox("Huoneet")
 		left_frame_layout = QtGui.QGridLayout()
 		left_frame.setLayout(left_frame_layout)
 		layout.addWidget(left_frame)
 		
 		# Room items
-		middle_frame = QtGui.QWidget(self)
-		middle_frame.setMaximumWidth(500)
+		middle_frame = QtGui.QGroupBox("Huoneen esineet")
 		middle_frame_layout = QtGui.QVBoxLayout()
 		middle_frame.setLayout(middle_frame_layout)
 		layout.addWidget(middle_frame)
 		
 		# Settings for items and rooms
-		right_frame = QtGui.QWidget(self)
-		right_frame.setMaximumWidth(500)
+		right_frame = QtGui.QGroupBox("Asetukset")
 		right_frame_layout = QtGui.QVBoxLayout()
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
@@ -89,7 +86,7 @@ class Editor(QtGui.QMainWindow):
 
 # Room image with caption used in the main view
 class RoomWidget(QtGui.QWidget):
-    def __init__(self, caption_text, parent=None):
+	def __init__(self, caption_text, parent=None):
 		super(RoomWidget, self).__init__(parent)
 		self.setAutoFillBackground(True)
 		
