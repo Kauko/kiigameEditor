@@ -140,7 +140,39 @@ class SettingsWidget(QtGui.QWidget):
 		clickTextEdit = QtGui.QTextEdit("Sopo nalle etc.")
 		clickTextEdit.setMaximumHeight(50)
 		
-		whereFromLabel = QtGui.QLabel("Mista sinne paasee?")
+		#TODO: Find some kind of splitter thing for this in Qt, for better labeling
+		pickupLabel = QtGui.QLabel("Poiminta")
+		
+		pickupTextLabel = QtGui.QLabel("Teksti poimittaessa:")
+		pickupTextEdit = QtGui.QTextEdit("Mitahan tama taalla tekee?")
+		pickupTextEdit.setMaximumHeight(50)
+		
+		pickupBlockLabel = QtGui.QLabel("Estaako jokin poiminnan?")
+		pickupBlockCombo = QtGui.QComboBox(self)
+		pickupBlockCombo.setIconSize(QtCore.QSize(50,50))
+		obstacleIcon = QtGui.QIcon(imgPixmap)
+		# Example obstacles
+		pickupBlockCombo.addItem(obstacleIcon, "Morko1")
+		pickupBlockCombo.addItem(obstacleIcon, "Morko2")
+		pickupBlockCombo.addItem(obstacleIcon, "Morko3")
+		
+		#TODO: Same as with pickupLabel
+		useLabel = QtGui.QLabel("Kaytto")
+		useTypeCombo = QtGui.QComboBox(self)
+		#TODO: Change according to what is chosen here
+		useTypeCombo.addItem("Ei kayttoa")
+		useTypeCombo.addItem("Kayta toiseen esineeseen")
+		useTypeCombo.addItem("Avaa jotakin")
+		useTypeCombo.addItem("Laita johonkin")
+		useTargetCombo = QtGui.QComboBox(self)
+		useTargetCombo.setIconSize(QtCore.QSize(50,50))
+		targetIcon = QtGui.QIcon(imgPixmap)
+		useTargetCombo.addItem(targetIcon, "Kohde1")
+		useTargetCombo.addItem(targetIcon, "Kohde2")
+		useTargetCombo.addItem(targetIcon, "Kohde3")
+		useTextLabel = QtGui.QLabel("Teksti kaytettaessa:")
+		useTextEdit = QtGui.QTextEdit("Kaappihan aukesi!")
+		useTextEdit.setMaximumHeight(50)
 		
 		layout.addWidget(nameLabel, 0, 0)
 		layout.addWidget(nameEdit, 0, 1, 1, 2)
@@ -148,7 +180,17 @@ class SettingsWidget(QtGui.QWidget):
 		layout.addWidget(imgLabel, 1, 1, 2, 2)
 		layout.addWidget(clickTextLabel, 4, 0)
 		layout.addWidget(clickTextEdit, 4, 1)
-		layout.addWidget(whereFromLabel, 6, 0)
+		layout.addWidget(pickupLabel, 5, 0)
+		layout.addWidget(pickupTextLabel, 6, 0)
+		layout.addWidget(pickupTextEdit, 6, 1)
+		layout.addWidget(pickupBlockLabel, 7, 0)
+		layout.addWidget(pickupBlockCombo, 7, 1)
+		layout.addWidget(useLabel, 8, 0)
+		layout.addWidget(useTypeCombo, 9, 1)
+		layout.addWidget(useTargetCombo, 10, 1)
+		layout.addWidget(useTextLabel, 11, 0)
+		layout.addWidget(useTextEdit, 11, 1)
+		
 	
 	#Settings for the room view
 	def showRoomOptions(self):
