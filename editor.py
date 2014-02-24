@@ -65,7 +65,7 @@ class Editor(QtGui.QMainWindow):
 		self.spaceTab.setLayout(layout)
 
 		# Room
-		left_frame = QtGui.QWidget(self)
+		left_frame = QtGui.QGroupBox("Huone")
 		left_frame_layout = QtGui.QVBoxLayout()
 		left_frame.setLayout(left_frame_layout)
 		layout.addWidget(left_frame)
@@ -80,7 +80,7 @@ class Editor(QtGui.QMainWindow):
 		left_frame_layout.addWidget(view)
 
 		# Settings
-		right_frame = QtGui.QWidget(self)
+		right_frame = QtGui.QGroupBox("Asetukset")
 		right_frame_layout = QtGui.QVBoxLayout()
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
@@ -117,7 +117,8 @@ class SettingsWidget(QtGui.QWidget):
 		super(SettingsWidget, self).__init__(parent)
 
 		# For testing the different options:
-		self.showRoomOptions()
+		self.showObjectOptions()
+		#self.showRoomOptions()
 		
 	#Settings for the object view
 	#TODO: Reduce redundancy; similar settings layout, "Name", "Picture" etc., are defined many times
@@ -136,13 +137,8 @@ class SettingsWidget(QtGui.QWidget):
 		imgLabel.setPixmap(imgPixmap)
 
 		clickTextLabel = QtGui.QLabel("Teksti klikatessa:")
-		musicTextEdit = QtGui.QLineEdit("")
-		musicTextEdit.setReadOnly(True)
-		# TODO: QFileDialog to select the music, doesn't work yet
-		musicBtn = QtGui.QPushButton('Selaa...', self)
-		musicBtn.setToolTip('Valitse musiikkitiedosto')
-		musicBtn.resize(musicBtn.sizeHint())
-		musicBtn.clicked.connect(self.showDialog)
+		clickTextEdit = QtGui.QTextEdit("Sopo nalle etc.")
+		clickTextEdit.setMaximumHeight(50)
 		
 		whereFromLabel = QtGui.QLabel("Mista sinne paasee?")
 		
@@ -151,8 +147,7 @@ class SettingsWidget(QtGui.QWidget):
 		layout.addWidget(imgTextLabel, 1, 0)
 		layout.addWidget(imgLabel, 1, 1, 2, 2)
 		layout.addWidget(clickTextLabel, 4, 0)
-		layout.addWidget(musicTextEdit, 4, 1)
-		layout.addWidget(musicBtn, 4, 2)
+		layout.addWidget(clickTextEdit, 4, 1)
 		layout.addWidget(whereFromLabel, 6, 0)
 	
 	#Settings for the room view
@@ -182,7 +177,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 		whereFromLabel = QtGui.QLabel("Mista sinne paasee?")
 		whereFromCombo = QtGui.QComboBox(self)
+		whereFromCombo.setIconSize(QtCore.QSize(50,50))
 		roomIcon = QtGui.QIcon(imgPixmap)
+		# Example rooms
 		whereFromCombo.addItem(roomIcon, "Huone2")
 		whereFromCombo.addItem(roomIcon, "Huone3")
 		whereFromCombo.addItem(roomIcon, "Huone4")
@@ -196,7 +193,6 @@ class SettingsWidget(QtGui.QWidget):
 		layout.addWidget(musicBtn, 4, 2)
 		layout.addWidget(whereFromLabel, 6, 0)
 		layout.addWidget(whereFromCombo, 6, 1, 1, 2)
-		#layout.setRowStretch(6, 100)
 	
 	def showDialog(self):
 		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
