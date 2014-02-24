@@ -174,6 +174,8 @@ class SettingsWidget(QtGui.QWidget):
 		useTextEdit = QtGui.QTextEdit("Kaappihan aukesi!")
 		useTextEdit.setMaximumHeight(50)
 		
+		allTextsButton = QtGui.QPushButton("Nama ja muut tekstit")
+		
 		layout.addWidget(nameLabel, 0, 0)
 		layout.addWidget(nameEdit, 0, 1, 1, 2)
 		layout.addWidget(imgTextLabel, 1, 0)
@@ -190,6 +192,7 @@ class SettingsWidget(QtGui.QWidget):
 		layout.addWidget(useTargetCombo, 10, 1)
 		layout.addWidget(useTextLabel, 11, 0)
 		layout.addWidget(useTextEdit, 11, 1)
+		layout.addWidget(allTextsButton, 12, 1)
 		
 	
 	#Settings for the room view
