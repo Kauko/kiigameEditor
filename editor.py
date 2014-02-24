@@ -115,15 +115,54 @@ class RoomWidget(QtGui.QWidget):
 class SettingsWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
 		super(SettingsWidget, self).__init__(parent)
+
+		# For testing the different options:
+		self.showRoomOptions()
 		
-		# TODO: Stop the vertical stretching/padding
+	#Settings for the object view
+	#TODO: Reduce redundancy; similar settings layout, "Name", "Picture" etc., are defined many times
+	def showObjectOptions(self):
 		layout = QtGui.QGridLayout()
 		self.setLayout(layout)
 		self.setSizePolicy(QtGui.QSizePolicy(
 		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
 		
-		# TODO: Function to change the layout according to what is chosen
-		# These are for the room settings
+		nameLabel = QtGui.QLabel("Nimi")
+		nameEdit = QtGui.QLineEdit("Nalle1")
+		# Object image
+		imgTextLabel = QtGui.QLabel("Kuva")
+		imgPixmap = QtGui.QPixmap("graphics/teddybear.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		imgLabel = QtGui.QLabel(self)
+		imgLabel.setPixmap(imgPixmap)
+
+		clickTextLabel = QtGui.QLabel("Teksti klikatessa:")
+		musicTextEdit = QtGui.QLineEdit("")
+		musicTextEdit.setReadOnly(True)
+		# TODO: QFileDialog to select the music, doesn't work yet
+		musicBtn = QtGui.QPushButton('Selaa...', self)
+		musicBtn.setToolTip('Valitse musiikkitiedosto')
+		musicBtn.resize(musicBtn.sizeHint())
+		musicBtn.clicked.connect(self.showDialog)
+		
+		whereFromLabel = QtGui.QLabel("Mista sinne paasee?")
+		
+		layout.addWidget(nameLabel, 0, 0)
+		layout.addWidget(nameEdit, 0, 1, 1, 2)
+		layout.addWidget(imgTextLabel, 1, 0)
+		layout.addWidget(imgLabel, 1, 1, 2, 2)
+		layout.addWidget(clickTextLabel, 4, 0)
+		layout.addWidget(musicTextEdit, 4, 1)
+		layout.addWidget(musicBtn, 4, 2)
+		layout.addWidget(whereFromLabel, 6, 0)
+	
+	#Settings for the room view
+	def showRoomOptions(self):
+		# TODO: Align the layout to the top
+		layout = QtGui.QGridLayout()
+		self.setLayout(layout)
+		self.setSizePolicy(QtGui.QSizePolicy(
+		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
+		
 		nameLabel = QtGui.QLabel("Nimi")
 		nameEdit = QtGui.QLineEdit("Huone1")
 		# Room image
@@ -142,6 +181,11 @@ class SettingsWidget(QtGui.QWidget):
 		musicBtn.clicked.connect(self.showDialog)
 		
 		whereFromLabel = QtGui.QLabel("Mista sinne paasee?")
+		whereFromCombo = QtGui.QComboBox(self)
+		roomIcon = QtGui.QIcon(imgPixmap)
+		whereFromCombo.addItem(roomIcon, "Huone2")
+		whereFromCombo.addItem(roomIcon, "Huone3")
+		whereFromCombo.addItem(roomIcon, "Huone4")
 		
 		layout.addWidget(nameLabel, 0, 0)
 		layout.addWidget(nameEdit, 0, 1, 1, 2)
@@ -151,16 +195,17 @@ class SettingsWidget(QtGui.QWidget):
 		layout.addWidget(musicTextEdit, 4, 1)
 		layout.addWidget(musicBtn, 4, 2)
 		layout.addWidget(whereFromLabel, 6, 0)
+		layout.addWidget(whereFromCombo, 6, 1, 1, 2)
 		#layout.setRowStretch(6, 100)
 	
 	def showDialog(self):
 		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
 		'Valitse musiikkitiedosto','/home/', "Musiikkitiedostot (*.mp3 *.ogg)")
 		
-		f = open(fname, 'r')
-		with f:
-			data = f.read()
-			self.musicTextEdit.setText(data)
+		#f = open(fname, 'r')
+		#with f:
+		#	data = f.read()
+		#	self.musicTextEdit.setText(fname.selectedFiles)
 
 class DropDownWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
