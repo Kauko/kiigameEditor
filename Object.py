@@ -1,4 +1,4 @@
-# Virtual class for game objects
+# Class for generic objects and upper class for all the other objects
 class Object(object):
 	def __init__(self):
 		self.id = ""
