@@ -1,4 +1,3 @@
-
 # Virtual class for game objects
 class Object(object):
 	def __init__(self):
@@ -26,7 +25,7 @@ class Container(Object):
 class Door(Object):
 	def __init__(self):
 		super(Door, self).__init__()
-		self.closedImage = ""
+		self.closedImage = self.image
 		self.lockedImage = ""
 		self.openImage = ""
 		self.locked = False
