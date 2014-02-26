@@ -28,6 +28,7 @@ class ScenarioData(object):
 			texts = json.load(f)
 			f.close()
 			
+		backgroundImages = {}
 		for child in images["children"]:
 			#print (child)
 			id = child["attrs"]["id"]
@@ -80,11 +81,16 @@ class ScenarioData(object):
 				self.endView = endView
 				
 			elif (id == "background_layer"):
-				pass
-				
+				# Store background layer images to a temporary dict
+				# TODO: This is stupid
+				for image in child["children"]:
+					roomId = image["attrs"]["id"]
+					picture = View.Room(roomId)
+					backgroundImages[roomId] = picture
+					
 			# TODO: Character layer
 			elif (id == "character_layer"):
-				print("char")
+				print("character layer")
 						
 			elif (category == "sequence"):
 				sequence = View.Sequence(child["attrs"]["id"])
@@ -94,6 +100,39 @@ class ScenarioData(object):
 					sequence.images.append(image)
 					
 				self.sequenceList.append(sequence)
+				
+			# Use the temporary dict here to get room objects
+			elif (id.find("object_layer_") != -1):
+				# For some reason this room may not exist
+				try:
+					roomImage = backgroundImages[id[13:]]
+				except KeyError:
+					continue
+					
+				# Create room objects
+				for image in child["children"]:
+					objectType = image["attrs"]["category"]
+					objectId = image["attrs"]["id"]
+					
+					if (objectType == "item"):
+						item = Object.Item(objectId)
+					elif (objectType == "container"):
+						item = Object.Door(objectId)
+					elif (objectType == "door"):
+						item = Object.Obstacle(objectId)
+					elif (objectType == "obstacle"):
+						item = Object.Item(objectId)
+					elif (objectType == "secret"):
+						item = Object.Item(objectId)
+						item.isSecret = True
+					elif (objectType == "object"):
+						item = Object.Object(objectId)
+						
+					picture =  Object.JSONObject(image["attrs"]["category"])
+					roomImage.objectList.append(item)
+				#print (roomImage.objectList)
+				
+				
 		return
 
 	def saveScenario(self):

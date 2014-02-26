@@ -18,6 +18,7 @@ class Item(Object):
 		super(Item, self).__init__()
 		self.pickUpText = ""
 		self.interaction = None
+		self.isSecret = False
 
 class Container(Object):
 	def __init__(self, id=None):
@@ -26,13 +27,13 @@ class Container(Object):
 		self.key = None
 		self.inItem = None
 		self.outItem = None
-
+		
 class Door(Object):
 	def __init__(self, id=None):
 		super(Door, self).__init__()
-		self.closedImage = self.image
-		self.lockedImage = ""
-		self.openImage = ""
+		self.closedImage = None
+		self.lockedImage = None
+		self.openImage = None
 		self.locked = False
 		self.key = None
 		self.destination = None
@@ -45,7 +46,7 @@ class Obstacle(Object):
 		self.blockTarget = None
 		self.trigger = None
 
-# JSON object
+# Objects derived from JSON
 class JSONObject(object):
 	def __init__(self, attributes, className="Image"):
 		self.imageAttributes = attributes

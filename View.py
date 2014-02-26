@@ -44,3 +44,4 @@ class Room(View):
 		self.objectList = []
 		self.background = None
 		self.comingFrom = []
+		
