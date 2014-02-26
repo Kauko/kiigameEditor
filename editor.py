@@ -117,8 +117,8 @@ class SettingsWidget(QtGui.QWidget):
 		super(SettingsWidget, self).__init__(parent)
 
 		# For testing the different options:
-		self.showObjectOptions()
-		#self.showRoomOptions()
+		#self.showObjectOptions()
+		self.showRoomOptions()
 		
 	#Settings for the object view
 	#TODO: Reduce redundancy; similar settings layout, "Name", "Picture" etc., are defined many times
