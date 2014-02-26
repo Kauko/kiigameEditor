@@ -7,22 +7,25 @@ class Object(object):
 		#		Static ID counter?
 		if not (id):
 			self.id = int(randint(0, 1000000000))
+		else:
+			self.id = id
 		self.name = ""
 		self.image = None
 		self.examine = ""
 		self.whatBlocks = None
+		self.location = None
 
 # Pickable item
 class Item(Object):
 	def __init__(self, id=None):
-		super(Item, self).__init__()
+		super(Item, self).__init__(id)
 		self.pickUpText = ""
 		self.interaction = None
 		self.isSecret = False
 
 class Container(Object):
 	def __init__(self, id=None):
-		super(Container, self).__init__()
+		super(Container, self).__init__(id)
 		self.locked = False
 		self.key = None
 		self.inItem = None
@@ -30,7 +33,7 @@ class Container(Object):
 		
 class Door(Object):
 	def __init__(self, id=None):
-		super(Door, self).__init__()
+		super(Door, self).__init__(id)
 		self.closedImage = None
 		self.lockedImage = None
 		self.openImage = None
@@ -40,7 +43,7 @@ class Door(Object):
 
 class Obstacle(Object):
 	def __init__(self, id=None):
-		super(Obstacle, self).__init__()
+		super(Obstacle, self).__init__(id)
 		self.blockingImage = self.image
 		self.unblockingImage = ""
 		self.blockTarget = None
@@ -51,4 +54,5 @@ class JSONObject(object):
 	def __init__(self, attributes, className="Image"):
 		self.imageAttributes = attributes
 		self.className = className
+		self.id = attributes["id"]
 

@@ -15,25 +15,77 @@ class ScenarioData(object):
 
 	# Load and parse game data files
 	def loadScenario(self):
-		# Load game data from files
+		self.parseImages()
+		self.parseObjects()
+		self.parseTexts()
+		
+	def parseObjects(self):
 		with open(self.dataDir + "/objects.json", encoding='utf-8') as f:
 			objects = json.load(f)
 			f.close()
 			
-		with open(self.dataDir + "/images.json", encoding="utf-8") as f:
-			images = json.load(f)
-			f.close()
+		for objectId in objects:
+			curObject = objects[objectId]
+			objectType = curObject["category"]
 			
+			# The object may be already created image, room or sequence.
+			# Find it and add attributes from objects.json
+			foundObject = None
+			for listItem in self.objectList:
+				if (listItem.id == objectId):
+					foundObject = listItem
+					break
+			
+			if not (foundObject):
+				for listItem in self.roomList:
+					if (listItem.id == objectId):
+						foundObject = listItem
+						
+			if not (foundObject):
+				for listItem in self.sequenceList:
+					if (listItem.id == objectId):
+						foundObject = listItem
+						break
+						
+			# Check menuview
+			if not (foundObject):
+				print(self.menuView.background.id, objectId)
+				if (self.menuView.background.id == objectId):
+					print ("ASLDOADL")
+			#print (self.menuView)
+			if not (foundObject):
+				print ("%s not found" %(objectId))
+				continue
+			if (objectType == "item"):
+				pass			
+			elif (objectType == "container"):
+				item = Object.Door(objectId)
+			elif (objectType == "door"):
+				item = Object.Obstacle(objectId)
+			elif (objectType == "obstacle"):
+				item = Object.Item(objectId)
+			elif (objectType == "secret"):
+				item = Object.Item(objectId)
+				item.isSecret = True
+			elif (objectType == "object"):
+				item = Object.Object(objectId)
+			
+	def parseTexts(self):
 		with open(self.dataDir + "/texts.json", encoding='utf-8') as f:
 			texts = json.load(f)
 			f.close()
 			
-		backgroundImages = {}
+	def parseImages(self):
+		with open(self.dataDir + "/images.json", encoding="utf-8") as f:
+			images = json.load(f)
+			f.close()
+			
+		roomImages = {}
 		for child in images["children"]:
-			#print (child)
 			id = child["attrs"]["id"]
 			category = child["attrs"]["category"]
 			
+			# Start menu
 			if (id == "start_layer"):
 				self.menuView = View.Menu("start_layer")
 				self.menuView.name = "Alkuvalikko"
@@ -65,6 +117,7 @@ class ScenarioData(object):
 						emptyButton.image = Object.JSONObject(image["attrs"])
 						self.menuView.creditsButton = creditsButton
 						
+			# End images
 			elif (id == "end_layer"):
 				endView = View.End("end_layer")
 				endView.name = "Loppukuva"
@@ -80,17 +133,17 @@ class ScenarioData(object):
 						endView.endText = Object.JSONObject(image["attrs"], "Text")
 				self.endView = endView
 				
-			elif (id == "background_layer"):
-				# Store background layer images to a temporary dict
+			# Store background layer images to a temporary dict
+			elif (id == "background_layer"):	
 				# TODO: This is stupid
 				for image in child["children"]:
 					roomId = image["attrs"]["id"]
 					picture = View.Room(roomId)
-					backgroundImages[roomId] = picture
+					roomImages[roomId] = picture
 					
 			# TODO: Character layer
 			elif (id == "character_layer"):
-				print("character layer")
+				pass
 						
 			elif (category == "sequence"):
 				sequence = View.Sequence(child["attrs"]["id"])
@@ -105,7 +158,7 @@ class ScenarioData(object):
 			elif (id.find("object_layer_") != -1):
 				# For some reason this room may not exist
 				try:
-					roomImage = backgroundImages[id[13:]]
+					room = roomImages[id[13:]]
 				except KeyError:
 					continue
 					
@@ -128,10 +181,11 @@ class ScenarioData(object):
 					elif (objectType == "object"):
 						item = Object.Object(objectId)
 						
-					picture =  Object.JSONObject(image["attrs"]["category"])
-					roomImage.objectList.append(item)
-				#print (roomImage.objectList)
-				
+					picture =  Object.JSONObject(image["attrs"])
+					room.objectList.append(item)
+					self.objectList.append(item)
+					
+				self.roomList.append(room)
 				
 		return
 

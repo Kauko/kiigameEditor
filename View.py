@@ -8,6 +8,8 @@ class View(object):
 		#		Static ID counter?
 		if not (id):
 			self.id = int(randint(0, 1000000000))
+		else:
+			self.id = id
 		self.name = ""
 		self.music = ""
 		self.type = ""

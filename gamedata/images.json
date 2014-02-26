@@ -910,7 +910,7 @@
 					"className": "Image"
 				}, {
 					"attrs": {
-						"id": "cieni_1",
+						"id": "cieni",
 						"x": 100,
 						"y": 380,
 						"category": "obstacle",
