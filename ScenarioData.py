@@ -16,8 +16,8 @@ class ScenarioData(object):
 	# Load and parse game data files
 	def loadScenario(self):
 		self.parseImages()
-		self.parseObjects()
-		self.parseTexts()
+		#self.parseObjects()
+		#self.parseTexts()
 		
 	def parseObjects(self):
 		with open(self.dataDir + "/objects.json", encoding='utf-8') as f:
@@ -50,11 +50,13 @@ class ScenarioData(object):
 			# Check menuview
 			if not (foundObject):
 				print(self.menuView.background.id, objectId)
+				
 				if (self.menuView.background.id == objectId):
 					print ("ASLDOADL")
+					
 			#print (self.menuView)
 			if not (foundObject):
-				print ("%s not found" %(objectId))
+				#print ("%s not found" %(objectId))
 				continue
 			if (objectType == "item"):
 				pass			
@@ -80,113 +82,72 @@ class ScenarioData(object):
 			images = json.load(f)
 			f.close()
 			
-		roomImages = {}
-		for child in images["children"]:
-			id = child["attrs"]["id"]
-			category = child["attrs"]["category"]
+		with open(self.dataDir + "/objects.json", encoding='utf-8') as f:
+			objects = json.load(f)
+			f.close()
 			
-			# Start menu
-			if (id == "start_layer"):
-				self.menuView = View.Menu("start_layer")
-				self.menuView.name = "Alkuvalikko"
+		roomImages = {}
+		objectsByCat = {}
+		for child in images["children"]:
+			objectCategory = child["attrs"]["category"]
+			
+			# Accept only certain types of views
+			allowedViews = ("start", "end", "sequence", "room")
+			if not (objectCategory in allowedViews):
+				continue
 				
-				for image in child["children"]:
-					image_id = image["attrs"]["id"]
-					
-					if (image_id == "start"):
-						self.menuView.background = Object.JSONObject(image["attrs"])
-						
-					elif (image_id == "begining"):
-						self.menuView.startImage = Object.JSONObject(image["attrs"])
-						
-					elif (image_id == "start_game"):
-						startButton = Object.Object("start_game")
-						startButton.name = "Aloituspainike"
-						startButton.image = Object.JSONObject(image["attrs"])
-						self.menuView.startButton = startButton
-						
-					elif (image_id == "start_credits"):
-						creditsButton = Object.Object("start_credits")
-						creditsButton.name = "Tekijät-painike"
-						creditsButton.image = Object.JSONObject(image["attrs"])
-						self.menuView.creditsButton = creditsButton
-						
-					elif (image_id == "start_empty"):
-						emptyButton = Object.Object("start_empty")
-						emptyButton.name = "Tyhjä painike"
-						emptyButton.image = Object.JSONObject(image["attrs"])
-						self.menuView.creditsButton = creditsButton
-						
-			# End images
-			elif (id == "end_layer"):
-				endView = View.End("end_layer")
-				endView.name = "Loppukuva"
+			objectId = child["attrs"]["id"]
+			
+			if not (objectCategory in objectsByCat):
+				objectsByCat[objectCategory] = {}
 				
-				for image in child["children"]:
-					image_id = image["attrs"]["id"]
+			layerAttrs = None
+			layerChildren = None
+			for layer in child:
+				if (layer == "attrs"):
+					layerAttrs = child[layer]
 					
-					if (image_id.find("end_picture_") != -1):
-						picture = Object.JSONObject(image["attrs"])
-						endView.endPictures.append(picture)
-						
-					elif (image_id == "rewards_text"):
-						endView.endText = Object.JSONObject(image["attrs"], "Text")
-				self.endView = endView
+				elif (layer == "children"):
+					layerChildren = child[layer]
+			print("===\n\n")
+			print("Here's layer attrs:")
+			print(layerAttrs)
+			#print(layerChildren)
+				#print(child[layer], layer)
+	
+			
+			if not (layerChildren):
+				continue
+			
+			# Go through objects in layers
+			createdObjects = {}
+			for item in layerChildren:
+				itemId = item["attrs"]["id"]
+				#imageAttributes = {}
 				
-			# Store background layer images to a temporary dict
-			elif (id == "background_layer"):	
-				# TODO: This is stupid
-				for image in child["children"]:
-					roomId = image["attrs"]["id"]
-					picture = View.Room(roomId)
-					roomImages[roomId] = picture
+				# Check for relation with objects.json objects
+				if ("object_name" in item["attrs"]):
+					jsonObject = objects[item["attrs"]["object_name"]]
 					
-			# TODO: Character layer
-			elif (id == "character_layer"):
-				pass
-						
-			elif (category == "sequence"):
-				sequence = View.Sequence(child["attrs"]["id"])
+					# Insert images.json object attributes on object.json object
+					for attr in jsonObject:
+						if (jsonObject[attr] == itemId):
+							jsonObject[attr] = item["attrs"]
+							break
+							
+					itemId = item["attrs"]["object_name"]
+					
+				elif (itemId in objects):
+					jsonObject = objects[itemId]
+				elif not (itemId in objects):
+					jsonObject = item["attrs"]
 				
-				for image in child["children"]:
-					image =  Object.JSONObject(image["attrs"])
-					sequence.images.append(image)
-					
-				self.sequenceList.append(sequence)
-				
-			# Use the temporary dict here to get room objects
-			elif (id.find("object_layer_") != -1):
-				# For some reason this room may not exist
-				try:
-					room = roomImages[id[13:]]
-				except KeyError:
-					continue
-					
-				# Create room objects
-				for image in child["children"]:
-					objectType = image["attrs"]["category"]
-					objectId = image["attrs"]["id"]
-					
-					if (objectType == "item"):
-						item = Object.Item(objectId)
-					elif (objectType == "container"):
-						item = Object.Door(objectId)
-					elif (objectType == "door"):
-						item = Object.Obstacle(objectId)
-					elif (objectType == "obstacle"):
-						item = Object.Item(objectId)
-					elif (objectType == "secret"):
-						item = Object.Item(objectId)
-						item.isSecret = True
-					elif (objectType == "object"):
-						item = Object.Object(objectId)
-						
-					picture =  Object.JSONObject(image["attrs"])
-					room.objectList.append(item)
-					self.objectList.append(item)
-					
-				self.roomList.append(room)
-				
+				createdObjects[itemId] = jsonObject
+			objectsByCat[objectCategory][objectId] = createdObjects
+			
+		import pprint
+		pp = pprint.PrettyPrinter(indent=4)
+		pp.pprint(objectsByCat)	
 		return
 
 	def saveScenario(self):

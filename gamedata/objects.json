@@ -140,20 +140,6 @@
 		"trigger": "cienibang",
 		"blocking_image": "cieni_1"
     },
-    "cieni_eyes": {
-    	"category": "obstacle",
-		"blocking": true,
-		"target": "shower_door_to_locker_room_2",
-		"trigger": "cienibang",
-		"blocking_image": "cieni_1"
-    },
-    "cieni_mouth": {
-    	"category": "obstacle",
-		"blocking": true,
-		"target": "shower_door_to_locker_room_2",
-		"trigger": "cienibang",
-		"blocking_image": "cieni_1"
-    },
     "tactic_board_wiper": {
     	"category": "item",
         "trigger": "tactic_board_1",
