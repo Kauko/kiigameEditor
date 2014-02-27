@@ -9,18 +9,18 @@ class Object(object):
 			self.id = int(randint(0, 1000000000))
 		else:
 			self.id = id
-		self.name = ""
+		#self.name = ""
 		self.image = None
-		self.examine = ""
-		self.whatBlocks = None
+		#self.examine = ""
+		#self.whatBlocks = None
 		self.location = None
-
+		
 # Pickable item
 class Item(Object):
 	def __init__(self, id=None):
 		super(Item, self).__init__(id)
-		self.pickUpText = ""
-		self.interaction = None
+		#self.pickUpText = ""
+		#self.interaction = None # TODO: Is this obsolete?
 		self.isSecret = False
 
 class Container(Object):
@@ -45,14 +45,18 @@ class Obstacle(Object):
 	def __init__(self, id=None):
 		super(Obstacle, self).__init__(id)
 		self.blockingImage = self.image
-		self.unblockingImage = ""
+		self.unblockingImage = None
 		self.blockTarget = None
 		self.trigger = None
 
 # Objects derived from JSON
 class JSONObject(object):
-	def __init__(self, attributes, className="Image"):
+	def __init__(self, attributes):
 		self.imageAttributes = attributes
-		self.className = className
+		
+		self.className = attributes["classname"]
+		attributes.pop("classname", None)
+		
 		self.id = attributes["id"]
-
+		attributes.pop("id", None)
+		

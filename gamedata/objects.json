@@ -4,15 +4,15 @@
 	    "music": "audio/alku_musax_mono_20131213.mp3"
 	},
 	"locker_room_1": {
-		"category": "room",
+		"category": "room_background",
 	    "music": "audio/alku_musax_mono_20131213.mp3"
 	},
 	"locker_room_2": {
-		"category": "room",
+		"category": "room_background",
 	    "music": "audio/loppu_musax_mono_20131213.mp3"
 	},
 	"shower_room": {
-		"category": "room",
+		"category": "room_background",
 	    "music": "audio/alku_musax_mono_20131213.mp3"
 	},
 	"jacket": {
@@ -138,7 +138,7 @@
 		"blocking": true,
 		"target": "shower_door_to_locker_room_2",
 		"trigger": "cienibang",
-		"blocking_image": "cieni_1"
+		"blocking_image": "cieni"
     },
     "tactic_board_wiper": {
     	"category": "item",
@@ -152,7 +152,7 @@
     },
     "cienibang": {
         "category": "item",
-        "trigger": "cieni_1",
+        "trigger": "cieni",
 		"outcome": "shower_door_to_locker_room_2_closed"
     },
     "poster_withglue": {

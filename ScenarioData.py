@@ -5,6 +5,7 @@ import View, Object
 
 class ScenarioData(object):
 	def __init__(self):
+		self.texts = {}
 		self.roomList = []
 		self.objectList = []
 		self.sequenceList = []
@@ -15,68 +16,14 @@ class ScenarioData(object):
 
 	# Load and parse game data files
 	def loadScenario(self):
+		self.parseTexts()
 		self.parseImages()
-		#self.parseObjects()
-		#self.parseTexts()
 		
-	def parseObjects(self):
-		with open(self.dataDir + "/objects.json", encoding='utf-8') as f:
-			objects = json.load(f)
-			f.close()
-			
-		for objectId in objects:
-			curObject = objects[objectId]
-			objectType = curObject["category"]
-			
-			# The object may be already created image, room or sequence.
-			# Find it and add attributes from objects.json
-			foundObject = None
-			for listItem in self.objectList:
-				if (listItem.id == objectId):
-					foundObject = listItem
-					break
-			
-			if not (foundObject):
-				for listItem in self.roomList:
-					if (listItem.id == objectId):
-						foundObject = listItem
-						
-			if not (foundObject):
-				for listItem in self.sequenceList:
-					if (listItem.id == objectId):
-						foundObject = listItem
-						break
-						
-			# Check menuview
-			if not (foundObject):
-				print(self.menuView.background.id, objectId)
-				
-				if (self.menuView.background.id == objectId):
-					print ("ASLDOADL")
-					
-			#print (self.menuView)
-			if not (foundObject):
-				#print ("%s not found" %(objectId))
-				continue
-			if (objectType == "item"):
-				pass			
-			elif (objectType == "container"):
-				item = Object.Door(objectId)
-			elif (objectType == "door"):
-				item = Object.Obstacle(objectId)
-			elif (objectType == "obstacle"):
-				item = Object.Item(objectId)
-			elif (objectType == "secret"):
-				item = Object.Item(objectId)
-				item.isSecret = True
-			elif (objectType == "object"):
-				item = Object.Object(objectId)
-			
 	def parseTexts(self):
 		with open(self.dataDir + "/texts.json", encoding='utf-8') as f:
-			texts = json.load(f)
+			self.texts = json.load(f)
 			f.close()
-			
+				
 	def parseImages(self):
 		with open(self.dataDir + "/images.json", encoding="utf-8") as f:
 			images = json.load(f)
@@ -86,13 +33,12 @@ class ScenarioData(object):
 			objects = json.load(f)
 			f.close()
 			
-		roomImages = {}
 		objectsByCat = {}
 		for child in images["children"]:
 			objectCategory = child["attrs"]["category"]
 			
 			# Accept only certain types of views
-			allowedViews = ("start", "end", "sequence", "room")
+			allowedViews = ("start", "end", "sequence", "room", "room_background")
 			if not (objectCategory in allowedViews):
 				continue
 				
@@ -101,20 +47,14 @@ class ScenarioData(object):
 			if not (objectCategory in objectsByCat):
 				objectsByCat[objectCategory] = {}
 				
-			layerAttrs = None
 			layerChildren = None
 			for layer in child:
-				if (layer == "attrs"):
-					layerAttrs = child[layer]
-					
-				elif (layer == "children"):
+				if (layer == "children"):
 					layerChildren = child[layer]
-			print("===\n\n")
-			print("Here's layer attrs:")
-			print(layerAttrs)
+			#print("===\n\n")
+			#print("Here's layer attrs:")
+			#print(layerAttrs)
 			#print(layerChildren)
-				#print(child[layer], layer)
-	
 			
 			if not (layerChildren):
 				continue
@@ -136,6 +76,7 @@ class ScenarioData(object):
 							break
 							
 					itemId = item["attrs"]["object_name"]
+					jsonObject["id"] = itemId
 					
 				# Merge object attributes
 				elif (itemId in objects):
@@ -148,14 +89,87 @@ class ScenarioData(object):
 				# No object.json relation
 				elif not (itemId in objects):
 					jsonObject = item["attrs"]
+					
+				jsonObject["classname"] = item["className"]
 				
 				createdObjects[itemId] = jsonObject
 			objectsByCat[objectCategory][objectId] = createdObjects
 			
 		import pprint
 		pp = pprint.PrettyPrinter(indent=4)
-		pp.pprint(objectsByCat)	
+		
+		pp.pprint(objectsByCat)
+		
+		# Create room objects
+		for layer in objectsByCat["room_background"]["background_layer"]:
+			attrs = objectsByCat["room_background"]["background_layer"][layer]
+			roomObject = View.Room(layer)
+			
+			try:
+				roomObject.music = attrs["music"]
+			except:
+				roomObject.music = ""
+				
+			self.roomList.append(roomObject)
+			
+		print("Rooms created:", len(self.roomList))
+		
+		# Create objects from the gathered data		
+		for layer in objectsByCat:		
+			if (layer == "room"):
+				for child in objectsByCat[layer]:
+					
+					currentRoom = self.getRoomById(child[13:])
+					
+					for obj in objectsByCat[layer][child]:
+						obj = objectsByCat[layer][child][obj]
+						
+						#print(obj)
+						#print("\n")
+						objId = obj["id"]
+						
+						if (obj["category"] == "object"):
+							gameObject = Object.Object(obj["id"])
+							
+						# TODO: Secret items - fix it in kiigame first
+						elif (obj["category"] == "item"):
+							gameObject = Object.Item(obj["id"])
+							gameObject.isSecret = False
+							
+						elif (obj["category"] == "container"):
+							gameObject = Object.Container(obj["id"])
+							gameObject.locked = obj["locked"]
+						elif (obj["category"] == "door"):
+							gameObject = Object.Door(obj["id"])
+							
+						elif (obj["category"] == "obstacle"):
+							gameObject = Object.Obstacle(obj["id"])
+							
+						# Common attributes for Objects
+						try:
+							objectName = self.texts[obj["id"]]["name"]
+						except KeyError:
+							objectName = ""
+							
+						gameObject.name = objectName
+						gameObject.image = Object.JSONObject(obj)
+						
+						self.objectList.append(obj)
+						currentRoom.objectList.append(obj)
+						
+			elif (layer == "sequence"):
+				pass
+			elif (layer == "start"):
+				pass
+			elif (layer == "end"):
+				pass
+		print(self.roomList[0])
 		return
+
+	def getRoomById(self, roomId):
+		for room in self.roomList:
+			if room.id == roomId:
+				return room
 
 	def saveScenario(self):
 		return

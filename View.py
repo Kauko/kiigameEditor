@@ -10,9 +10,9 @@ class View(object):
 			self.id = int(randint(0, 1000000000))
 		else:
 			self.id = id
-		self.name = ""
+		#self.name = ""
 		self.music = ""
-		self.type = ""
+		#self.type = "" # TODO: What was the idea of this again?
 
 # Game cutscenes
 class Sequence(View):

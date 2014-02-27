@@ -379,12 +379,13 @@
 			"attrs": {
 				"id": "background_layer",
 				"visible": false,
-				"category": "room"
+				"category": "room_background"
 			},
 			"className": "Layer",
 			"children": [
 				{
 					"attrs": {
+						"category": "room_background",
 						"id": "locker_room_1",
 						"width": 981,
 						"height": 543,
@@ -395,6 +396,7 @@
 					"className": "Image"
 				}, {
 					"attrs": {
+						"category": "room_background",
 						"id": "locker_room_2",
 						"width": 981,
 						"height": 543,
@@ -405,6 +407,7 @@
 					"className": "Image"
 				}, {
 					"attrs": {
+						"category": "room_background",
 						"id": "shower_room",
 						"width": 981,
 						"height": 543,
@@ -415,6 +418,7 @@
 					"className": "Image"
 				}, {
 					"attrs": {
+						"category": "room_background",
 						"id": "wc_1",
 						"width": 981,
 						"height": 543,
@@ -425,6 +429,7 @@
 					"className": "Image"
 				}, {
 					"attrs": {
+						"category": "room_background",
 						"id": "wc_2",
 						"width": 981,
 						"height": 543,
