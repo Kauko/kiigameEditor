@@ -120,12 +120,12 @@ class ScenarioData(object):
 				continue
 			
 			# Go through objects in layers
+			# And check for relation with objects.json objects
 			createdObjects = {}
 			for item in layerChildren:
 				itemId = item["attrs"]["id"]
-				#imageAttributes = {}
 				
-				# Check for relation with objects.json objects
+				# In-attribute relation with images.json objects ("object_name")
 				if ("object_name" in item["attrs"]):
 					jsonObject = objects[item["attrs"]["object_name"]]
 					
@@ -137,8 +137,15 @@ class ScenarioData(object):
 							
 					itemId = item["attrs"]["object_name"]
 					
+				# Merge object attributes
 				elif (itemId in objects):
-					jsonObject = objects[itemId]
+					jsonObject = item["attrs"]
+					tempObject = objects[itemId]
+					
+					for attr in tempObject:
+						jsonObject[attr] = tempObject[attr]
+						
+				# No object.json relation
 				elif not (itemId in objects):
 					jsonObject = item["attrs"]
 				
