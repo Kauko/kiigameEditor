@@ -119,7 +119,7 @@ class ScenarioData(object):
 			if (layer == "room"):
 				for child in objectsByCat[layer]:
 					
-					currentRoom = self.getRoomById(child[13:])
+					currentRoom = self.getRoom(child[13:])
 					
 					for obj in objectsByCat[layer][child]:
 						obj = objectsByCat[layer][child][obj]
@@ -129,33 +129,42 @@ class ScenarioData(object):
 						objId = obj["id"]
 						
 						if (obj["category"] == "object"):
-							gameObject = Object.Object(obj["id"])
+							self.addObject(currentRoom, obj["id"])
+							#gameObject = Object.Object(obj["id"])
 							
 						# TODO: Secret items - fix it in kiigame first
 						elif (obj["category"] == "item"):
-							gameObject = Object.Item(obj["id"])
-							gameObject.isSecret = False
+							self.addItem(currentRoom, obj["id"])
+							#gameObject = Object.Item(obj["id"])
 							
 						elif (obj["category"] == "container"):
-							gameObject = Object.Container(obj["id"])
-							gameObject.locked = obj["locked"]
+							self.addContainer(currentRoom, obj["id"], obj["locked"])
+							#gameObject = Object.Container(obj["id"])
+							#gameObject.locked = obj["locked"]
 						elif (obj["category"] == "door"):
-							gameObject = Object.Door(obj["id"])
+							self.addDoor(currentRoom, obj["id"])
+							#gameObject = Object.Door(obj["id"])
 							
 						elif (obj["category"] == "obstacle"):
-							gameObject = Object.Obstacle(obj["id"])
+							self.addObstacle(currentRoom, obj["id"])
+							#gameObject = Object.Obstacle(obj["id"])
 							
-						# Common attributes for Objects
-						try:
-							objectName = self.texts[obj["id"]]["name"]
-						except KeyError:
-							objectName = ""
-							
-						gameObject.name = objectName
-						gameObject.image = Object.JSONObject(obj)
 						
-						self.objectList.append(obj)
-						currentRoom.objectList.append(obj)
+						# TODO: Better parameters for addX functions
+						# 		General (image, location) and object-specific (name, key, ...)
+						
+						# Common attributes for Objects
+						#try:
+						#	objectName = self.texts[obj["id"]]["name"]
+						#except KeyError:
+						#	objectName = ""
+							
+						# TODO: Name giving
+						#gameObject.name = objectName
+						#gameObject.image = Object.JSONObject(obj)
+						
+						
+						#currentRoom.objectList.append(obj)
 						
 			elif (layer == "sequence"):
 				pass
@@ -163,13 +172,33 @@ class ScenarioData(object):
 				pass
 			elif (layer == "end"):
 				pass
-		print(self.roomList[0])
+		print(self.roomList)
 		return
 
-	def getRoomById(self, roomId):
+	def getRoom(self, roomId):
 		for room in self.roomList:
-			if room.id == roomId:
+			if (room.id == roomId):
 				return room
+
+	def getSequence(self, sequenceId):
+		for sequence in self.sequenceList:
+			if (sequence.id == sequenceId):
+				return sequence
+
+	def getObject(self, objectId):
+		for obj in self.objectList:
+			if (obj.id == objectId):
+				return obj
+
+	def deleteObject(self, objectId):
+		for obj in self.objectList:
+			if obj.id == objectId:
+				self.objectList.remove(obj)
+
+		for room in self.roomList:
+			roomObject = room.getObject(objectId)
+			if (roomObject):
+				room.deleteObject(objectId)
 
 	def saveScenario(self):
 		return
@@ -177,19 +206,48 @@ class ScenarioData(object):
 	def addView(self):
 		return
 
-	def addObject(self):
-		return
+	# Create new generic object
+	def addObject(self, room, objectId):
+		newObject = Object.Object(objectId)
+		
+		self.__appendObject__(newObject, room)
+
+	# Create new item
+	def addItem(self, room, itemId, isSecret=False):
+		newObject = Object.Object(itemId)
+		newObject.isSecret = isSecret
+		
+		self.__appendObject__(newObject, room)
+
+	# Create new container
+	def addContainer(self, room, containerId, isLocked):
+		newObject = Object.Container(containerId)
+		newObject.isLocked = isLocked
+
+		self.__appendObject__(newObject, room)
+
+	# Create new door
+	def addDoor(self, room, doorId):
+		newObject = Object.Door(doorId)
+
+		self.__appendObject__(newObject, room)
+
+	# Create new obstacle
+	def addObstacle(self, room, obstacleId):
+		newObject = Object.Obstacle(obstacleId)
+
+		self.__appendObject__(newObject, room)
+
+	# Add newly created object to this instance's and room's object lists
+	def __appendObject__(self, newObject, room=None):
+		# Object may be created without room
+		if (room):
+			newObject.location = room
+			room.objectList.append(newObject)
+			
+		self.objectList.append(newObject)
 
 	def deleteView(self):
-		return
-
-	def deleteObject(self):
-		return
-
-	def getObject(self):
-		return
-
-	def getView(self):
 		return
 
 	def editObject(self):

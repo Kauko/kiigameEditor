@@ -14,19 +14,19 @@ class Object(object):
 		#self.examine = ""
 		#self.whatBlocks = None
 		self.location = None
-		
+
 # Pickable item
 class Item(Object):
 	def __init__(self, id=None):
 		super(Item, self).__init__(id)
 		#self.pickUpText = ""
-		#self.interaction = None # TODO: Is this obsolete?
+		self.interaction = None
 		self.isSecret = False
 
 class Container(Object):
 	def __init__(self, id=None):
 		super(Container, self).__init__(id)
-		self.locked = False
+		self.isLocked = False
 		self.key = None
 		self.inItem = None
 		self.outItem = None
@@ -37,7 +37,7 @@ class Door(Object):
 		self.closedImage = None
 		self.lockedImage = None
 		self.openImage = None
-		self.locked = False
+		self.isLocked = False
 		self.key = None
 		self.destination = None
 

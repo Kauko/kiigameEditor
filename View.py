@@ -19,6 +19,11 @@ class Sequence(View):
 	def __init__(self, id=None):
 		super(Sequence, self).__init__(id)
 		self.images = []
+		
+	def deleteImage(self, imageId):
+		for image in self.images:
+			if (image.id == imageId):
+				self.images.remove(image)
 
 # Start menu
 class Menu(View):
@@ -36,14 +41,23 @@ class End(View):
 		super(End, self).__init__(id)
 		# TODO: End pictures are stupid
 		# TODO: Before handling that, arrange pictures for UI?
-		self.endPictures = []
-		self.endText = None
+		self.endImages = []
+		#self.endText = None
 		
+	def deleteImage(self, imageId):
+		for image in self.endImages:
+			if (image.id == imageId):
+				self.endImages.remove(image)
+
 # Any game room
 class Room(View):
 	def __init__(self, id=None):
 		super(Room, self).__init__(id)
 		self.objectList = []
 		self.background = None
-		self.comingFrom = []
+		#self.comingFrom = []
 		
+	def deleteObject(self, objectId):
+		for obj in self.objectList:
+			if (obj.id == objectId):
+				self.objectList.remove(obj)
