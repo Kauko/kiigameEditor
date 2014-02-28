@@ -58,22 +58,34 @@ class ScenarioData(object):
 			
 			if not (layerChildren):
 				continue
-			
+				
 			# Go through objects in layers
 			# And check for relation with objects.json objects
 			createdObjects = {}
+			
+			# TODO: Sequence attributes (music, ...)
+			
 			for item in layerChildren:
 				itemId = item["attrs"]["id"]
 				
 				# In-attribute relation with images.json objects ("object_name")
 				if ("object_name" in item["attrs"]):
-					jsonObject = objects[item["attrs"]["object_name"]]
 					
+					# Get the image attributes by its index number
+					if (item["attrs"]["category"] == "sequence"):
+						imageIndex = itemId[len(item["attrs"]["object_name"])+1:]
+						jsonObject = objects[item["attrs"]["object_name"]]["images"][imageIndex]
+						# Insert objects.json attributes to images.json object
+						
+						
 					# Insert images.json object attributes on object.json object
-					for attr in jsonObject:
-						if (jsonObject[attr] == itemId):
-							jsonObject[attr] = item["attrs"]
-							break
+					else:
+						jsonObject = objects[item["attrs"]["object_name"]]
+						
+						for attr in jsonObject:
+							if (jsonObject[attr] == itemId):
+								jsonObject[attr] = item["attrs"]
+								break
 							
 					itemId = item["attrs"]["object_name"]
 					jsonObject["id"] = itemId
@@ -199,23 +211,6 @@ class ScenarioData(object):
 							# TODO: Non-blocking image
 							self.addObstacle(currentRoom, obj["id"], self.texts[blockingImage["id"]]["name"], blockingImage, destination, blockTarget)
 							
-						
-						# TODO: Better parameters for addX functions
-						# 		General (image, location) and object-specific (name, key, ...)
-						
-						# Common attributes for Objects
-						#try:
-						#	objectName = self.texts[obj["id"]]["name"]
-						#except KeyError:
-						#	objectName = ""
-							
-						# TODO: Name giving
-						#gameObject.name = objectName
-						#gameObject.image = Object.JSONObject(obj)
-						
-						
-						#currentRoom.objectList.append(obj)
-						
 			elif (layer == "sequence"):
 				pass
 			elif (layer == "start"):
@@ -253,6 +248,10 @@ class ScenarioData(object):
 	def saveScenario(self):
 		return
 
+	def addSequence(self):
+		newView = View.Sequence()
+		self.sequenceList.append(newView)
+		
 	def addView(self):
 		return
 
@@ -285,6 +284,8 @@ class ScenarioData(object):
 	# Create new container
 	def addContainer(self, room, containerId, isLocked, name="", emptyImg=None, fullImg=None, lockedImg=None, key=None, inItem=None, outItem=None):
 		newObject = Object.Container(containerId)
+		
+		newObject.name = name
 		newObject.isLocked = isLocked
 		newObject.key = key
 		newObject.inItem = inItem

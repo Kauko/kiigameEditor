@@ -251,56 +251,70 @@
 				"id": "intro_layer",
 				"visible": false,
 				"category": "sequence",
-                "object_name": "intro"
+				"object_name": "intro"
 			},
 			"className": "Layer",
 			"children": [
 				{
 					"attrs": {
 						"id": "intro_1",
-						"src": "images/intro_1.png"
+						"src": "images/intro_1.png",
+						"object_name": "intro",
+						"category": "sequence"
 					},
 					"className": "Image"
 				}, {
 					"attrs": {
 						"id": "intro_2",
 						"src": "images/intro_2.png",
-						"visible": false
+						"visible": false,
+						"object_name": "intro",
+						"category": "sequence"
 					},
 					"className": "Image"
 				}, {
 					"attrs": {
 						"id": "intro_3",
 						"src": "images/intro_3.png",
-						"visible": false
+						"visible": false,
+						"object_name": "intro",
+						"category": "sequence"
 					},
 					"className": "Image"
 				}, {
 					"attrs": {
 						"id": "intro_4",
 						"src": "images/intro_4.png",
-						"visible": false
+						"visible": false,
+						"object_name": "intro",
+						"category": "sequence"
 					},
 					"className": "Image"
 				}, {
 					"attrs": {
 						"id": "intro_5",
 						"src": "images/intro_5.png",
-						"visible": false
+						"visible": false,
+						"object_name": "intro",
+						"category": "sequence"
 					},
 					"className": "Image"
 				}, {
 					"attrs": {
 						"id": "intro_6",
 						"src": "images/intro_6.png",
-						"visible": false
+						"visible": false,
+						"object_name": "intro",
+						"category": "sequence"
 					},
 					"className": "Image"
 				}, {
 					"attrs": {
 						"id": "intro_7",
 						"src": "images/black.png",
-						"visible": false
+						"visible": false,
+						"object_name": "intro",
+						"category": "sequence"
 					},
 					"className": "Image"
 				}
@@ -317,7 +331,9 @@
 				{
 					"attrs": {
 						"id": "outro_1",
-						"src": "images/outro_1.png"
+						"src": "images/outro_1.png",
+						"object_name": "outro",
+						"category": "sequence"
 					},
 					"className": "Image"
 				}
