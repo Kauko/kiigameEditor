@@ -49,9 +49,9 @@ class Obstacle(Object):
 		self.blockTarget = ""
 		self.trigger = ""
 
-# Image object
 class JSONImage(object):
 	def __init__(self, attributes):
+		# TODO: What if no ID?
 		self.id = attributes["id"]
 		self.src = attributes["src"]
 		self.x = attributes["x"]
@@ -59,6 +59,14 @@ class JSONImage(object):
 		
 class JSONText(object):
 	def __init__(self, attributes):
+		# TODO: What if no ID?
 		self.id = attributes["id"]
 		self.attributes = attributes
 
+class SequenceImage(object):
+	def __init__(self, id, src, doFade, showTime):
+		# TODO: What if no ID?
+		self.id = id
+		self.src = src
+		self.doFade = doFade
+		self.showTime = showTime

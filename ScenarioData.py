@@ -51,6 +51,8 @@ class ScenarioData(object):
 			for layer in child:
 				if (layer == "children"):
 					layerChildren = child[layer]
+				elif (layer == "attrs"):
+					layerAttrs = child[layer]
 			#print("===\n\n")
 			#print("Here's layer attrs:")
 			#print(layerAttrs)
@@ -63,30 +65,42 @@ class ScenarioData(object):
 			# And check for relation with objects.json objects
 			createdObjects = {}
 			
-			# TODO: Sequence attributes (music, ...)
-			
+			# Insert general sequence attributes
+			#if (layerAttrs["category"] == "sequence"):
+				#sequenceAttrs = objects[layerAttrs["object_name"]]
+				
+				#createdObjects["id"] = layerAttrs["object_name"]
+				#for attr in sequenceAttrs:
+				#	createdObjects[attr] = sequenceAttrs[attr]
+					
+				#for index in sequenceAttrs["images"]:
+				#	print(sequenceAttrs["images"][index])
+				#	sequenceAttrs["images"][index] = sequenceAttrs["images"][index]["id"]
+			#print(createdObjects)
+					
+					
 			for item in layerChildren:
 				itemId = item["attrs"]["id"]
 				
 				# In-attribute relation with images.json objects ("object_name")
 				if ("object_name" in item["attrs"]):
+					jsonObject = objects[item["attrs"]["object_name"]]
 					
-					# Get the image attributes by its index number
-					if (item["attrs"]["category"] == "sequence"):
-						imageIndex = itemId[len(item["attrs"]["object_name"])+1:]
-						jsonObject = objects[item["attrs"]["object_name"]]["images"][imageIndex]
-						# Insert objects.json attributes to images.json object
-						
-						
-					# Insert images.json object attributes on object.json object
-					else:
-						jsonObject = objects[item["attrs"]["object_name"]]
-						
-						for attr in jsonObject:
-							if (jsonObject[attr] == itemId):
-								jsonObject[attr] = item["attrs"]
-								break
+					for attr in jsonObject:
+						if (jsonObject[attr] == itemId):
+							jsonObject[attr] = item["attrs"]
+							break
 							
+					# Add sequence image attributes
+					if (item["attrs"]["category"] == "sequence"):
+						for attr in jsonObject["images"]:
+							print(attr)
+							imageId = jsonObject["images"][attr]["id"]
+							print(imageId, item["attrs"])
+							if (imageId == itemId):
+								# Merge image attribute dicts
+								jsonObject["images"][attr] = dict(list(item["attrs"].items()) + list(jsonObject["images"][attr].items()))
+								
 					itemId = item["attrs"]["object_name"]
 					jsonObject["id"] = itemId
 					
@@ -210,9 +224,28 @@ class ScenarioData(object):
 							
 							# TODO: Non-blocking image
 							self.addObstacle(currentRoom, obj["id"], self.texts[blockingImage["id"]]["name"], blockingImage, destination, blockTarget)
-							
+									
 			elif (layer == "sequence"):
-				pass
+				for child in objectsByCat[layer]:
+					for sequence in objectsByCat[layer][child]:
+						sequence = objectsByCat[layer][child][sequence]
+						
+						sequenceImages = sequence["images"]
+						
+						# End may have no transition
+						# TODO: This is stupid
+						try:
+							sequenceTransition = sequence["transition"]
+						except:
+							sequenceTransition = None
+												
+						try:
+							sequenceMusic = sequence["music"]
+						except KeyError:
+							sequenceMusic = None
+						
+						self.addSequence(sequence["id"], sequenceTransition, sequenceImages, sequenceMusic)
+					
 			elif (layer == "start"):
 				pass
 			elif (layer == "end"):
@@ -247,9 +280,18 @@ class ScenarioData(object):
 
 	def saveScenario(self):
 		return
-
-	def addSequence(self):
-		newView = View.Sequence()
+		
+	def addSequence(self, sequenceId, transition, images, music):
+		newView = View.Sequence(sequenceId)
+		
+		newView.transition = transition
+		newView.music = music
+		
+		# Create image objects for the sequence
+		for i in images:
+			sequenceImage = Object.SequenceImage(images[i]["id"], images[i]["src"], images[i]["do_fade"], images[i]["show_time"])
+			newView.images.append(sequenceImage)
+			
 		self.sequenceList.append(newView)
 		
 	def addView(self):
