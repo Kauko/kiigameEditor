@@ -39,15 +39,15 @@ class Door(Object):
 		self.openImage = None
 		self.isLocked = False
 		self.key = None
-		self.destination = None
+		self.destination = ""
 
 class Obstacle(Object):
 	def __init__(self, id=None):
 		super(Obstacle, self).__init__(id)
 		self.blockingImage = self.image
 		self.unblockingImage = None
-		self.blockTarget = None
-		self.trigger = None
+		self.blockTarget = ""
+		self.trigger = ""
 
 # Image object
 class JSONImage(object):
@@ -57,4 +57,8 @@ class JSONImage(object):
 		self.x = attributes["x"]
 		self.y = attributes["y"]
 		
+class JSONText(object):
+	def __init__(self, attributes):
+		self.id = attributes["id"]
+		self.attributes = attributes
 
