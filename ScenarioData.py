@@ -129,25 +129,44 @@ class ScenarioData(object):
 						objId = obj["id"]
 						
 						if (obj["category"] == "object"):
-							self.addObject(currentRoom, obj["id"])
+							self.addObject(currentRoom, obj["id"], self.texts[objId]["name"])
 							#gameObject = Object.Object(obj["id"])
 							
 						# TODO: Secret items - fix it in kiigame first
 						elif (obj["category"] == "item"):
-							self.addItem(currentRoom, obj["id"])
-							#gameObject = Object.Item(obj["id"])
+							self.addItem(currentRoom, obj["id"], self.texts[objId]["name"])
 							
 						elif (obj["category"] == "container"):
-							self.addContainer(currentRoom, obj["id"], obj["locked"])
-							#gameObject = Object.Container(obj["id"])
-							#gameObject.locked = obj["locked"]
+							emptyImage = obj["empty_image"]
+							fullImage = obj["full_image"]
+							
+							try:
+								lockedImage = obj["locked_image"]
+							except KeyError:
+								lockedImage = None
+							
+							self.addContainer(currentRoom, obj["id"], obj
+							["locked"], self.texts[emptyImage["id"]]["name"], emptyImage, fullImage, lockedImage)
+							
 						elif (obj["category"] == "door"):
-							self.addDoor(currentRoom, obj["id"])
-							#gameObject = Object.Door(obj["id"])
+							openImage = obj["open_image"]
+							
+							try:
+								closedImage = obj["closed_image"]
+							except KeyError:
+								closedImage = None						
+							try:
+								lockedImage = obj["locked_image"]
+							except:
+								lockedImage = None
+							
+							self.addDoor(currentRoom, obj["id"], self.texts[openImage["id"]]["name"], openImage, closedImage, lockedImage)
 							
 						elif (obj["category"] == "obstacle"):
-							self.addObstacle(currentRoom, obj["id"])
-							#gameObject = Object.Obstacle(obj["id"])
+							blockingImage = obj["blocking_image"]
+							
+							# TODO: Non-blocking image
+							self.addObstacle(currentRoom, obj["id"], self.texts[blockingImage["id"]]["name"], blockingImage)
 							
 						
 						# TODO: Better parameters for addX functions
@@ -207,34 +226,74 @@ class ScenarioData(object):
 		return
 
 	# Create new generic object
-	def addObject(self, room, objectId):
+	def addObject(self, room, objectId=None, name="", src=""):
 		newObject = Object.Object(objectId)
+		
+		newObject.id = objectId
+		newObject.name = name
+		newObject.location = room
+		newObject.image = src
 		
 		self.__appendObject__(newObject, room)
 
 	# Create new item
-	def addItem(self, room, itemId, isSecret=False):
+	def addItem(self, room, itemId, isSecret=False, name="", src=""):
 		newObject = Object.Object(itemId)
+		
+		newObject.id = itemId
+		newObject.name = name
 		newObject.isSecret = isSecret
+		newObject.image = src
 		
 		self.__appendObject__(newObject, room)
 
 	# Create new container
-	def addContainer(self, room, containerId, isLocked):
+	def addContainer(self, room, containerId, isLocked, name="", emptyImg=None, fullImg=None, lockedImg=None):
 		newObject = Object.Container(containerId)
 		newObject.isLocked = isLocked
+		
+		print("MRPT",emptyImg)
+		if (emptyImg):
+			newObject.emptyImage = Object.JSONImage(emptyImg)
+		
+		if (fullImg):
+			newObject.fullImage = Object.JSONImage(fullImg)
+			
+		if (lockedImg):
+			newObject.lockedImage = Object.JSONImage(lockedImg)
 
 		self.__appendObject__(newObject, room)
 
 	# Create new door
-	def addDoor(self, room, doorId):
+	def addDoor(self, room, doorId, name="", openImg=None, closedImg=None, lockedImg=None):
 		newObject = Object.Door(doorId)
-
+		
+		newObject.id = doorId
+		newObject.name = name
+		
+		if (openImg):
+			newObject.openImage = Object.JSONImage(openImg)
+			
+		if (closedImg):
+			newObject.closedImage = Object.JSONImage(closedImg)
+			
+		if (lockedImg):
+			newObject.lockedImage = Object.JSONImage(lockedImg)
+					
 		self.__appendObject__(newObject, room)
 
 	# Create new obstacle
-	def addObstacle(self, room, obstacleId):
+	def addObstacle(self, room, obstacleId, name=None, blockingImg=None, unblockingImg=None):
 		newObject = Object.Obstacle(obstacleId)
+		
+		newObject.id = obstacleId
+		newObject.name = name
+		
+		if (blockingImg):
+			newObject.blockingImage = Object.JSONImage(blockingImg)
+			
+		if (unblockingImg):
+			newObject.unblockingImage = Object.JSONImage(unblockingImg)
 
 		self.__appendObject__(newObject, room)
 

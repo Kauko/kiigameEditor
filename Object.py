@@ -9,7 +9,7 @@ class Object(object):
 			self.id = int(randint(0, 1000000000))
 		else:
 			self.id = id
-		#self.name = ""
+		self.name = ""
 		self.image = None
 		#self.examine = ""
 		#self.whatBlocks = None
@@ -49,14 +49,12 @@ class Obstacle(Object):
 		self.blockTarget = None
 		self.trigger = None
 
-# Objects derived from JSON
-class JSONObject(object):
+# Image object
+class JSONImage(object):
 	def __init__(self, attributes):
-		self.imageAttributes = attributes
-		
-		self.className = attributes["classname"]
-		attributes.pop("classname", None)
-		
 		self.id = attributes["id"]
-		attributes.pop("id", None)
+		self.src = attributes["src"]
+		self.x = attributes["x"]
+		self.y = attributes["y"]
 		
+
