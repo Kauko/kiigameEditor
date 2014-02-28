@@ -27,22 +27,22 @@ class Sequence(View):
 
 # Start menu
 class Menu(View):
-	def __init__(self, id=None):
-		super(Menu, self).__init__(id)
+	def __init__(self, beginningImage, background, startButton, creditsButton, emptyButton):
+		super(Menu, self).__init__("start")
+		self.beginningImage = None
 		self.background = None
 		self.startButton = None
 		self.creditsButton = None
 		self.emptyButton = None
-		self.startImage = None
 
 # End menu
 class End(View):
-	def __init__(self, id=None):
-		super(End, self).__init__(id)
+	def __init__(self, endText, endImages):
+		super(End, self).__init__("end")
 		# TODO: End pictures are stupid
 		# TODO: Before handling that, arrange pictures for UI?
-		self.endImages = []
-		#self.endText = None
+		self.endImages = endImages
+		self.endText = endText
 		
 	def deleteImage(self, imageId):
 		for image in self.endImages:

@@ -247,9 +247,16 @@ class ScenarioData(object):
 						self.addSequence(sequence["id"], sequenceTransition, sequenceImages, sequenceMusic)
 					
 			elif (layer == "start"):
-				pass
+				for child in objectsByCat[layer]:
+					start = objectsByCat[layer][child]
+					self.addMenu(start["begining"], start["start"], start["start_game"], start["start_credits"], start["start_empty"])
+					
 			elif (layer == "end"):
-				pass
+				endText = objectsByCat[layer]["end_layer"].pop("rewards_text", None)
+				endImages = list(objectsByCat[layer]["end_layer"].values())
+				
+				self.addEnd(endText, endImages)
+				
 		print(self.roomList)
 		return
 
@@ -280,6 +287,21 @@ class ScenarioData(object):
 
 	def saveScenario(self):
 		return
+	
+	def addEnd(self, endText, endImages):
+		newView = View.End(endText, endImages)
+		self.endView = newView
+		
+	def addMenu(self, beginningImage, background, startButton, creditsButton, emptyButton):
+		beginningImage = Object.JSONImage(beginningImage)
+		background = Object.JSONImage(background)
+		startButton = Object.JSONImage(startButton)
+		creditsButton = Object.JSONImage(creditsButton)
+		emptyButton = Object.JSONImage(emptyButton)
+		
+		newView = View.Menu(beginningImage, background, startButton, creditsButton, emptyButton)
+		
+		self.menuView = newView
 		
 	def addSequence(self, sequenceId, transition, images, music):
 		newView = View.Sequence(sequenceId)

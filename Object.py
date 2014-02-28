@@ -54,8 +54,17 @@ class JSONImage(object):
 		# TODO: What if no ID?
 		self.id = attributes["id"]
 		self.src = attributes["src"]
-		self.x = attributes["x"]
-		self.y = attributes["y"]
+		
+		# TODO: This is stupid
+		try:
+			self.x = attributes["x"]
+		except KeyError:
+			self.x = 0
+			
+		try:
+			self.y = attributes["y"]
+		except KeyError:
+			self.y = 0
 		
 class JSONText(object):
 	def __init__(self, attributes):
@@ -70,3 +79,4 @@ class SequenceImage(object):
 		self.src = src
 		self.doFade = doFade
 		self.showTime = showTime
+		
