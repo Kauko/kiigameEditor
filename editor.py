@@ -73,8 +73,7 @@ class Editor(QtGui.QMainWindow):
 		# Display room image
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
-		
-		pixmap = QtGui.QPixmap("graphics/intro_5.png")
+		pixmap = QtGui.QPixmap("graphics/intro_5.png").scaled(1024, 534, QtCore.Qt.KeepAspectRatio)
 		scene.addPixmap(pixmap)
 		
 		left_frame_layout.addWidget(view)
@@ -117,8 +116,8 @@ class SettingsWidget(QtGui.QWidget):
 		super(SettingsWidget, self).__init__(parent)
 
 		# For testing the different options:
-		#self.showObjectOptions()
-		self.showRoomOptions()
+		self.showObjectOptions()
+		#self.showRoomOptions()
 		
 	#Settings for the object view
 	#TODO: Reduce redundancy; similar settings layout, "Name", "Picture" etc., are defined many times
@@ -142,6 +141,8 @@ class SettingsWidget(QtGui.QWidget):
 		
 		#TODO: Find some kind of splitter thing for this in Qt, for better labeling
 		pickupLabel = QtGui.QLabel("Poiminta")
+		pickupLabelLine = QtGui.QLabel("")
+		pickupLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		
 		pickupTextLabel = QtGui.QLabel("Teksti poimittaessa:")
 		pickupTextEdit = QtGui.QTextEdit("Mitahan tama taalla tekee?")
@@ -158,6 +159,8 @@ class SettingsWidget(QtGui.QWidget):
 		
 		#TODO: Same as with pickupLabel
 		useLabel = QtGui.QLabel("Kaytto")
+		useLabelLine = QtGui.QLabel("")
+		useLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		useTypeCombo = QtGui.QComboBox(self)
 		#TODO: Change according to what is chosen here
 		useTypeCombo.addItem("Ei kayttoa")
@@ -182,17 +185,19 @@ class SettingsWidget(QtGui.QWidget):
 		layout.addWidget(imgLabel, 1, 1, 2, 2)
 		layout.addWidget(clickTextLabel, 4, 0)
 		layout.addWidget(clickTextEdit, 4, 1)
-		layout.addWidget(pickupLabel, 5, 0)
-		layout.addWidget(pickupTextLabel, 6, 0)
-		layout.addWidget(pickupTextEdit, 6, 1)
-		layout.addWidget(pickupBlockLabel, 7, 0)
-		layout.addWidget(pickupBlockCombo, 7, 1)
-		layout.addWidget(useLabel, 8, 0)
-		layout.addWidget(useTypeCombo, 9, 1)
-		layout.addWidget(useTargetCombo, 10, 1)
-		layout.addWidget(useTextLabel, 11, 0)
-		layout.addWidget(useTextEdit, 11, 1)
-		layout.addWidget(allTextsButton, 12, 1)
+		layout.addWidget(pickupLabelLine, 5, 0, 1, 2)
+		layout.addWidget(pickupLabel, 6, 0)
+		layout.addWidget(pickupTextLabel, 7, 0)
+		layout.addWidget(pickupTextEdit, 7, 1)
+		layout.addWidget(pickupBlockLabel, 8, 0)
+		layout.addWidget(pickupBlockCombo, 8, 1)
+		layout.addWidget(useLabelLine, 9, 0, 1, 2)
+		layout.addWidget(useLabel, 10, 0)
+		layout.addWidget(useTypeCombo, 11, 1)
+		layout.addWidget(useTargetCombo, 12, 1)
+		layout.addWidget(useTextLabel, 13, 0)
+		layout.addWidget(useTextEdit, 13, 1)
+		layout.addWidget(allTextsButton, 14, 1)
 		
 	
 	#Settings for the room view
