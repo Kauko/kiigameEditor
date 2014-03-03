@@ -73,7 +73,7 @@ class Editor(QtGui.QMainWindow):
 		# Display room image
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
-		pixmap = QtGui.QPixmap("graphics/intro_5.png").scaled(1024, 534, QtCore.Qt.KeepAspectRatio)
+		pixmap = QtGui.QPixmap("gamedata/kiigame/images/intro_5.png").scaled(1024, 534, QtCore.Qt.KeepAspectRatio)
 		scene.addPixmap(pixmap)
 		
 		left_frame_layout.addWidget(view)
@@ -99,7 +99,7 @@ class RoomWidget(QtGui.QWidget):
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
 		
-		pixmap = QtGui.QPixmap("graphics/character_panic.png")
+		pixmap = QtGui.QPixmap("gamedata/kiigame/images/character_panic.png")
 		scene.addPixmap(pixmap)
 		
 		layout.addWidget(view)
@@ -131,7 +131,7 @@ class SettingsWidget(QtGui.QWidget):
 		nameEdit = QtGui.QLineEdit("Nalle1")
 		# Object image
 		imgTextLabel = QtGui.QLabel("Kuva")
-		imgPixmap = QtGui.QPixmap("graphics/teddybear.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		imgPixmap = QtGui.QPixmap("gamedata/kiigame/images/teddybear.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		imgLabel = QtGui.QLabel(self)
 		imgLabel.setPixmap(imgPixmap)
 
@@ -139,7 +139,6 @@ class SettingsWidget(QtGui.QWidget):
 		clickTextEdit = QtGui.QTextEdit("Sopo nalle etc.")
 		clickTextEdit.setMaximumHeight(50)
 		
-		#TODO: Find some kind of splitter thing for this in Qt, for better labeling
 		pickupLabel = QtGui.QLabel("Poiminta")
 		pickupLabelLine = QtGui.QLabel("")
 		pickupLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
@@ -157,7 +156,6 @@ class SettingsWidget(QtGui.QWidget):
 		pickupBlockCombo.addItem(obstacleIcon, "Morko2")
 		pickupBlockCombo.addItem(obstacleIcon, "Morko3")
 		
-		#TODO: Same as with pickupLabel
 		useLabel = QtGui.QLabel("Kaytto")
 		useLabelLine = QtGui.QLabel("")
 		useLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
@@ -212,7 +210,7 @@ class SettingsWidget(QtGui.QWidget):
 		nameEdit = QtGui.QLineEdit("Huone1")
 		# Room image
 		imgTextLabel = QtGui.QLabel("Kuva")
-		imgPixmap = QtGui.QPixmap("graphics/shower_room.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		imgPixmap = QtGui.QPixmap("gamedata/kiigame/images/shower_room.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		imgLabel = QtGui.QLabel(self)
 		imgLabel.setPixmap(imgPixmap)
 

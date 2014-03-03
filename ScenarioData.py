@@ -12,7 +12,7 @@ class ScenarioData(object):
 		self.characterImages = []
 		self.menuView = None
 		self.endView = None
-		self.dataDir = "gamedata"
+		self.dataDir = "gamedata/kiigame"
 
 	# Load and parse game data files
 	def loadScenario(self):
