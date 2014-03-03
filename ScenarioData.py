@@ -65,20 +65,6 @@ class ScenarioData(object):
 			# And check for relation with objects.json objects
 			createdObjects = {}
 			
-			# Insert general sequence attributes
-			#if (layerAttrs["category"] == "sequence"):
-				#sequenceAttrs = objects[layerAttrs["object_name"]]
-				
-				#createdObjects["id"] = layerAttrs["object_name"]
-				#for attr in sequenceAttrs:
-				#	createdObjects[attr] = sequenceAttrs[attr]
-					
-				#for index in sequenceAttrs["images"]:
-				#	print(sequenceAttrs["images"][index])
-				#	sequenceAttrs["images"][index] = sequenceAttrs["images"][index]["id"]
-			#print(createdObjects)
-					
-					
 			for item in layerChildren:
 				itemId = item["attrs"]["id"]
 				
@@ -284,10 +270,7 @@ class ScenarioData(object):
 			roomObject = room.getObject(objectId)
 			if (roomObject):
 				room.deleteObject(objectId)
-
-	def saveScenario(self):
-		return
-	
+					
 	def addEnd(self, endText, endImages):
 		newView = View.End(endText, endImages)
 		self.endView = newView
@@ -315,9 +298,6 @@ class ScenarioData(object):
 			newView.images.append(sequenceImage)
 			
 		self.sequenceList.append(newView)
-		
-	def addView(self):
-		return
 
 	# Create new generic object
 	def addObject(self, room, objectId=None, name="", src=""):
@@ -422,5 +402,9 @@ class ScenarioData(object):
 	def editUse(self):
 		return
 
+	def saveScenario(self):
+		return
+
 sc = ScenarioData()
 sc.loadScenario()
+
