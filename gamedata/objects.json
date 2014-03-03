@@ -1,0 +1,222 @@
+{
+	"start_layer": {
+		"category": "start",
+	    "music": "audio/alku_musax_mono_20131213.mp3"
+	},
+	"locker_room_1": {
+		"category": "room_background",
+	    "music": "audio/alku_musax_mono_20131213.mp3"
+	},
+	"locker_room_2": {
+		"category": "room_background",
+	    "music": "audio/loppu_musax_mono_20131213.mp3"
+	},
+	"shower_room": {
+		"category": "room_background",
+	    "music": "audio/alku_musax_mono_20131213.mp3"
+	},
+	"jacket": {
+        "category": "container",
+        "full_image": "jacket_full",
+        "empty_image": "jacket_empty",
+        "in": "dnaanalyzer",
+        "out": "dnaanalyzer",
+        "state": "full",
+        "locked": false,
+        "blocked": false
+    },
+    "locker": {
+        "category": "container",
+        "full_image": "locker_open",
+        "empty_image": "locker_empty",
+        "locked_image": "locker_closed",
+        "out": "airfreshener",
+        "state": "full",
+        "key": "teddybear_chewinggum",
+        "locked": true,
+        "blocked": false
+    },
+    "garbagecan": {
+        "category": "container",
+        "full_image": "garbagecan_teddy",
+        "empty_image": "garbagecan",
+        "in": "teddybear",
+        "out": "teddybear_chewinggum",
+        "state": "empty",
+        "locked": false,
+        "blocked": false
+    },
+	"stinking_wc_door":	{
+		"closed_image": "locker_room_1_door_to_wc_closed",
+		"locked_image": "locker_room_1_door_to_wc_stinking",
+		"open_image": "locker_room_1_door_to_wc_open",
+		"category": "door",
+		"locked": true,
+		"blocked": false,
+		"state": "closed",
+		"key": "airfreshener",
+		"transition": "wc_1"
+	},
+    "locker_room_1_shower_door": {
+		"closed_image": "locker_room_1_door_to_shower_closed",
+		"open_image": "locker_room_1_door_to_shower_open",
+		"category": "door",
+        "locked": false,
+		"blocked": false,
+		"state": "closed",
+		"transition": "shower_room"
+    },
+    "locker_room_2_wc_door": {
+		"closed_image": "locker_room_2_door_to_wc_closed",
+		"open_image": "locker_room_2_door_to_wc_open",
+		"category": "door",
+        "locked": false,
+		"blocked": false,
+		"state": "closed",
+		"transition": "wc_2"
+    },
+    "locker_room_2_shower_door": {
+		"open_image": "locker_room_2_door_to_shower",
+		"category": "door",
+        "locked": false,
+		"blocked": false,
+		"state": "open",
+		"transition": "shower_room"
+    },
+    "shower_door_to_locker_room_1": {
+		"open_image": "shower_door_to_locker_room_1",
+		"category": "door",
+        "locked": false,
+		"blocked": false,
+		"state": "open",
+		"transition": "locker_room_1"
+    },
+	"shower_door_to_locker_room_2":	{
+    	"blocked_image": "shower_door_to_locker_room_2_blocked",
+		"closed_image": "shower_door_to_locker_room_2_closed",
+		"open_image": "shower_door_to_locker_room_2_open",
+		"category": "door",
+		"locked": false,
+		"blocked": true,
+		"state": "closed",
+		"transition": "locker_room_2"
+	},
+    "wc_1_door_to_locker_room_1": {
+		"open_image": "wc_1_door_to_locker_room_1",
+		"category": "door",
+        "locked": false,
+		"blocked": false,
+		"state": "open",
+		"transition": "locker_room_1"
+    },
+    "wc_2_door_to_locker_room_2": {
+		"open_image": "wc_2_door_to_locker_room_2",
+		"category": "door",
+        "locked": false,
+		"blocked": false,
+		"state": "open",
+		"transition": "locker_room_2"
+    },
+    "oikotie_onneen": {
+    	"open_image": "oikotie",
+        "category": "door",
+        "locked": false,
+        "blocked": false,
+        "state": "open",
+        "transition": "locker_room_1"
+    },
+    "oikotie_locker_room2": {
+    	"open_image": "oikotie_locker_room2",
+        "category": "door",
+        "locked": false,
+        "blocked": false,
+        "state": "open",
+        "transition": "locker_room_2"
+    },
+    "cieni": {
+    	"category": "obstacle",
+		"blocking": true,
+		"target": "shower_door_to_locker_room_2",
+		"trigger": "cienibang",
+		"blocking_image": "cieni"
+    },
+    "tactic_board_wiper": {
+    	"category": "item",
+        "trigger": "tactic_board_1",
+        "outcome": "tactic_board_2"
+    },
+    "marker": {
+    	"category": "item",
+    	"trigger": "tactic_board_2",
+        "outcome": "tactic_board_3"
+    },
+    "cienibang": {
+        "category": "item",
+        "trigger": "cieni",
+		"outcome": "shower_door_to_locker_room_2_closed"
+    },
+    "poster_withglue": {
+        "category": "item",
+		"trigger": "wall",
+		"outcome": "poster_onthewall"
+    },
+    "hairkeeper": {
+        "category": "item",
+    	"trigger": "poster_withoutglue",
+        "outcome": "poster_withglue"
+    },
+    "intro": {
+    	"category": "sequence",
+        "transition": "locker_room_1",
+        "music": "audio/intro_mono_20131213.mp3",
+        "images": {
+        	"1": {
+            	"id": "intro_1",
+                "show_time": 4000,
+                "do_fade": true
+            },
+            "2": {
+            	"id": "intro_2",
+                "show_time": 5000,
+                "do_fade": true
+            },
+            "3": {
+            	"id": "intro_3",
+                "show_time": 4500,
+                "do_fade": true
+            },
+            "4": {
+            	"id": "intro_4",
+                "show_time": 1000,
+                "do_fade": false
+            },
+            "5": {
+            	"id": "intro_5",
+                "show_time": 1000,
+                "do_fade": false
+            },
+            "6": {
+            	"id": "intro_6",
+                "show_time": 1000,
+                "do_fade": false
+            },
+            "7": {
+            	"id": "intro_7",
+                "show_time": 1000,
+                "do_fade": false
+            }
+        }
+    },
+    "outro": {
+    	"category": "sequence",
+    	"music": "audio/loppu_musax_mono_20131213.mp3",
+        "images": {
+        	"1": {
+            	"id": "outro_1",
+                "show_time": 4000,
+                "do_fade": true
+            }
+        }
+    }
+}
+
