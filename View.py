@@ -61,3 +61,4 @@ class Room(View):
 		for obj in self.objectList:
 			if (obj.id == objectId):
 				self.objectList.remove(obj)
+				

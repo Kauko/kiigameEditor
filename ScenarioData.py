@@ -1,4 +1,4 @@
-# -*- coding: cp1252 -*-
+# -*- coding: UTF-8 -*-
 
 import json
 import View, Object
@@ -12,12 +12,13 @@ class ScenarioData(object):
 		self.characterImages = []
 		self.menuView = None
 		self.endView = None
-		self.dataDir = "gamedata/kiigame"
+		self.dataDir = "gamedata"
 
 	# Load and parse game data files
 	def loadScenario(self):
 		self.parseTexts()
 		self.parseImages()
+		self.createInteractions()
 		
 	def parseTexts(self):
 		with open(self.dataDir + "/texts.json", encoding='utf-8') as f:
@@ -80,9 +81,8 @@ class ScenarioData(object):
 					# Add sequence image attributes
 					if (item["attrs"]["category"] == "sequence"):
 						for attr in jsonObject["images"]:
-							print(attr)
 							imageId = jsonObject["images"][attr]["id"]
-							print(imageId, item["attrs"])
+							
 							if (imageId == itemId):
 								# Merge image attribute dicts
 								jsonObject["images"][attr] = dict(list(item["attrs"].items()) + list(jsonObject["images"][attr].items()))
@@ -109,7 +109,6 @@ class ScenarioData(object):
 			
 		import pprint
 		pp = pprint.PrettyPrinter(indent=4)
-		
 		pp.pprint(objectsByCat)
 		
 		# Create room objects
@@ -127,7 +126,7 @@ class ScenarioData(object):
 		print("Rooms created:", len(self.roomList))
 		
 		# Create objects from the gathered data		
-		for layer in objectsByCat:		
+		for layer in objectsByCat:
 			if (layer == "room"):
 				for child in objectsByCat[layer]:
 					
@@ -148,7 +147,16 @@ class ScenarioData(object):
 							
 						# TODO: Secret items - fix it in kiigame first
 						elif (obj["category"] == "item"):
-							self.addItem(currentRoom, obj["id"], self.texts[objId]["name"], obj["src"])
+							try:
+								itemTrigger = obj["trigger"]
+							except KeyError:
+								itemTrigger = None
+							try:
+								itemOutcome = obj["outcome"]
+							except KeyError:
+								itemOutcome = None
+								
+							self.addItem(currentRoom, obj["id"], self.texts[objId]["name"], obj["src"], itemTrigger=itemTrigger, itemOutcome=itemOutcome)
 							
 						elif (obj["category"] == "container"):
 							emptyImage = obj["empty_image"]
@@ -209,7 +217,7 @@ class ScenarioData(object):
 								trigger = ""
 							
 							# TODO: Non-blocking image
-							self.addObstacle(currentRoom, obj["id"], self.texts[blockingImage["id"]]["name"], blockingImage, destination, blockTarget)
+							self.addObstacle(currentRoom, obj["id"], self.texts[blockingImage["id"]]["name"], blockingImage, destination, blockTarget, trigger)
 									
 			elif (layer == "sequence"):
 				for child in objectsByCat[layer]:
@@ -244,8 +252,40 @@ class ScenarioData(object):
 				self.addEnd(endText, endImages)
 				
 		print(self.roomList)
-		return
-
+		
+	# Add interactions for pickable items
+	def createInteractions(self):
+		for item in self.objectList:
+			if (type(item) != Object.Item):
+				continue
+				
+			# Get other items with this item as their target
+			for target in self.objectList:
+				#print("    ",target.id)
+				targetType = type(target)
+				
+				# Set trigger types
+				if (targetType == Object.Item):
+					if (target.interaction.triggerTarget == item.id):
+						item.interaction.setTriggerType("triggerTo", 
+						target.id, target.interaction.triggerOutcome)
+						
+				elif (targetType == Object.Container):
+					if (target.key == item.id):
+						item.interaction.setTriggerType("keyTo", target.id)
+					elif (target.inItem == item.id):
+						item.interaction.setTriggerType("goesInto", target.id)
+					elif (target.outItem == item.id):
+						item.interaction.comesFrom = target.id
+						
+				elif (targetType == Object.Door):
+					if (target.key == item.id):
+						item.interaction.setTriggerType("keyTo", target.id)
+						
+				elif (targetType == Object.Obstacle):
+					if (target.trigger == item.id):
+						item.interaction.setTriggerType("triggerTo", target.id)
+					
 	def getRoom(self, roomId):
 		for room in self.roomList:
 			if (room.id == roomId):
@@ -303,7 +343,6 @@ class ScenarioData(object):
 	def addObject(self, room, objectId=None, name="", src=""):
 		newObject = Object.Object(objectId)
 		
-		newObject.id = objectId
 		newObject.name = name
 		newObject.image = src
 		
@@ -315,10 +354,14 @@ class ScenarioData(object):
 		self.__appendObject__(newObject, room)
 
 	# Create new item
-	def addItem(self, room, itemId, isSecret=False, name="", src=""):
-		newObject = Object.Object(itemId)
+	def addItem(self, room, itemId, name="", src="", isSecret=False, itemTrigger=None, itemOutcome=None):
+		interaction = Object.Interaction()
 		
-		newObject.id = itemId
+		if (itemTrigger):
+			interaction.setTriggerType("triggerTo", itemTrigger, itemOutcome)
+			
+		newObject = Object.Item(itemId, interaction)
+		
 		newObject.name = name
 		newObject.isSecret = isSecret
 		newObject.image = src
@@ -350,7 +393,6 @@ class ScenarioData(object):
 	def addDoor(self, room, doorId, isLocked, name="", openImg=None, closedImg=None, lockedImg=None, key=None, destination=""):
 		newObject = Object.Door(doorId)
 		
-		newObject.id = doorId
 		newObject.name = name
 		newObject.isLocked = isLocked
 		newObject.key = key
@@ -370,8 +412,6 @@ class ScenarioData(object):
 	# Create new obstacle
 	def addObstacle(self, room, obstacleId, name=None, blockingImg=None, unblockingImg=None, blockTarget="", trigger=""):
 		newObject = Object.Obstacle(obstacleId)
-		
-		newObject.id = obstacleId
 		newObject.name = name
 		newObject.blockTarget = blockTarget
 		newObject.trigger = trigger
@@ -381,18 +421,18 @@ class ScenarioData(object):
 			
 		if (unblockingImg):
 			newObject.unblockingImage = Object.JSONImage(unblockingImg)
-
+			
 		self.__appendObject__(newObject, room)
 
 	# Add newly created object to this instance's and room's object lists
 	def __appendObject__(self, newObject, room=None):
-		# Object may be created without room
+		# Object may be created without a room
 		if (room):
 			newObject.location = room
 			room.objectList.append(newObject)
 			
 		self.objectList.append(newObject)
-
+		
 	def deleteView(self):
 		return
 
