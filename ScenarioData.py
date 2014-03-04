@@ -76,30 +76,10 @@ class ScenarioData(object):
 					relatedObject = objects[item["attrs"]["object_name"]]
 					relatedObject["id"] = item["attrs"]["object_name"]
 					jsonObject = {}
-					#jsonObject = objects[item["attrs"]["object_name"]]
-					#for attr in jsonObject:
-					#	if (jsonObject[attr] == itemId):
-					#		jsonObject[attr] = item["attrs"]
-					#		break
-							
-					# Add sequence image attributes
-					#if (item["attrs"]["category"] == "sequence"):
-					#	for attr in jsonObject["images"]:
-					#		imageId = jsonObject["images"][attr]["id"]
-					#
-					#		if (imageId == itemId):
-					#			# Merge image attribute dicts
-					#			jsonObject["images"][attr] = dict(list(item["attrs"].items()) + list(jsonObject["images"][attr].items()))
-								
-					#itemId = item["attrs"]["object_name"]
-					#jsonObject["id"] = itemId
 					
 				# Merge object attributes
 				elif (itemId in objects):
 					jsonObject = objects[itemId]
-					
-					#for attr in tempObject:
-					#	jsonObject[attr] = tempObject[attr]
 						
 				# No object.json relation
 				elif not (itemId in objects):
@@ -108,7 +88,6 @@ class ScenarioData(object):
 				jsonImage["classname"] = item["className"]
 
 				if (len(relatedObject) != 0):
-					print("RELATED", relatedObject)
 					createdObjects[relatedObject["id"]] = {"object": relatedObject, "image": {}}
 
 				createdObjects[itemId] = {}
@@ -123,14 +102,11 @@ class ScenarioData(object):
 		
 		# Create room objects
 		for layer in objectsByCat["room_background"]["background_layer"]:
-			attrs = objectsByCat["room_background"]["background_layer"][layer]
-			roomObject = View.Room(layer)
+			room = objectsByCat["room_background"]["background_layer"][layer]
+			viewAttributes = room["object"]
+			imageAttributes = room["image"]
 			
-			try:
-				roomObject.music = attrs["music"]
-			except:
-				roomObject.music = ""
-				
+			roomObject = View.Room(viewAttributes, imageAttributes)
 			self.roomList.append(roomObject)
 			
 		print("Rooms created:", len(self.roomList))
@@ -179,15 +155,16 @@ class ScenarioData(object):
 				for child in objectsByCat[layer]:
 					imageAttributes = []
 					for sequence in objectsByCat[layer][child]:
-						sequence = objectsByCat[layer][child][sequence]
+						sequenceAttrs = objectsByCat[layer][child][sequence]
 						
 						# Object
-						if (len(sequence["image"]) == 0):
-							objectAttributes = sequence["object"]
+						if (len(sequenceAttrs["image"]) == 0):
+							objectAttributes = sequenceAttrs["object"]
+							objectAttributes["id"] = sequence
 						# Images
 						else:
-							imageAttributes.append(sequence["image"])
-						
+							imageAttributes.append(sequenceAttrs["image"])
+							
 					self.addSequence(objectAttributes, imageAttributes)
 			elif (layer == "start"):
 				start = objectsByCat[layer]["start_layer"]
@@ -269,11 +246,7 @@ class ScenarioData(object):
 		self.endView = newView
 		
 	def addMenu(self, beginningImage, background, startButton, creditsButton, emptyButton):
-		beginningImage = Object.JSONImage(beginningImage)
-		background = Object.JSONImage(background)
-		startButton = Object.JSONImage(startButton)
-		creditsButton = Object.JSONImage(creditsButton)
-		emptyButton = Object.JSONImage(emptyButton)
+
 		
 		newView = View.Menu(beginningImage, background, startButton, creditsButton, emptyButton)
 		
@@ -281,92 +254,35 @@ class ScenarioData(object):
 		
 	def addSequence(self, objectAttributes, imageAttributes):
 		newView = View.Sequence(objectAttributes, imageAttributes)
-			
 		self.sequenceList.append(newView)
 
 	# Create new generic object
 	def addObject(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Object(objectAttributes, imageAttributes)
-		
-		#newObject.name = name
-		#newObject.image = src
-		
+		newObject = Object.Object(room, objectAttributes, imageAttributes)
 		self.__appendObject__(newObject, room)
 
 	def addText(self, room, objectAttributes):
 		newObject = Object.JSONText(objectAttributes)
-		
 		self.__appendObject__(newObject, room)
 
 	# Create new item
 	def addItem(self, room, objectAttributes, imageAttributes):
-		#interaction = Object.Interaction()
-		
-		#if (itemTrigger):
-		#	interaction.setTriggerType("triggerTo", itemTrigger, itemOutcome)
-			
-		newObject = Object.Item(objectAttributes, imageAttributes)
-		
-		#newObject.name = name
-		#newObject.isSecret = isSecret
-		#newObject.image = src
-		
+		newObject = Object.Item(room, objectAttributes, imageAttributes)
 		self.__appendObject__(newObject, room)
 
 	# Create new container
 	def addContainer(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Container(objectAttributes, imageAttributes)
-		
-		#newObject.name = name
-		#newObject.isLocked = isLocked
-		#newObject.key = key
-		#newObject.inItem = inItem
-		#newObject.outItem = outItem
-		
-		#if (emptyImg):
-		#	newObject.emptyImage = Object.JSONImage(emptyImg)
-		
-		#if (fullImg):
-		#	newObject.fullImage = Object.JSONImage(fullImg)
-			
-		#if (lockedImg):
-		#	newObject.lockedImage = Object.JSONImage(lockedImg)
-
+		newObject = Object.Container(room, objectAttributes, imageAttributes)
 		self.__appendObject__(newObject, room)
 
 	# Create new door
 	def addDoor(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Door(objectAttributes, imageAttributes)
-		
-		#newObject.name = name
-		#newObject.isLocked = isLocked
-		#newObject.key = key
-		#newObject.destination = destination
-		
-		#if (openImg):
-		#	newObject.openImage = Object.JSONImage(openImg)
-			
-		#if (closedImg):
-		#	newObject.closedImage = Object.JSONImage(closedImg)
-			
-		#if (lockedImg):
-		#	newObject.lockedImage = Object.JSONImage(lockedImg)
-					
+		newObject = Object.Door(room, objectAttributes, imageAttributes)	
 		self.__appendObject__(newObject, room)
 
 	# Create new obstacle
 	def addObstacle(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Obstacle(objectAttributes, imageAttributes)
-		#newObject.name = name
-		#newObject.blockTarget = blockTarget
-		#newObject.trigger = trigger
-		
-		#if (blockingImg):
-		#	newObject.blockingImage = Object.JSONImage(blockingImg)
-			
-		#if (unblockingImg):
-		#	newObject.unblockingImage = Object.JSONImage(unblockingImg)
-			
+		newObject = Object.Obstacle(room, objectAttributes, imageAttributes)
 		self.__appendObject__(newObject, room)
 
 	# Add newly created object to this instance's and room's object lists

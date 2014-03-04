@@ -1,44 +1,40 @@
 from random import randint
 
-# TODO: "None" attributes should be objects, not strings?
-
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
-	def __init__(self, objectAttributes, imageAttributes):
+	def __init__(self, room, objectAttributes, imageAttributes):
 		# TODO: Check id collision, "running" id instead of randint?
 		#		Static ID counter?
-		#if not (id):
-		#	self.id = int(randint(0, 1000000000))
-		#else:
-		#	self.id = id
-		#self.name = ""
-		#self.image = None
-		#self.examine = ""
+		if ("id" in objectAttributes):
+			self.id = objectAttributes["id"]
+		else:
+			self.id = int(randint(0, 1000000000))
+			
 		#self.whatBlocks = None # TODO: In interaction instead?
-		self.location = None
+		self.location = room
 		self.image = JSONImage(imageAttributes)
 		self.objectAttributes = objectAttributes
 
 # Pickable item
 class Item(Object):
-	def __init__(self, objectAttributes, imageAttributes):
-		super(Item, self).__init__(objectAttributes, imageAttributes)
+	def __init__(self, room, objectAttributes, imageAttributes):
+		super(Item, self).__init__(room, objectAttributes, imageAttributes)
 		#self.pickUpText = ""
 		#self.interaction = interaction
 		#self.interaction.parentItem = self
 		#self.isSecret = False
 		
 class Container(Object):
-	def __init__(self, objectAttributes, imageAttributes):
-		super(Container, self).__init__(objectAttributes, imageAttributes)
+	def __init__(self, room, objectAttributes, imageAttributes):
+		super(Container, self).__init__(room, objectAttributes, imageAttributes)
 		#self.isLocked = False
 		#self.key = None
 		#self.inItem = None
 		#self.outItem = None
 		
 class Door(Object):
-	def __init__(self, objectAttributes, imageAttributes):
-		super(Door, self).__init__(objectAttributes, imageAttributes)
+	def __init__(self, room, objectAttributes, imageAttributes):
+		super(Door, self).__init__(room, objectAttributes, imageAttributes)
 		#self.closedImage = None
 		#self.lockedImage = None
 		#self.openImage = None
@@ -47,8 +43,8 @@ class Door(Object):
 		self.destination = None
 
 class Obstacle(Object):
-	def __init__(self, objectAttributes, imageAttributes):
-		super(Obstacle, self).__init__(objectAttributes, imageAttributes)
+	def __init__(self, room, objectAttributes, imageAttributes):
+		super(Obstacle, self).__init__(room, objectAttributes, imageAttributes)
 		#self.blockingImage = self.image
 		#self.unblockingImage = None
 		#self.blockTarget = ""
@@ -108,27 +104,20 @@ class Interaction(object):
 		
 class JSONImage(object):
 	def __init__(self, objectAttributes):
-		# TODO: What if no ID?
-		#self.id = attributes["id"]
-		#self.src = attributes["src"]
-		
-		# TODO: This is stupid
-		#try:
-		#	self.x = attributes["x"]
-		#except KeyError:
-		#	self.x = 0
-			
-		#try:
-		#	self.y = attributes["y"]
-		#except KeyError:
-		#	self.y = 0
+		if ("id" in objectAttributes):
+			self.id = objectAttributes["id"]
+		else:
+			self.id = int(randint(0, 1000000000))
 
 		self.objectAttributes = objectAttributes
 
 class JSONText(object):
 	def __init__(self, objectAttributes):
-		# TODO: What if no ID?
-		#self.id = attributes["id"]
+		if ("id" in objectAttributes):
+			self.id = objectAttributes["id"]
+		else:
+			self.id = int(randint(0, 1000000000))
+			
 		self.objectAttributes = objectAttributes
 		
 		

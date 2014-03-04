@@ -10,19 +10,17 @@ class View(object):
 			self.id = int(randint(0, 1000000000))
 		else:
 			self.id = id
-		self.name = ""
-		self.music = ""
-		#self.type = "" # TODO: What was the idea of this again?
 
 # Game cutscenes
 class Sequence(View):
 	def __init__(self, objectAttributes, imageAttributes):
-		super(Sequence, self).__init__(id)
+		super(Sequence, self).__init__(objectAttributes["id"])
 		self.images = []
-				
+		
+		self.objectAttributes = objectAttributes
+		
 		# Create image objects
 		for image in imageAttributes:
-			print (image)
 			sequenceImage = Object.JSONImage(image)
 			self.images.append(sequenceImage)
 		
@@ -35,11 +33,12 @@ class Sequence(View):
 class Menu(View):
 	def __init__(self, beginningImage, background, startButton, creditsButton, emptyButton):
 		super(Menu, self).__init__("start")
-		self.beginningImage = None
-		self.background = None
-		self.startButton = None
-		self.creditsButton = None
-		self.emptyButton = None
+		
+		self.beginningImage = Object.JSONImage(beginningImage)
+		self.background = Object.JSONImage(background)
+		self.startButton = Object.JSONImage(startButton)
+		self.creditsButton = Object.JSONImage(creditsButton)
+		self.emptyButton = Object.JSONImage(emptyButton)
 
 # End menu
 class End(View):
@@ -57,11 +56,11 @@ class End(View):
 
 # Any game room
 class Room(View):
-	def __init__(self, id=None):
-		super(Room, self).__init__(id)
+	def __init__(self, viewAttributes, imageAttributes):
+		super(Room, self).__init__(imageAttributes["id"])
+		
 		self.objectList = []
-		self.background = None
-		#self.comingFrom = []
+		self.background = Object.JSONImage(imageAttributes)
 		
 	def deleteObject(self, objectId):
 		for obj in self.objectList:
