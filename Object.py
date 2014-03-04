@@ -128,15 +128,7 @@ class JSONImage(object):
 class JSONText(object):
 	def __init__(self, objectAttributes):
 		# TODO: What if no ID?
-		self.id = attributes["id"]
+		#self.id = attributes["id"]
 		self.objectAttributes = objectAttributes
-
-class SequenceImage(object):
-	def __init__(self, objectAttributese):
-		# TODO: What if no ID?
-		#self.id = id
-		#self.src = src
-		#self.doFade = doFade
-		#self.showTime = showTime
-		self.objectAttributes = objectAttributes
+		
 		

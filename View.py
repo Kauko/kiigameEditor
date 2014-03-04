@@ -16,9 +16,15 @@ class View(object):
 
 # Game cutscenes
 class Sequence(View):
-	def __init__(self, id=None):
+	def __init__(self, objectAttributes, imageAttributes):
 		super(Sequence, self).__init__(id)
 		self.images = []
+				
+		# Create image objects
+		for image in imageAttributes:
+			print (image)
+			sequenceImage = Object.JSONImage(image)
+			self.images.append(sequenceImage)
 		
 	def deleteImage(self, imageId):
 		for image in self.images:

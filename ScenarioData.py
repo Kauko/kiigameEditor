@@ -18,7 +18,7 @@ class ScenarioData(object):
 	def loadScenario(self):
 		self.parseTexts()
 		self.parseImages()
-		self.createInteractions()
+		#self.createInteractions()
 		
 	def parseTexts(self):
 		with open(self.dataDir + "/texts.json", encoding='utf-8') as f:
@@ -105,11 +105,11 @@ class ScenarioData(object):
 				elif not (itemId in objects):
 					jsonObject = {}
 					
-				#jsonObject["classname"] = item["className"]
+				jsonImage["classname"] = item["className"]
 
 				if (len(relatedObject) != 0):
 					print("RELATED", relatedObject)
-					createdObjects[relatedObject["id"]] = relatedObject
+					createdObjects[relatedObject["id"]] = {"object": relatedObject, "image": {}}
 
 				createdObjects[itemId] = {}
 				createdObjects[itemId]["object"] = jsonObject
@@ -144,130 +144,61 @@ class ScenarioData(object):
 					
 					for obj in objectsByCat[layer][child]:
 						obj = objectsByCat[layer][child][obj]
+						objectAttributes = obj["object"]
+						imageAttributes = obj["image"]
 						
 						#print(obj)
 						#print("\n")
 						#objId = obj["id"]
-						print("OOAS", obj)
-						objCat = obj["image"]["category"]
 						
-						#TODO :Text
-						#if (obj["category"] == "object" and obj["classname"] == "Text"):
-						#	self.addText(currentRoom, obj)
+						# Check category from either image or object
+						try:
+							objCat = obj["image"]["category"]
+						except KeyError:
+							objCat = obj["object"]["category"]
+						
+						if (objCat == "object" and obj["image"]["classname"] == "Text"):
+							self.addText(currentRoom, imageAttributes)
 							
-						if (objCat == "object"):
-							#self.addObject(currentRoom, obj, obj["id"], self.texts[objId]["name"], obj["src"])
-							objectAttributes = obj["object"]
-							imageAttributes = obj["image"]
-							print("OBJE", obj, objectAttributes)
+						elif (objCat == "object"):
 							self.addObject(currentRoom, objectAttributes, imageAttributes)
-		"""
-					# TODO: Secret items - fix it in kiigame first
-						elif (obj["category"] == "item"):
-							try:
-								itemTrigger = obj["trigger"]
-							except KeyError:
-								itemTrigger = None
-							try:
-								itemOutcome = obj["outcome"]
-							except KeyError:
-								itemOutcome = None
-								
-							self.addItem(currentRoom, obj["id"], self.texts[objId]["name"], obj["src"], itemTrigger=itemTrigger, itemOutcome=itemOutcome)
+						# TODO: Secret items - fix it in kiigame first
+						elif (objCat == "item"):
+							self.addItem(currentRoom, objectAttributes, imageAttributes)
 							
-						elif (obj["category"] == "container"):
-							emptyImage = obj["empty_image"]
-							fullImage = obj["full_image"]
+						elif (objCat == "container"):
+							self.addContainer(currentRoom, objectAttributes, imageAttributes)
 							
-							try:
-								lockedImage = obj["locked_image"]
-							except KeyError:
-								lockedImage = None
-							try:
-								key = obj["key"]
-							except KeyError:
-								key = None
-							try:
-								inItem = obj["inItem"]
-							except:
-								inItem = None
-							try:
-								outItem = obj["outItem"]
-							except KeyError:
-								outItem = None
+						elif (objCat == "door"):
+							self.addDoor(currentRoom, objectAttributes, imageAttributes)
 							
-							self.addContainer(currentRoom, obj["id"], obj
-							["locked"], self.texts[emptyImage["id"]]["name"], emptyImage, fullImage, lockedImage, key, inItem, outItem)
-							
-						elif (obj["category"] == "door"):
-							openImage = obj["open_image"]
-							
-							try:
-								closedImage = obj["closed_image"]
-							except KeyError:
-								closedImage = None						
-							try:
-								lockedImage = obj["locked_image"]
-							except:
-								lockedImage = None	
-							try:
-								key = obj["key"]
-							except KeyError:
-								key = None
-							
-							self.addDoor(currentRoom, obj["id"], obj["locked"], self.texts[openImage["id"]]["name"], openImage, closedImage, lockedImage, key)
-							
-						elif (obj["category"] == "obstacle"):
-							blockingImage = obj["blocking_image"]
-							
-							try:
-								destination = obj["transition"]
-							except KeyError:
-								destination = ""
-							try:
-								blockTarget = obj["target"]
-							except KeyError:
-								blockTarget = ""
-							try:
-								trigger = obj["trigger"]
-							except KeyError:
-								trigger = ""
-							
-							# TODO: Non-blocking image
-							self.addObstacle(currentRoom, obj["id"], self.texts[blockingImage["id"]]["name"], blockingImage, destination, blockTarget, trigger)
-									
+						elif (objCat == "obstacle"):
+							self.addObstacle(currentRoom, objectAttributes, imageAttributes)
+			
 			elif (layer == "sequence"):
 				for child in objectsByCat[layer]:
+					imageAttributes = []
 					for sequence in objectsByCat[layer][child]:
 						sequence = objectsByCat[layer][child][sequence]
 						
-						sequenceImages = sequence["images"]
+						# Object
+						if (len(sequence["image"]) == 0):
+							objectAttributes = sequence["object"]
+						# Images
+						else:
+							imageAttributes.append(sequence["image"])
 						
-						# End may have no transition
-						# TODO: This is stupid
-						try:
-							sequenceTransition = sequence["transition"]
-						except:
-							sequenceTransition = None
-												
-						try:
-							sequenceMusic = sequence["music"]
-						except KeyError:
-							sequenceMusic = None
-						
-						self.addSequence(sequence["id"], sequenceTransition, sequenceImages, sequenceMusic)
-					
+					self.addSequence(objectAttributes, imageAttributes)
 			elif (layer == "start"):
-				for child in objectsByCat[layer]:
-					start = objectsByCat[layer][child]
-					self.addMenu(start["begining"], start["start"], start["start_game"], start["start_credits"], start["start_empty"])
+				start = objectsByCat[layer]["start_layer"]
+				self.addMenu(start["begining"]["image"], start["start"]["image"], start["start_game"]["image"], start["start_credits"]["image"], start["start_empty"]["image"])
 					
 			elif (layer == "end"):
 				endText = objectsByCat[layer]["end_layer"].pop("rewards_text", None)
 				endImages = list(objectsByCat[layer]["end_layer"].values())
 				
 				self.addEnd(endText, endImages)
-		"""
+				
 		print(self.roomList)
 	
 	# Save scenario to JSON files
@@ -348,16 +279,8 @@ class ScenarioData(object):
 		
 		self.menuView = newView
 		
-	def addSequence(self, sequenceId, transition, images, music):
-		newView = View.Sequence(sequenceId)
-		
-		newView.transition = transition
-		newView.music = music
-		
-		# Create image objects for the sequence
-		for i in images:
-			sequenceImage = Object.SequenceImage(images[i]["id"], images[i]["src"], images[i]["do_fade"], images[i]["show_time"])
-			newView.images.append(sequenceImage)
+	def addSequence(self, objectAttributes, imageAttributes):
+		newView = View.Sequence(objectAttributes, imageAttributes)
 			
 		self.sequenceList.append(newView)
 
@@ -382,7 +305,7 @@ class ScenarioData(object):
 		#if (itemTrigger):
 		#	interaction.setTriggerType("triggerTo", itemTrigger, itemOutcome)
 			
-		newObject = Object.Item(itemId, objectAttributes, imageAttributes)
+		newObject = Object.Item(objectAttributes, imageAttributes)
 		
 		#newObject.name = name
 		#newObject.isSecret = isSecret
