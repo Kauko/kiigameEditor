@@ -57,7 +57,7 @@ class End(View):
 # Any game room
 class Room(View):
 	def __init__(self, viewAttributes, imageAttributes):
-		super(Room, self).__init__(imageAttributes["id"])
+		super(Room, self).__init__(imageAttributes[0]["id"])
 		
 		self.objectList = []
 		self.background = Object.JSONImage(imageAttributes)

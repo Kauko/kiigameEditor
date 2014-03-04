@@ -35,6 +35,7 @@ class ScenarioData(object):
 			f.close()
 			
 		objectsByCat = {}
+		
 		for child in images["children"]:
 			objectCategory = child["attrs"]["category"]
 			
@@ -65,37 +66,37 @@ class ScenarioData(object):
 			# Go through objects in layers
 			# And check for relation with objects.json objects
 			createdObjects = {}
-			
 			for item in layerChildren:
 				itemId = item["attrs"]["id"]
 				jsonImage = item["attrs"]
-				relatedObject = {}
-
-				# In-attribute relation with images.json objects ("object_name")
+				
+				# Get possible attributes from objects.json
 				if ("object_name" in item["attrs"]):
-					relatedObject = objects[item["attrs"]["object_name"]]
-					relatedObject["id"] = item["attrs"]["object_name"]
-					jsonObject = {}
+					itemId = item["attrs"]["object_name"]
 					
-				# Merge object attributes
+					# Save related objects for later use
+					jsonObject = objects[itemId]
+					jsonObject["id"] = itemId
+					
 				elif (itemId in objects):
 					jsonObject = objects[itemId]
-						
-				# No object.json relation
+					
 				elif not (itemId in objects):
 					jsonObject = {}
 					
 				jsonImage["classname"] = item["className"]
-
-				if (len(relatedObject) != 0):
-					createdObjects[relatedObject["id"]] = {"object": relatedObject, "image": {}}
-
-				createdObjects[itemId] = {}
+				
+				if not (itemId in createdObjects):
+					createdObjects[itemId] = {}
 				createdObjects[itemId]["object"] = jsonObject
-				createdObjects[itemId]["image"] = jsonImage
+				
+				if not ("image" in createdObjects[itemId]):
+					createdObjects[itemId]["image"] = []
+					
+				createdObjects[itemId]["image"].append(jsonImage)
 				
 			objectsByCat[objectCategory][objectId] = createdObjects
-			
+		
 		import pprint
 		pp = pprint.PrettyPrinter(indent=4)
 		pp.pprint(objectsByCat)
@@ -123,17 +124,17 @@ class ScenarioData(object):
 						objectAttributes = obj["object"]
 						imageAttributes = obj["image"]
 						
-						#print(obj)
+						print(obj)
 						#print("\n")
 						#objId = obj["id"]
 						
 						# Check category from either image or object
 						try:
-							objCat = obj["image"]["category"]
+							objCat = obj["image"][0]["category"]
 						except KeyError:
 							objCat = obj["object"]["category"]
 						
-						if (objCat == "object" and obj["image"]["classname"] == "Text"):
+						if (objCat == "object" and obj["image"][0]["classname"] == "Text"):
 							self.addText(currentRoom, imageAttributes)
 							
 						elif (objCat == "object"):
@@ -154,18 +155,17 @@ class ScenarioData(object):
 			elif (layer == "sequence"):
 				for child in objectsByCat[layer]:
 					imageAttributes = []
-					for sequence in objectsByCat[layer][child]:
-						sequenceAttrs = objectsByCat[layer][child][sequence]
+					
+					# Ugly way to get sequenceId
+					for sequenceId in objectsByCat[layer][child]:
+						pass
 						
-						# Object
-						if (len(sequenceAttrs["image"]) == 0):
-							objectAttributes = sequenceAttrs["object"]
-							objectAttributes["id"] = sequence
-						# Images
-						else:
-							imageAttributes.append(sequenceAttrs["image"])
-							
+					objectAttributes = objectsByCat[layer][child][sequenceId]["object"]
+					objectAttributes["id"] = sequenceId
+					imageAttributes = objectsByCat[layer][child][sequenceId]["image"]
+					
 					self.addSequence(objectAttributes, imageAttributes)
+				
 			elif (layer == "start"):
 				start = objectsByCat[layer]["start_layer"]
 				self.addMenu(start["begining"]["image"], start["start"]["image"], start["start_game"]["image"], start["start_credits"]["image"], start["start_empty"]["image"])

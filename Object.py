@@ -19,10 +19,8 @@ class Object(object):
 class Item(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
 		super(Item, self).__init__(room, objectAttributes, imageAttributes)
-		#self.pickUpText = ""
 		#self.interaction = interaction
 		#self.interaction.parentItem = self
-		#self.isSecret = False
 		
 class Container(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
@@ -35,6 +33,7 @@ class Container(Object):
 class Door(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
 		super(Door, self).__init__(room, objectAttributes, imageAttributes)
+
 		#self.closedImage = None
 		#self.lockedImage = None
 		#self.openImage = None

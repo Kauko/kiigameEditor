@@ -539,7 +539,7 @@
 					"className": "Image"
 				},{
 					"attrs": {
-						"id": "garbagecan",
+						"id": "garbagecan_empty",
 						"x": 5,
 						"y": 428,
 						"category": "container",
@@ -861,7 +861,7 @@
 			"children": [
 				{
 					"attrs": {
-						"id": "shower_door_to_locker_room_1",
+						"id": "shower_door_to_locker_room_1_image",
 						"x": 691,
 						"y": 136,
 						"category": "door",
@@ -931,7 +931,7 @@
 					"className": "Image"
 				}, {
 					"attrs": {
-						"id": "cieni",
+						"id": "cieni_body",
 						"x": 100,
 						"y": 380,
 						"category": "obstacle",
@@ -1000,7 +1000,7 @@
 			"children": [
 				{
 					"attrs": {
-						"id": "wc_1_door_to_locker_room_1",
+						"id": "wc_1_door_to_locker_room_1_image",
 						"x": 281,
 						"y": 125,
 						"category": "door",
@@ -1091,7 +1091,7 @@
 			"children": [
 				{
 					"attrs": {
-						"id": "wc_2_door_to_locker_room_2",
+						"id": "wc_2_door_to_locker_room_2_image",
 						"x": 555,
 						"y": 127,
 						"category": "door",
@@ -1327,7 +1327,7 @@
 					"className": "Image"
 				}, {
 					"attrs": {
-						"id": "oikotie_locker_room2",
+						"id": "oikotie_locker_room2_image",
 						"x": 691,
 						"y": 136,
 						"category": "door",
