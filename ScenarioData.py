@@ -124,6 +124,8 @@ class ScenarioData(object):
 						objectAttributes = obj["object"]
 						imageAttributes = obj["image"]
 						
+						print(obj)
+						
 						#print(obj)
 						#print("\n")
 						#objId = obj["id"]
@@ -135,7 +137,7 @@ class ScenarioData(object):
 							objCat = obj["object"]["category"]
 						
 						if (objCat == "object" and obj["image"][0]["classname"] == "Text"):
-							self.addText(currentRoom, imageAttributes)
+							self.addText(currentRoom, imageAttributes[0])
 							
 						elif (objCat == "object"):
 							self.addObject(currentRoom, objectAttributes, imageAttributes)
@@ -168,7 +170,7 @@ class ScenarioData(object):
 				
 			elif (layer == "start"):
 				start = objectsByCat[layer]["start_layer"]
-				self.addMenu(start["begining"]["image"], start["start"]["image"], start["start_game"]["image"], start["start_credits"]["image"], start["start_empty"]["image"])
+				self.addMenu(start["begining"]["image"][0], start["start"]["image"][0], start["start_game"]["image"][0], start["start_credits"]["image"][0], start["start_empty"]["image"][0])
 					
 			elif (layer == "end"):
 				endText = objectsByCat[layer]["end_layer"].pop("rewards_text", None)
@@ -179,10 +181,8 @@ class ScenarioData(object):
 		print(self.roomList)
 		
 		for obj in self.objectList:
-			obj.postInit(self.hello)
+			obj.postInit(self.getAnyEntity)
 			
-	def hello(self,x):
-		print("x iss ",x)
 	# Save scenario to JSON files
 ##	def saveScenario(self):
 ##		for item in self.objectList:
@@ -236,6 +236,17 @@ class ScenarioData(object):
 			if (obj.id == objectId):
 				return obj
 
+	# Get room, sequence or object
+	def getAnyEntity(self, entityType, entityId):
+		if (entityType == "room"):
+			return self.getRoom(entityId)
+		elif (entityType == "sequence"):
+			return self.getSequence(entityId)
+		elif (entityType == "object"):
+			return self.getObject(entityId)
+			
+		return None
+
 	def deleteObject(self, objectId):
 		for obj in self.objectList:
 			if obj.id == objectId:
@@ -267,7 +278,7 @@ class ScenarioData(object):
 		self.__appendObject__(newObject, room)
 
 	def addText(self, room, objectAttributes):
-		newObject = Object.JSONText(objectAttributes)
+		newObject = Object.JSONText(room, objectAttributes)
 		self.__appendObject__(newObject, room)
 
 	# Create new item

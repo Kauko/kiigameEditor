@@ -2,23 +2,28 @@ from random import randint
 
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
-	def __init__(self, room, objectAttributes, imageAttributes):
+	def __init__(self, location, objectAttributes, imageAttributes):
 		# TODO: Check id collision, "running" id instead of randint?
 		#		Static ID counter?
 		if ("id" in objectAttributes):
 			self.id = objectAttributes["id"]
+		elif ("id" in imageAttributes[0]):
+			self.id = imageAttributes[0]["id"]
 		else:
 			self.id = int(randint(0, 1000000000))
 			
+		print("MY ID IS:  ", self.id)
 		#self.whatBlocks = None # TODO: In interaction instead?
-		self.location = room
-		self.image = JSONImage(imageAttributes)
+		self.location = location
 		self.objectAttributes = objectAttributes
+		
+		# JSONText and JSONImages don't need image
+		if (imageAttributes):
+			self.image = JSONImage(location, imageAttributes[0])
 
 	# Set attributes that are available only after all objects are created
-	def postInit(self, seekFunction):
-		seekFunction("hello world :DDD")
-		pass
+	def postInit(self, getObject):
+		return
 
 # Pickable item
 class Item(Object):
@@ -48,15 +53,15 @@ class Door(Object):
 		openImage = self.__getAttributeImage__("open_image", imageAttributes)
 		
 		if (closedImage):
-			self.closedImage = JSONImage(closedImage)
+			self.closedImage = JSONImage(self, closedImage)
 		if (lockedImage):
-			self.lockedImage = JSONImage(lockedImage)
+			self.lockedImage = JSONImage(self, lockedImage)
 		if (openImage):
-			self.openImage = JSONImage(openImage)
+			self.openImage = JSONImage(self, openImage)
 		
 		# Handle these in postInit
 		self.key = None
-		self.destination = None
+		self.transition = None
 		
 	# Get attributed door image (closed_image etc.) from imageAttributes
 	# and create image object from it
@@ -67,6 +72,17 @@ class Door(Object):
 				if (attr["id"] == imageId):
 					return attr
 		return None
+		
+	def postInit(self, getAnyEntity):
+		try:
+			self.key = getAnyEntity("object", self.objectAttributes["key"])
+		except KeyError:
+			pass
+			
+		try:
+			self.transition = getAnyEntity("room", self.objectAttributes["transition"])
+		except KeyError:
+			pass
 					
 class Obstacle(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
@@ -103,7 +119,7 @@ class Interaction(object):
 	def setTriggerType(self, triggerType, triggerTarget, triggerOutcome=None):
 		if not (triggerType in ("goesInto", "keyTo", "triggerTo")):
 			return
-		
+			
 		# triggerTo requires outcome parameter
 		if (triggerType == "triggerTo"):
 			#if not (triggerOutcome):
@@ -128,22 +144,11 @@ class Interaction(object):
 	def setDefaultText(self, text):
 		self.setText("default", text)
 		
-class JSONImage(object):
-	def __init__(self, objectAttributes):
-		if ("id" in objectAttributes):
-			self.id = objectAttributes["id"]
-		else:
-			self.id = int(randint(0, 1000000000))
-
-		self.objectAttributes = objectAttributes
-
-class JSONText(object):
-	def __init__(self, objectAttributes):
-		if ("id" in objectAttributes):
-			self.id = objectAttributes["id"]
-		else:
-			self.id = int(randint(0, 1000000000))
-			
-		self.objectAttributes = objectAttributes
+class JSONImage(Object):
+	def __init__(self, location, objectAttributes):
+		super(JSONImage, self).__init__(location, objectAttributes, None)
 		
+class JSONText(Object):
+	def __init__(self, location, objectAttributes):
+		super(JSONText, self).__init__(location, objectAttributes, None)
 		

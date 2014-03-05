@@ -21,7 +21,7 @@ class Sequence(View):
 		
 		# Create image objects
 		for image in imageAttributes:
-			sequenceImage = Object.JSONImage(image)
+			sequenceImage = Object.JSONImage(self, image)
 			self.images.append(sequenceImage)
 		
 	def deleteImage(self, imageId):
@@ -31,14 +31,14 @@ class Sequence(View):
 
 # Start menu
 class Menu(View):
-	def __init__(self, beginningImage, background, startButton, creditsButton, emptyButton):
+	def __init__(self, beginingImage, background, startButton, creditsButton, emptyButton):
 		super(Menu, self).__init__("start")
-		
-		self.beginningImage = Object.JSONImage(beginningImage)
-		self.background = Object.JSONImage(background)
-		self.startButton = Object.JSONImage(startButton)
-		self.creditsButton = Object.JSONImage(creditsButton)
-		self.emptyButton = Object.JSONImage(emptyButton)
+		print("JELLO",beginingImage)
+		self.beginningImage = Object.JSONImage(self, beginingImage)
+		self.background = Object.JSONImage(self, background)
+		self.startButton = Object.JSONImage(self, startButton)
+		self.creditsButton = Object.JSONImage(self, creditsButton)
+		self.emptyButton = Object.JSONImage(self, emptyButton)
 
 # End menu
 class End(View):
@@ -60,7 +60,7 @@ class Room(View):
 		super(Room, self).__init__(imageAttributes[0]["id"])
 		
 		self.objectList = []
-		self.background = Object.JSONImage(imageAttributes)
+		self.background = Object.JSONImage(self, imageAttributes[0])
 		
 	def deleteObject(self, objectId):
 		for obj in self.objectList:
