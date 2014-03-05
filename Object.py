@@ -12,7 +12,6 @@ class Object(object):
 		else:
 			self.id = int(randint(0, 1000000000))
 			
-		print("MY ID IS:  ", self.id)
 		#self.whatBlocks = None # TODO: In interaction instead?
 		self.location = location
 		self.objectAttributes = objectAttributes
@@ -20,11 +19,19 @@ class Object(object):
 		# JSONText and JSONImages don't need image
 		if (imageAttributes):
 			self.image = JSONImage(location, imageAttributes[0])
-
-	# Set attributes that are available only after all objects are created
-	def postInit(self, getObject):
+			
+	# Return attributed object image (closed_image etc.) from imageAttributes
+	def __getAttributeImage__(self, attribute, imageAttributes):
+		if (attribute in self.objectAttributes):
+			imageId = self.objectAttributes[attribute]
+			for attr in imageAttributes:
+				if (attr["id"] == imageId):
+					return attr
+		return None
+		
+	def postInit(self, getGameObject):
 		return
-
+		
 # Pickable item
 class Item(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
@@ -32,13 +39,60 @@ class Item(Object):
 		#self.interaction = interaction
 		#self.interaction.parentItem = self
 		
+		# Handle these in postInit
+		self.trigger = None
+		self.outcome = None
+		
+	def postInit(self, getGameObject):
+		try:
+			self.trigger = getGameObject("object", self.objectAttributes["trigger"])
+		except KeyError:
+			pass
+			
+		try:
+			self.outcome = getGameObject("object", self.objectAttributes["outcome"])
+		except KeyError:
+			pass
+			
 class Container(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
 		super(Container, self).__init__(room, objectAttributes, imageAttributes)
-		#self.isLocked = False
-		#self.key = None
-		#self.inItem = None
-		#self.outItem = None
+		
+		# Create the available door image objects
+		self.emptyImage = None
+		self.lockedImage = None
+		self.fullImage = None
+		emptyImage = self.__getAttributeImage__("empty_image", imageAttributes)
+		lockedImage = self.__getAttributeImage__("locked_image", imageAttributes)
+		fullImage = self.__getAttributeImage__("full_image", imageAttributes)
+		
+		if (emptyImage):
+			self.emptyImage = JSONImage(self, emptyImage)
+		if (lockedImage):
+			self.lockedImage = JSONImage(self, lockedImage)
+		if (fullImage):
+			self.fullImage = JSONImage(self, fullImage)
+		
+		# Handle these in postInit
+		self.key = None
+		self.inItem = None
+		self.outItem = None
+		
+	def postInit(self, getGameObject):
+		try:
+			self.key = getGameObject("object", self.objectAttributes["key"])
+		except KeyError:
+			pass
+			
+		try:
+			self.inItem = getGameObject("object", self.objectAttributes["in"])
+		except KeyError:
+			pass
+			
+		try:
+			self.outItem = getGameObject("object", self.objectAttributes["out"])
+		except KeyError:
+			pass
 		
 class Door(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
@@ -63,35 +117,48 @@ class Door(Object):
 		self.key = None
 		self.transition = None
 		
-	# Get attributed door image (closed_image etc.) from imageAttributes
-	# and create image object from it
-	def __getAttributeImage__(self, attribute, imageAttributes):
-		if (attribute in self.objectAttributes):
-			imageId = self.objectAttributes[attribute]
-			for attr in imageAttributes:
-				if (attr["id"] == imageId):
-					return attr
-		return None
-		
-	def postInit(self, getAnyEntity):
+	def postInit(self, getGameObject):
 		try:
-			self.key = getAnyEntity("object", self.objectAttributes["key"])
+			self.key = getGameObject("object", self.objectAttributes["key"])
 		except KeyError:
 			pass
 			
 		try:
-			self.transition = getAnyEntity("room", self.objectAttributes["transition"])
+			self.transition = getGameObject("room", self.objectAttributes["transition"])
 		except KeyError:
 			pass
 					
 class Obstacle(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
 		super(Obstacle, self).__init__(room, objectAttributes, imageAttributes)
-		#self.blockingImage = self.image
-		#self.unblockingImage = None
-		#self.blockTarget = ""
-		#self.trigger = ""
+		
+		# Create the available door image objects
+		self.blockingImage = None
+		self.unblockingImage = None
+		blockingImage = self.__getAttributeImage__("blocking_image", imageAttributes)
+		# TODO: Unblocking not implemented in kiigame
+		unblockingImage = self.__getAttributeImage__("unblocking_image", imageAttributes)
+		
+		if (blockingImage):
+			self.blockingImage = JSONImage(self, blockingImage)
+		if (unblockingImage):
+			self.unblockingImage = JSONImage(self, unblockingImage)
+			
+		# Handle these in postInit
+		self.blockTarget = None
+		self.trigger = None
 
+	def postInit(self, getGameObject):
+		try:
+			self.blockTarget = getGameObject("object", self.objectAttributes["target"])
+		except KeyError:
+			pass
+			
+		try:
+			self.trigger = getGameObject("object", self.objectAttributes["trigger"])
+		except KeyError:
+			pass
+			
 # Interaction data for pickable items
 class Interaction(object):
 	def __init__(self):

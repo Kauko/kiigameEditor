@@ -33,7 +33,7 @@ class Sequence(View):
 class Menu(View):
 	def __init__(self, beginingImage, background, startButton, creditsButton, emptyButton):
 		super(Menu, self).__init__("start")
-		print("JELLO",beginingImage)
+		
 		self.beginningImage = Object.JSONImage(self, beginingImage)
 		self.background = Object.JSONImage(self, background)
 		self.startButton = Object.JSONImage(self, startButton)

@@ -160,6 +160,10 @@
 		"trigger": "wall",
 		"outcome": "poster_onthewall"
     },
+    "poster_onthewall": {
+    	"category": "object",
+    	"ending": true
+    },
     "hairkeeper": {
         "category": "item",
     	"trigger": "poster_withoutglue",

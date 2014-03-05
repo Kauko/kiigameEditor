@@ -124,12 +124,6 @@ class ScenarioData(object):
 						objectAttributes = obj["object"]
 						imageAttributes = obj["image"]
 						
-						print(obj)
-						
-						#print(obj)
-						#print("\n")
-						#objId = obj["id"]
-						
 						# Check category from either image or object
 						try:
 							objCat = obj["image"][0]["category"]
@@ -181,7 +175,7 @@ class ScenarioData(object):
 		print(self.roomList)
 		
 		for obj in self.objectList:
-			obj.postInit(self.getAnyEntity)
+			obj.postInit(self.getGameObject)
 			
 	# Save scenario to JSON files
 ##	def saveScenario(self):
@@ -237,7 +231,7 @@ class ScenarioData(object):
 				return obj
 
 	# Get room, sequence or object
-	def getAnyEntity(self, entityType, entityId):
+	def getGameObject(self, entityType, entityId):
 		if (entityType == "room"):
 			return self.getRoom(entityId)
 		elif (entityType == "sequence"):
