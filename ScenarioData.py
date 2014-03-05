@@ -124,7 +124,7 @@ class ScenarioData(object):
 						objectAttributes = obj["object"]
 						imageAttributes = obj["image"]
 						
-						print(obj)
+						#print(obj)
 						#print("\n")
 						#objId = obj["id"]
 						
@@ -177,7 +177,12 @@ class ScenarioData(object):
 				self.addEnd(endText, endImages)
 				
 		print(self.roomList)
-	
+		
+		for obj in self.objectList:
+			obj.postInit(self.hello)
+			
+	def hello(self,x):
+		print("x iss ",x)
 	# Save scenario to JSON files
 ##	def saveScenario(self):
 ##		for item in self.objectList:

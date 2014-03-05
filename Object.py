@@ -15,6 +15,11 @@ class Object(object):
 		self.image = JSONImage(imageAttributes)
 		self.objectAttributes = objectAttributes
 
+	# Set attributes that are available only after all objects are created
+	def postInit(self, seekFunction):
+		seekFunction("hello world :DDD")
+		pass
+
 # Pickable item
 class Item(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
@@ -33,14 +38,36 @@ class Container(Object):
 class Door(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
 		super(Door, self).__init__(room, objectAttributes, imageAttributes)
-
-		#self.closedImage = None
-		#self.lockedImage = None
-		#self.openImage = None
-		#self.isLocked = False
-		#self.key = None
+		
+		# Create the available door image objects
+		self.closedImage = None
+		self.lockedImage = None
+		self.openImage = None
+		closedImage = self.__getAttributeImage__("closed_image", imageAttributes)
+		lockedImage = self.__getAttributeImage__("locked_image", imageAttributes)
+		openImage = self.__getAttributeImage__("open_image", imageAttributes)
+		
+		if (closedImage):
+			self.closedImage = JSONImage(closedImage)
+		if (lockedImage):
+			self.lockedImage = JSONImage(lockedImage)
+		if (openImage):
+			self.openImage = JSONImage(openImage)
+		
+		# Handle these in postInit
+		self.key = None
 		self.destination = None
-
+		
+	# Get attributed door image (closed_image etc.) from imageAttributes
+	# and create image object from it
+	def __getAttributeImage__(self, attribute, imageAttributes):
+		if (attribute in self.objectAttributes):
+			imageId = self.objectAttributes[attribute]
+			for attr in imageAttributes:
+				if (attr["id"] == imageId):
+					return attr
+		return None
+					
 class Obstacle(Object):
 	def __init__(self, room, objectAttributes, imageAttributes):
 		super(Obstacle, self).__init__(room, objectAttributes, imageAttributes)
