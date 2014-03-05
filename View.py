@@ -13,7 +13,7 @@ class View(object):
 
 # Game cutscenes
 class Sequence(View):
-	def __init__(self, objectAttributes, imageAttributes):
+	def __init__(self, data, objectAttributes, imageAttributes):
 		super(Sequence, self).__init__(objectAttributes["id"])
 		self.images = []
 		
@@ -21,7 +21,7 @@ class Sequence(View):
 		
 		# Create image objects
 		for image in imageAttributes:
-			sequenceImage = Object.JSONImage(self, image)
+			sequenceImage = Object.JSONImage(data, self, image)
 			self.images.append(sequenceImage)
 		
 	def deleteImage(self, imageId):
@@ -31,14 +31,14 @@ class Sequence(View):
 
 # Start menu
 class Menu(View):
-	def __init__(self, beginingImage, background, startButton, creditsButton, emptyButton):
+	def __init__(self, data, beginingImage, background, startButton, creditsButton, emptyButton):
 		super(Menu, self).__init__("start")
 		
-		self.beginningImage = Object.JSONImage(self, beginingImage)
-		self.background = Object.JSONImage(self, background)
-		self.startButton = Object.JSONImage(self, startButton)
-		self.creditsButton = Object.JSONImage(self, creditsButton)
-		self.emptyButton = Object.JSONImage(self, emptyButton)
+		self.beginingImage = Object.JSONImage(data, self, beginingImage)
+		self.background = Object.JSONImage(data, self, background)
+		self.startButton = Object.JSONImage(data, self, startButton)
+		self.creditsButton = Object.JSONImage(data, self, creditsButton)
+		self.emptyButton = Object.JSONImage(data, self, emptyButton)
 
 # End menu
 class End(View):
@@ -56,11 +56,11 @@ class End(View):
 
 # Any game room
 class Room(View):
-	def __init__(self, viewAttributes, imageAttributes):
-		super(Room, self).__init__(imageAttributes[0]["id"])
+	def __init__(self, data, viewAttributes, imageAttributes):
+		super(Room, self).__init__(imageAttributes["id"])
 		
 		self.objectList = []
-		self.background = Object.JSONImage(self, imageAttributes[0])
+		self.background = Object.JSONImage(data, self, imageAttributes)
 		
 	def deleteObject(self, objectId):
 		for obj in self.objectList:

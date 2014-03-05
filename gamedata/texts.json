@@ -596,7 +596,7 @@
         "name": "Töherrys",
         "examine": "Tässä lukee: \"Hähähää, piilotin teijän pelikirjat!!1 Ette ikinä löydä tuotakaan tuolta penkin alta! Eiku per\""
     },
-    "shower_door_to_locker_room_1": {
+    "shower_door_to_locker_room_1_image": {
         "name": "Pukuhuoneen ovi",
         "examine": "Tästä pukuhuoneesta havahduin."
     },
@@ -624,7 +624,7 @@
         "name": "Suihku",
         "examine": "Tästä suihkusta tulee aivan liian sopivaa vettä."
     },
-    "cieni": {
+    "cieni_body": {
         "name": "Sieni",
         "examine": "Hyi, mikä sienikasvusto! En missään nimessä koske pitkällä tikullakaan tuohon kasvustoon. Taitaa olla muuten tason 23 jalkasieni! Harmi kun pokepallot jäivät kotiin..."
     },
@@ -748,7 +748,7 @@
         "shower_middle": "Nalle haluaisi käydä suihkussa. Nallella ei kuitenkaan ole pyyhettä mukanaan.",
         "shower_right": "Nalle haluaisi käydä suihkussa. Nallella ei kuitenkaan ole pyyhettä mukanaan."
     },
-    "wc_1_door_to_locker_room_1": {
+    "wc_1_door_to_locker_room_1_image": {
         "name": "Vessan ovi",
         "examine": "Mistähän minä oikein pääsisin ulos?"
     },
@@ -930,7 +930,7 @@
     "reward_2": {
         "pickup": "Löysin paperimasiinaan piilotetun kirjan!"
     },
-    "wc_2_door_to_locker_room_2": {
+    "wc_2_door_to_locker_room_2_image": {
         "name": "Vessan ovi",
         "examine": "Mistähän minä oikein pääsisin ulos?"
     },

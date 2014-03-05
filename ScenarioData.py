@@ -1,7 +1,6 @@
-# -*- coding: UTF-8 -*-
-
 import json
-import View, Object
+import View
+import Object
 
 class ScenarioData(object):
 	def __init__(self):
@@ -69,7 +68,7 @@ class ScenarioData(object):
 			for item in layerChildren:
 				itemId = item["attrs"]["id"]
 				jsonImage = item["attrs"]
-				
+				self
 				# Get possible attributes from objects.json
 				if ("object_name" in item["attrs"]):
 					itemId = item["attrs"]["object_name"]
@@ -107,7 +106,7 @@ class ScenarioData(object):
 			viewAttributes = room["object"]
 			imageAttributes = room["image"]
 			
-			roomObject = View.Room(viewAttributes, imageAttributes)
+			roomObject = View.Room(self, viewAttributes, imageAttributes[0])
 			self.roomList.append(roomObject)
 			
 		print("Rooms created:", len(self.roomList))
@@ -135,6 +134,7 @@ class ScenarioData(object):
 							
 						elif (objCat == "object"):
 							self.addObject(currentRoom, objectAttributes, imageAttributes)
+							
 						# TODO: Secret items - fix it in kiigame first
 						elif (objCat == "item"):
 							self.addItem(currentRoom, objectAttributes, imageAttributes)
@@ -230,6 +230,13 @@ class ScenarioData(object):
 			if (obj.id == objectId):
 				return obj
 
+	
+	def getText(self, objectId):
+		try:
+			return self.texts[objectId]
+		except KeyError:
+			return None
+		
 	# Get room, sequence or object
 	def getGameObject(self, entityType, entityId):
 		if (entityType == "room"):
@@ -250,7 +257,7 @@ class ScenarioData(object):
 			roomObject = room.getObject(objectId)
 			if (roomObject):
 				room.deleteObject(objectId)
-					
+				
 	def addEnd(self, endText, endImages):
 		newView = View.End(endText, endImages)
 		self.endView = newView
@@ -258,41 +265,41 @@ class ScenarioData(object):
 	def addMenu(self, beginningImage, background, startButton, creditsButton, emptyButton):
 
 		
-		newView = View.Menu(beginningImage, background, startButton, creditsButton, emptyButton)
+		newView = View.Menu(self, beginningImage, background, startButton, creditsButton, emptyButton)
 		
 		self.menuView = newView
 		
 	def addSequence(self, objectAttributes, imageAttributes):
-		newView = View.Sequence(objectAttributes, imageAttributes)
+		newView = View.Sequence(self, objectAttributes, imageAttributes)
 		self.sequenceList.append(newView)
 
 	# Create new generic object
 	def addObject(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Object(room, objectAttributes, imageAttributes)
+		newObject = Object.Object(self, room, objectAttributes, imageAttributes)
 		self.__appendObject__(newObject, room)
 
 	def addText(self, room, objectAttributes):
-		newObject = Object.JSONText(room, objectAttributes)
+		newObject = Object.JSONText(self, room, objectAttributes)
 		self.__appendObject__(newObject, room)
 
 	# Create new item
 	def addItem(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Item(room, objectAttributes, imageAttributes)
+		newObject = Object.Item(self, room, objectAttributes, imageAttributes)
 		self.__appendObject__(newObject, room)
 
 	# Create new container
 	def addContainer(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Container(room, objectAttributes, imageAttributes)
+		newObject = Object.Container(self, room, objectAttributes, imageAttributes)
 		self.__appendObject__(newObject, room)
 
 	# Create new door
 	def addDoor(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Door(room, objectAttributes, imageAttributes)	
+		newObject = Object.Door(self, room, objectAttributes, imageAttributes)	
 		self.__appendObject__(newObject, room)
 
 	# Create new obstacle
 	def addObstacle(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Obstacle(room, objectAttributes, imageAttributes)
+		newObject = Object.Obstacle(self, room, objectAttributes, imageAttributes)
 		self.__appendObject__(newObject, room)
 
 	# Add newly created object to this instance's and room's object lists

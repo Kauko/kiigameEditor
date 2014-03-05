@@ -2,7 +2,7 @@ from random import randint
 
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
-	def __init__(self, location, objectAttributes, imageAttributes):
+	def __init__(self, data, location, objectAttributes, imageAttributes):
 		# TODO: Check id collision, "running" id instead of randint?
 		#		Static ID counter?
 		if ("id" in objectAttributes):
@@ -15,10 +15,11 @@ class Object(object):
 		#self.whatBlocks = None # TODO: In interaction instead?
 		self.location = location
 		self.objectAttributes = objectAttributes
+		self.texts = data.getText(self.id)
 		
 		# JSONText and JSONImages don't need image
 		if (imageAttributes):
-			self.image = JSONImage(location, imageAttributes[0])
+			self.image = JSONImage(data, location, imageAttributes[0])
 			
 	# Return attributed object image (closed_image etc.) from imageAttributes
 	def __getAttributeImage__(self, attribute, imageAttributes):
@@ -34,8 +35,8 @@ class Object(object):
 		
 # Pickable item
 class Item(Object):
-	def __init__(self, room, objectAttributes, imageAttributes):
-		super(Item, self).__init__(room, objectAttributes, imageAttributes)
+	def __init__(self, data, room, objectAttributes, imageAttributes):
+		super(Item, self).__init__(data, room, objectAttributes, imageAttributes)
 		#self.interaction = interaction
 		#self.interaction.parentItem = self
 		
@@ -55,8 +56,8 @@ class Item(Object):
 			pass
 			
 class Container(Object):
-	def __init__(self, room, objectAttributes, imageAttributes):
-		super(Container, self).__init__(room, objectAttributes, imageAttributes)
+	def __init__(self, data, room, objectAttributes, imageAttributes):
+		super(Container, self).__init__(data, room, objectAttributes, imageAttributes)
 		
 		# Create the available door image objects
 		self.emptyImage = None
@@ -67,11 +68,11 @@ class Container(Object):
 		fullImage = self.__getAttributeImage__("full_image", imageAttributes)
 		
 		if (emptyImage):
-			self.emptyImage = JSONImage(self, emptyImage)
+			self.emptyImage = JSONImage(data, self, emptyImage)
 		if (lockedImage):
-			self.lockedImage = JSONImage(self, lockedImage)
+			self.lockedImage = JSONImage(data, self, lockedImage)
 		if (fullImage):
-			self.fullImage = JSONImage(self, fullImage)
+			self.fullImage = JSONImage(data, self, fullImage)
 		
 		# Handle these in postInit
 		self.key = None
@@ -95,8 +96,8 @@ class Container(Object):
 			pass
 		
 class Door(Object):
-	def __init__(self, room, objectAttributes, imageAttributes):
-		super(Door, self).__init__(room, objectAttributes, imageAttributes)
+	def __init__(self, data, room, objectAttributes, imageAttributes):
+		super(Door, self).__init__(data, room, objectAttributes, imageAttributes)
 		
 		# Create the available door image objects
 		self.closedImage = None
@@ -107,11 +108,11 @@ class Door(Object):
 		openImage = self.__getAttributeImage__("open_image", imageAttributes)
 		
 		if (closedImage):
-			self.closedImage = JSONImage(self, closedImage)
+			self.closedImage = JSONImage(data, self, closedImage)
 		if (lockedImage):
-			self.lockedImage = JSONImage(self, lockedImage)
+			self.lockedImage = JSONImage(data, self, lockedImage)
 		if (openImage):
-			self.openImage = JSONImage(self, openImage)
+			self.openImage = JSONImage(data, self, openImage)
 		
 		# Handle these in postInit
 		self.key = None
@@ -129,8 +130,8 @@ class Door(Object):
 			pass
 					
 class Obstacle(Object):
-	def __init__(self, room, objectAttributes, imageAttributes):
-		super(Obstacle, self).__init__(room, objectAttributes, imageAttributes)
+	def __init__(self, data, room, objectAttributes, imageAttributes):
+		super(Obstacle, self).__init__(data, room, objectAttributes, imageAttributes)
 		
 		# Create the available door image objects
 		self.blockingImage = None
@@ -212,10 +213,10 @@ class Interaction(object):
 		self.setText("default", text)
 		
 class JSONImage(Object):
-	def __init__(self, location, objectAttributes):
-		super(JSONImage, self).__init__(location, objectAttributes, None)
+	def __init__(self, data, location, imageAttributes):
+		super(JSONImage, self).__init__(data, location, imageAttributes, None)
 		
 class JSONText(Object):
-	def __init__(self, location, objectAttributes):
-		super(JSONText, self).__init__(location, objectAttributes, None)
+	def __init__(self, data, location, textAttributes):
+		super(JSONText, self).__init__(data, location, textAttributes, None)
 		
