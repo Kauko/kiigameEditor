@@ -167,10 +167,14 @@ class ScenarioData(object):
 				self.addMenu(start["begining"]["image"][0], start["start"]["image"][0], start["start_game"]["image"][0], start["start_credits"]["image"][0], start["start_empty"]["image"][0])
 					
 			elif (layer == "end"):
-				endText = objectsByCat[layer]["end_layer"].pop("rewards_text", None)
+				endText = objectsByCat[layer]["end_layer"].pop("rewards_text", None)["image"][0]
 				endImages = list(objectsByCat[layer]["end_layer"].values())
 				
-				self.addEnd(endText, endImages)
+				endImagesList = []
+				for image in endImages:
+					endImagesList.append(image["image"][0])
+					
+				self.addEnd(endText, endImagesList)
 				
 		print(self.roomList)
 		
@@ -178,9 +182,60 @@ class ScenarioData(object):
 			obj.postInit(self.getGameObject)
 			
 	# Save scenario to JSON files
-##	def saveScenario(self):
-##		for item in self.objectList:
-##			print (item)
+	def saveScenario(self):
+		scenarioChildren = []
+		
+		# Start menu
+		startObjects = []
+		startObjects.extend([
+			self.__createLayerChild__(self.menuView.beginingImage.objectAttributes),
+			self.__createLayerChild__(self.menuView.background.objectAttributes),
+			self.__createLayerChild__(self.menuView.startButton.objectAttributes),
+			self.__createLayerChild__(self.menuView.creditsButton.objectAttributes),
+			self.__createLayerChild__(self.menuView.emptyButton.objectAttributes)
+		])
+		startAttrs = {"id": "start_layer", "category": "start"}
+		startLayer = self.__createLayer__(startAttrs, startObjects)
+		scenarioChildren.append(startLayer)
+		
+		# End view
+		endObjects = []
+		endAttrs = {"id": "end_layer", "visible": False, "category": "end"}
+		
+		for image in self.endView.endImages:
+			endObjects.append(self.__createLayerChild__(image.objectAttributes))
+			
+		# TODO: End text object
+		endLayer = self.__createLayer__(endAttrs, endObjects)
+		scenarioChildren.append(endLayer)
+		
+		# Sequences
+		for sequence in self.sequenceList:
+			sequenceObjects = []
+			# TODO: Dynamic layer attrs?
+			sequenceAttrs = {"id": sequence.id + "_layer", "visible": False, "category": "sequence",	"object_name": sequence.id}
+			
+			for image in sequence.images:
+				sequenceObjects.append(self.__createLayerChild__(image.objectAttributes))
+				
+			sequenceLayer = self.__createLayer__(sequenceAttrs, sequenceObjects)
+			scenarioChildren.append(sequenceLayer)
+			
+		# Bundle everything together
+		scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
+		scenarioData = self.__createLayer__(scenarioAttrs, scenarioChildren, "Stage")
+		
+		import pprint
+		pp = pprint.PrettyPrinter(indent=4)
+		pp.pprint(scenarioData)
+		
+	# Game object layers
+	def __createLayer__(self, attrs, children, className="Layer"):
+		return {"attrs": attrs, "className": className, "children": children}
+	
+	# Single items for game layers
+	def __createLayerChild__(self, attrs, className="Image"):
+		return {"attrs": attrs, "className": className}
 		
 	# Add interactions for pickable items
 	def createInteractions(self):
@@ -229,7 +284,6 @@ class ScenarioData(object):
 		for obj in self.objectList:
 			if (obj.id == objectId):
 				return obj
-
 	
 	def getText(self, objectId):
 		try:
@@ -259,12 +313,10 @@ class ScenarioData(object):
 				room.deleteObject(objectId)
 				
 	def addEnd(self, endText, endImages):
-		newView = View.End(endText, endImages)
+		newView = View.End(self, endText, endImages)
 		self.endView = newView
 		
 	def addMenu(self, beginningImage, background, startButton, creditsButton, emptyButton):
-
-		
 		newView = View.Menu(self, beginningImage, background, startButton, creditsButton, emptyButton)
 		
 		self.menuView = newView
@@ -278,6 +330,8 @@ class ScenarioData(object):
 		newObject = Object.Object(self, room, objectAttributes, imageAttributes)
 		self.__appendObject__(newObject, room)
 
+	# JSON text object
+	# TODO: What is the meaning of this?
 	def addText(self, room, objectAttributes):
 		newObject = Object.JSONText(self, room, objectAttributes)
 		self.__appendObject__(newObject, room)
@@ -322,5 +376,5 @@ class ScenarioData(object):
 
 sc = ScenarioData()
 sc.loadScenario()
-#sc.saveScenario()
+sc.saveScenario()
 

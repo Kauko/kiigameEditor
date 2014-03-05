@@ -28,7 +28,7 @@ class Sequence(View):
 		for image in self.images:
 			if (image.id == imageId):
 				self.images.remove(image)
-
+				
 # Start menu
 class Menu(View):
 	def __init__(self, data, beginingImage, background, startButton, creditsButton, emptyButton):
@@ -42,12 +42,14 @@ class Menu(View):
 
 # End menu
 class End(View):
-	def __init__(self, endText, endImages):
+	def __init__(self, data, endText, endImages):
 		super(End, self).__init__("end")
-		# TODO: End pictures are stupid
-		# TODO: Before handling that, arrange pictures for UI?
-		self.endImages = endImages
-		self.endText = endText
+		
+		self.endImages = []
+		for image in endImages:
+			self.endImages.append(Object.JSONImage(data, self, image))
+			
+		self.endText = Object.JSONText(data, self, endText)
 		
 	def deleteImage(self, imageId):
 		for image in self.endImages:
