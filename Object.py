@@ -33,6 +33,11 @@ class Object(object):
 	def postInit(self, getGameObject):
 		return
 		
+	def getImages(self):
+		images = [self.image]
+		return list(filter((None).__ne__, images))
+		
+	
 # Pickable item
 class Item(Object):
 	def __init__(self, data, room, objectAttributes, imageAttributes):
@@ -94,6 +99,10 @@ class Container(Object):
 			self.outItem = getGameObject("object", self.objectAttributes["out"])
 		except KeyError:
 			pass
+			
+	def getImages(self):
+		images = [self.emptyImage, self.lockedImage, self.fullImage]
+		return list(filter((None).__ne__, images))
 		
 class Door(Object):
 	def __init__(self, data, room, objectAttributes, imageAttributes):
@@ -128,7 +137,11 @@ class Door(Object):
 			self.transition = getGameObject("room", self.objectAttributes["transition"])
 		except KeyError:
 			pass
-					
+			
+	def getImages(self):
+		images = [self.closedImage, self.lockedImage, self.openImage]
+		return list(filter((None).__ne__, images))
+		
 class Obstacle(Object):
 	def __init__(self, data, room, objectAttributes, imageAttributes):
 		super(Obstacle, self).__init__(data, room, objectAttributes, imageAttributes)
@@ -160,6 +173,10 @@ class Obstacle(Object):
 		except KeyError:
 			pass
 			
+	def getImages(self):
+		images = [self.blockingImage, self.unblockingImage]
+		return list(filter((None).__ne__, images))
+		
 # Interaction data for pickable items
 class Interaction(object):
 	def __init__(self):
@@ -219,4 +236,7 @@ class JSONImage(Object):
 class JSONText(Object):
 	def __init__(self, data, location, textAttributes):
 		super(JSONText, self).__init__(data, location, textAttributes, None)
+		
+	def getImages(self):
+		return [self]
 		

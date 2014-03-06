@@ -11,7 +11,7 @@ class ScenarioData(object):
 		self.characterImages = []
 		self.menuView = None
 		self.endView = None
-		self.dataDir = "gamedata"
+		self.dataDir = "gamedata/latkazombit"
 
 	# Load and parse game data files
 	def loadScenario(self):
@@ -36,6 +36,7 @@ class ScenarioData(object):
 		objectsByCat = {}
 		
 		for child in images["children"]:
+			print(child["attrs"])
 			objectCategory = child["attrs"]["category"]
 			
 			# Accept only certain types of views
@@ -68,7 +69,7 @@ class ScenarioData(object):
 			for item in layerChildren:
 				itemId = item["attrs"]["id"]
 				jsonImage = item["attrs"]
-				self
+				
 				# Get possible attributes from objects.json
 				if ("object_name" in item["attrs"]):
 					itemId = item["attrs"]["object_name"]
@@ -91,34 +92,41 @@ class ScenarioData(object):
 				
 				if not ("image" in createdObjects[itemId]):
 					createdObjects[itemId]["image"] = []
-					
+				
 				createdObjects[itemId]["image"].append(jsonImage)
 				
 			objectsByCat[objectCategory][objectId] = createdObjects
+			objectsByCat[objectCategory][objectId]["attrs"] = child["attrs"]
 		
 		import pprint
 		pp = pprint.PrettyPrinter(indent=4)
 		pp.pprint(objectsByCat)
 		
-		# Create room objects
+		# Create room objects from background_layer
 		for layer in objectsByCat["room_background"]["background_layer"]:
+			if (layer == "attrs"):
+				continue
+					
 			room = objectsByCat["room_background"]["background_layer"][layer]
 			viewAttributes = room["object"]
 			imageAttributes = room["image"]
 			
-			roomObject = View.Room(self, viewAttributes, imageAttributes[0])
-			self.roomList.append(roomObject)
+			self.addRoom(viewAttributes, imageAttributes[0])
 			
 		print("Rooms created:", len(self.roomList))
 		
 		# Create objects from the gathered data		
 		for layer in objectsByCat:
 			if (layer == "room"):
+				
 				for child in objectsByCat[layer]:
-					
 					currentRoom = self.getRoom(child[13:])
+					currentRoom.layerAttrs = objectsByCat[layer][child]["attrs"]
 					
 					for obj in objectsByCat[layer][child]:
+						if (obj == "attrs"):
+							continue
+							
 						obj = objectsByCat[layer][child][obj]
 						objectAttributes = obj["object"]
 						imageAttributes = obj["image"]
@@ -150,6 +158,7 @@ class ScenarioData(object):
 			
 			elif (layer == "sequence"):
 				for child in objectsByCat[layer]:
+					sequenceAttrs = objectsByCat[layer][child].pop("attrs")
 					imageAttributes = []
 					
 					# Ugly way to get sequenceId
@@ -160,21 +169,23 @@ class ScenarioData(object):
 					objectAttributes["id"] = sequenceId
 					imageAttributes = objectsByCat[layer][child][sequenceId]["image"]
 					
-					self.addSequence(objectAttributes, imageAttributes)
+					self.addSequence(sequenceAttrs, objectAttributes, imageAttributes)
 				
 			elif (layer == "start"):
 				start = objectsByCat[layer]["start_layer"]
-				self.addMenu(start["begining"]["image"][0], start["start"]["image"][0], start["start_game"]["image"][0], start["start_credits"]["image"][0], start["start_empty"]["image"][0])
+				self.addMenu(start["attrs"], start["begining"]["image"][0], start["start"]["image"][0], start["start_game"]["image"][0], start["start_credits"]["image"][0], start["start_empty"]["image"][0])
 					
 			elif (layer == "end"):
 				endText = objectsByCat[layer]["end_layer"].pop("rewards_text", None)["image"][0]
+				endAttrs = objectsByCat[layer]["end_layer"].pop("attrs")
 				endImages = list(objectsByCat[layer]["end_layer"].values())
 				
 				endImagesList = []
 				for image in endImages:
+					print(image)
 					endImagesList.append(image["image"][0])
 					
-				self.addEnd(endText, endImagesList)
+				self.addEnd(endAttrs, endText, endImagesList)
 				
 		print(self.roomList)
 		
@@ -184,7 +195,7 @@ class ScenarioData(object):
 	# Save scenario to JSON files
 	def saveScenario(self):
 		scenarioChildren = []
-		
+		#TODO: Objects JSON, texts JSON
 		# Start menu
 		startObjects = []
 		startObjects.extend([
@@ -205,15 +216,16 @@ class ScenarioData(object):
 		for image in self.endView.endImages:
 			endObjects.append(self.__createLayerChild__(image.objectAttributes))
 			
-		# TODO: End text object
+		endObjects.append(self.__createLayerChild__(self.endView.endText.objectAttributes, "Text"))
+		print(self.endView.endText)
+		
 		endLayer = self.__createLayer__(endAttrs, endObjects)
 		scenarioChildren.append(endLayer)
 		
 		# Sequences
 		for sequence in self.sequenceList:
 			sequenceObjects = []
-			# TODO: Dynamic layer attrs?
-			sequenceAttrs = {"id": sequence.id + "_layer", "visible": False, "category": "sequence",	"object_name": sequence.id}
+			sequenceAttrs = sequence.layerAttrs
 			
 			for image in sequence.images:
 				sequenceObjects.append(self.__createLayerChild__(image.objectAttributes))
@@ -221,14 +233,38 @@ class ScenarioData(object):
 			sequenceLayer = self.__createLayer__(sequenceAttrs, sequenceObjects)
 			scenarioChildren.append(sequenceLayer)
 			
+		# Rooms
+		backgroundChildren = []
+		
+		for room in self.roomList:
+			print(room)
+			roomObjects = []
+			backgroundChildren.append(room.background.objectAttributes)
+			
+			for obj in room.objectList:
+				#print(obj.id,obj.imageAttributes)
+				#roomObjects.append(obj.)
+				objImages = obj.getImages()
+				#print(obj, obj.id)
+				for image in objImages:
+					objClassName = image.objectAttributes["classname"]
+					roomObjects.append(self.__createLayerChild__(image.objectAttributes, objClassName))
+				roomLayer = self.__createLayer__(room.layerAttrs, roomObjects)
+				scenarioChildren.append(roomLayer)
+		
+		# Background layer
+		backgroundLayerAttrs = {"id": "background_layer", "visible": False, "category": "room_background"}
+		backgroundLayer = self.__createLayer__(backgroundLayerAttrs, backgroundChildren)
+		scenarioChildren.append(backgroundLayer)
+		
 		# Bundle everything together
 		scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
 		scenarioData = self.__createLayer__(scenarioAttrs, scenarioChildren, "Stage")
 		
-		import pprint
-		pp = pprint.PrettyPrinter(indent=4)
-		pp.pprint(scenarioData)
-		
+		#import pprint
+		#pp = pprint.PrettyPrinter(indent=4)
+		#pp.pprint(scenarioData)
+		print(json.dumps(scenarioData, sort_keys=True, indent=4, separators=(',', ': ')))
 	# Game object layers
 	def __createLayer__(self, attrs, children, className="Layer"):
 		return {"attrs": attrs, "className": className, "children": children}
@@ -312,18 +348,22 @@ class ScenarioData(object):
 			if (roomObject):
 				room.deleteObject(objectId)
 				
-	def addEnd(self, endText, endImages):
-		newView = View.End(self, endText, endImages)
+	def addEnd(self, layerAttrs, endText, endImages):
+		newView = View.End(self, layerAttrs, endText, endImages)
 		self.endView = newView
 		
-	def addMenu(self, beginningImage, background, startButton, creditsButton, emptyButton):
-		newView = View.Menu(self, beginningImage, background, startButton, creditsButton, emptyButton)
+	def addMenu(self, layerAttrs, beginningImage, background, startButton, creditsButton, emptyButton):
+		newView = View.Menu(self, layerAttrs, beginningImage, background, startButton, creditsButton, emptyButton)
 		
 		self.menuView = newView
 		
-	def addSequence(self, objectAttributes, imageAttributes):
-		newView = View.Sequence(self, objectAttributes, imageAttributes)
+	def addSequence(self, layerAttrs, objectAttributes, imageAttributes):
+		newView = View.Sequence(self, layerAttrs, objectAttributes, imageAttributes)
 		self.sequenceList.append(newView)
+
+	def addRoom(self, objectAttributes, imageAttributes):
+		newView = View.Room(self, objectAttributes, imageAttributes)
+		self.roomList.append(newView)
 
 	# Create new generic object
 	def addObject(self, room, objectAttributes, imageAttributes):
