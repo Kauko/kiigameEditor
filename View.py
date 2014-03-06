@@ -34,9 +34,10 @@ class Sequence(View):
 				
 # Start menu
 class Menu(View):
-	def __init__(self, data, layerAttrs, beginingImage, background, startButton, creditsButton, emptyButton):
+	def __init__(self, data, objectAttributes, layerAttrs, beginingImage, background, startButton, creditsButton, emptyButton):
 		super(Menu, self).__init__(layerAttrs, "start")
 		
+		self.objectAttributes = objectAttributes
 		self.beginingImage = Object.JSONImage(data, self, beginingImage)
 		self.background = Object.JSONImage(data, self, background)
 		self.startButton = Object.JSONImage(data, self, startButton)
@@ -66,7 +67,8 @@ class Room(View):
 		
 		self.objectList = []
 		self.background = Object.JSONImage(data, self, imageAttributes)
-		self.layerAttrs = None
+		self.layerAttrs = None # Hopefully set later
+		self.viewAttributes = viewAttributes
 		
 	def deleteObject(self, objectId):
 		for obj in self.objectList:
