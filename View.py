@@ -69,6 +69,10 @@ class Room(View):
 		self.background = Object.JSONImage(data, self, imageAttributes)
 		self.layerAttrs = None # Hopefully set later
 		self.viewAttributes = viewAttributes
+	
+	def getImage(self):
+		image = self.background
+		return image
 		
 	def deleteObject(self, objectId):
 		for obj in self.objectList:

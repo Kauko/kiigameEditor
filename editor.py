@@ -73,7 +73,8 @@ class Editor(QtGui.QMainWindow):
 		# Display room image
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
-		pixmap = QtGui.QPixmap("gamedata/latkazombit/images/intro_5.png").scaled(1024, 534, QtCore.Qt.KeepAspectRatio)
+		#print(ScenarioData.sc.roomList[0].background.objectAttributes['src'])
+		pixmap = QtGui.QPixmap(ScenarioData.sc.roomList[0].background.objectAttributes['src']).scaled(1024, 534, QtCore.Qt.KeepAspectRatio)
 		scene.addPixmap(pixmap)
 		
 		left_frame_layout.addWidget(view)
