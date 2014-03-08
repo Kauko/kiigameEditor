@@ -6,11 +6,11 @@ class ScenarioData(object):
 	def __init__(self):
 		self.texts = {}
 		self.roomList = []
-		self.objectList = []
+		#self.objectList = []
 		self.sequenceList = []
 		#self.characterImages = []
 		self.otherObjectsList = {}
-		self.menuView = None
+		self.startView = None
 		self.endView = None
 		self.dataDir = "gamedata/latkazombit"
 
@@ -115,111 +115,24 @@ class ScenarioData(object):
 		pp = pprint.PrettyPrinter(indent=4)
 		pp.pprint(objectsByCat)
 		
-		# Create room objects from background_layer
-		"""for layer in objectsByCat["room_background"]["background_layer"]:
-			if (layer in ("attrs", "object")):
-				continue
-					
-			room = objectsByCat["room_background"]["background_layer"][layer]
-			viewAttributes = room["object"]
-			imageAttributes = room["image"]
-			
-			self.addRoom(viewAttributes, imageAttributes[0])
-			
-		print("Rooms created:", len(self.roomList))
-		"""
 		# Create objects from the gathered data		
 		for layer in objectsByCat:
 			if (layer == "misc"):
 				continue
 				
 			for child in objectsByCat[layer]:
-				#print(objectsByCat[layer][child])
 				viewImages = objectsByCat[layer][child].pop("image")
 				viewAttributes = objectsByCat[layer][child]
 				
-				#for obj in objectsByCat[layer][child]:
-					#obj = objectsByCat[layer][child][obj]
-					#objectAttributes = obj["object"]
-					#imageAttributes = obj["image"]
-				#	viewImages.append(objectsByCat[layer][child][obj])
-				"""
-				# Check category from either image or object
-				try:
-					objCat = obj["image"][0]["category"]
-				except KeyError:
-					objCat = obj["object"]["category"]
-				
-				if (objCat == "room_background"):
-					self.addRoom(viewAttributes, imageAttributes[0])
-				
-				elif (objCat == "object" and obj["image"][0]["classname"] == "Text"):
-					self.addText(currentRoom, imageAttributes[0])
-					
-				elif (objCat == "object"):
-					self.addObject(currentRoom, objectAttributes, imageAttributes)
-					
-				# TODO: Secret items - fix it in kiigame first
-				elif (objCat == "item"):
-					self.addItem(currentRoom, objectAttributes, imageAttributes)
-					
-				elif (objCat == "container"):
-					self.addContainer(currentRoom, objectAttributes, imageAttributes)
-					
-				elif (objCat == "door"):
-					self.addDoor(currentRoom, objectAttributes, imageAttributes)
-					
-				elif (objCat == "obstacle"):
-					self.addObstacle(currentRoom, objectAttributes, imageAttributes)
-				"""
-				#print("loooo",viewImages)
 				if (layer == "room"):
 					self.addRoom(child, viewAttributes, viewImages)
 				elif (layer == "sequence"):
-				    print("seqq")
-				else:
-				    print("other")
-			"""		    
-			elif (layer == "sequence"):
-				for child in objectsByCat[layer]:
-					sequenceAttrs = objectsByCat[layer][child].pop("attrs")
-					objectsByCat[layer][child].pop("object")
+				    self.addSequence(child, viewAttributes, viewImages)
+				elif (layer == "start"):
+					self.addStart(viewAttributes, viewImages)
+				elif (layer == "end"):
+					self.addEnd(viewAttributes, viewImages)
 					
-					imageAttributes = []
-					
-					# Ugly way to get sequenceId
-					for sequenceId in objectsByCat[layer][child]:
-						pass
-						
-					objectAttributes = objectsByCat[layer][child][sequenceId]["object"]
-					objectAttributes["id"] = sequenceId
-					imageAttributes = objectsByCat[layer][child][sequenceId]["image"]
-					
-					self.addSequence(sequenceAttrs, objectAttributes, imageAttributes)
-				
-			elif (layer == "start"):
-				start = objectsByCat[layer]["start_layer"]
-				startAttributes = start["object"]
-				
-				self.addMenu(startAttributes, start["attrs"], start["begining"]["image"][0], start["start"]["image"][0], start["start_game"]["image"][0], start["start_credits"]["image"][0], start["start_empty"]["image"][0])
-					
-			elif (layer == "end"):
-				endText = objectsByCat[layer]["end_layer"].pop("rewards_text", None)["image"][0]
-				endAttrs = objectsByCat[layer]["end_layer"].pop("attrs")
-				endObject = objectsByCat[layer]["end_layer"].pop("object")
-				endImages = list(objectsByCat[layer]["end_layer"].values())
-				
-				endImagesList = []
-				for image in endImages:
-					endImagesList.append(image["image"][0])
-					
-				self.addEnd(endObject, endAttrs, endText, endImagesList)
-				
-			elif (layer == "misc" or layer == "custom"):
-				for child in objectsByCat[layer]:
-					
-					self.otherObjectsList[child] = objectsByCat[layer][child]
-			"""
 		#pp.pprint(self.otherObjectsList)
 		print(self.roomList)
 		
@@ -359,39 +272,6 @@ class ScenarioData(object):
 	def __createLayerChild__(self, attrs, className="Image"):
 		return {"attrs": attrs, "className": className}
 		
-	# Add interactions for pickable items
-	def createInteractions(self):
-		for item in self.objectList:
-			if (type(item) != Object.Item):
-				continue
-				
-			# Get other items with this item as their target
-			for target in self.objectList:
-				#print("    ",target.id)
-				targetType = type(target)
-				
-				# Set trigger types
-				if (targetType == Object.Item):
-					if (target.interaction.triggerTarget == item.id):
-						item.interaction.setTriggerType("triggerTo", 
-						target.id, target.interaction.triggerOutcome)
-						
-				elif (targetType == Object.Container):
-					if (target.key == item.id):
-						item.interaction.setTriggerType("keyTo", target.id)
-					elif (target.inItem == item.id):
-						item.interaction.setTriggerType("goesInto", target.id)
-					elif (target.outItem == item.id):
-						item.interaction.comesFrom = target.id
-						
-				elif (targetType == Object.Door):
-					if (target.key == item.id):
-						item.interaction.setTriggerType("keyTo", target.id)
-						
-				elif (targetType == Object.Obstacle):
-					if (target.trigger == item.id):
-						item.interaction.setTriggerType("triggerTo", target.id)
-					
 	def getRoom(self, roomId):
 		for room in self.roomList:
 			if (room.id == roomId):
@@ -434,62 +314,21 @@ class ScenarioData(object):
 			if (roomObject):
 				room.deleteObject(objectId)
 				
-	def addEnd(self, endObject, layerAttrs, endText, endImages):
-		newView = View.End(self, endObject, layerAttrs, endText, endImages)
+	def addEnd(self, endAttributes, endImages):
+		newView = View.End(self, endAttributes, endImages)
 		self.endView = newView
 		
-	def addMenu(self, objectAttrs, layerAttrs, beginningImage, background, startButton, creditsButton, emptyButton):
-		newView = View.Menu(self, objectAttrs, layerAttrs, beginningImage, background, startButton, creditsButton, emptyButton)
+	def addStart(self, startAttributes, startImages):
+		newView = View.Start(self, startAttributes, startImages)
+		self.startView = newView
 		
-		self.menuView = newView
-		
-	def addSequence(self, layerAttrs, objectAttributes, imageAttributes):
-		newView = View.Sequence(self, layerAttrs, objectAttributes, imageAttributes)
+	def addSequence(self, sequenceId, sequenceAttributes, sequenceImages):
+		newView = View.Sequence(self, sequenceId, sequenceAttributes, sequenceImages)
 		self.sequenceList.append(newView)
 
 	def addRoom(self, roomId, roomAttributes, roomImages):
 		newView = View.Room(self, roomId, roomAttributes, roomImages)
 		self.roomList.append(newView)
-
-	# Create new generic object
-	def addObject(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Object(self, room, objectAttributes, imageAttributes)
-		self.__appendObject__(newObject, room)
-
-	# JSON text object
-	# TODO: What is the meaning of this?
-	def addText(self, room, objectAttributes):
-		newObject = Object.JSONText(self, room, objectAttributes)
-		self.__appendObject__(newObject, room)
-
-	# Create new item
-	def addItem(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Item(self, room, objectAttributes, imageAttributes)
-		self.__appendObject__(newObject, room)
-
-	# Create new container
-	def addContainer(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Container(self, room, objectAttributes, imageAttributes)
-		self.__appendObject__(newObject, room)
-
-	# Create new door
-	def addDoor(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Door(self, room, objectAttributes, imageAttributes)	
-		self.__appendObject__(newObject, room)
-
-	# Create new obstacle
-	def addObstacle(self, room, objectAttributes, imageAttributes):
-		newObject = Object.Obstacle(self, room, objectAttributes, imageAttributes)
-		self.__appendObject__(newObject, room)
-
-	# Add newly created object to this instance's and room's object lists
-	def __appendObject__(self, newObject, room=None):
-		# Object may be created without a room
-		if (room):
-			newObject.location = room
-			room.objectList.append(newObject)
-			
-		self.objectList.append(newObject)
 		
 	def deleteView(self):
 		return

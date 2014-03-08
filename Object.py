@@ -7,7 +7,7 @@ class Object(object):
 	usedIds = []
 	def createUniqueId(newId=None):
 		if not (newId):
-			newId = str(randint(0, 10))
+			newId = str(randint(0, 1000000000))
 			
 		failed = False
 		failCount = 0
@@ -32,13 +32,12 @@ class Object(object):
 		self.objectAttributes = objectAttributes
 		self.texts = data.getText(self.id)
 		
-		#print("instance",isinstance(self, Object), super())
 		# JSONImage doesn't need an image object
 		self.images = []
 		if not (isinstance(self, JSONImage)):
 			for image in images:
-				self.images.append(JSONImage(data, location, image))
-			
+				self.images.append(JSONImage(data, location, image, objectAttributes))
+		
 	# Return attributed object image (closed_image etc.) from imageAttributes
 	def __getAttributeImage__(self, attribute, imageAttributes):
 		if (attribute in self.objectAttributes):
@@ -198,8 +197,11 @@ class Obstacle(Object):
 		images = [self.blockingImage, self.unblockingImage]
 		return list(filter((None).__ne__, images))
 		
+# Image object representing what is in the JSON data
 class JSONImage(Object):
-	def __init__(self, data, location, imageAttributes):
-		super(JSONImage, self).__init__(data, location, imageAttributes["id"], imageAttributes, None)
-		self.imageAttributes = self.objectAttributes
+	# imageAttributes has to be dict, not a list as with other objects
+	# objectAttributes is a dict with object, attrs and className keys
+	def __init__(self, data, location, imageAttributes, objectAttributes):
+		super(JSONImage, self).__init__(data, location, imageAttributes["id"], None, objectAttributes)
+		self.imageAttributes = imageAttributes
 		
