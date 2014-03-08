@@ -115,7 +115,7 @@ class ScenarioData(object):
 			viewAttributes = room["object"]
 			imageAttributes = room["image"]
 			
-			self.addRoom(objectAttributes, viewAttributes, imageAttributes[0])
+			self.addRoom(viewAttributes, imageAttributes[0])
 			
 		print("Rooms created:", len(self.roomList))
 		
@@ -380,7 +380,8 @@ class ScenarioData(object):
 		newView = View.Sequence(self, layerAttrs, objectAttributes, imageAttributes)
 		self.sequenceList.append(newView)
 
-	def addRoom(self, objectAttributes, viewAttributes, imageAttributes):
+	#, objectAttributes taken away, wasn't used
+	def addRoom(self, viewAttributes, imageAttributes):
 		newView = View.Room(self, viewAttributes, imageAttributes)
 		self.roomList.append(newView)
 

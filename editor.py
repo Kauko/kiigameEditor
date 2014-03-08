@@ -73,7 +73,7 @@ class Editor(QtGui.QMainWindow):
 		# Display room image
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
-		pixmap = QtGui.QPixmap("gamedata/kiigame/images/intro_5.png").scaled(1024, 534, QtCore.Qt.KeepAspectRatio)
+		pixmap = QtGui.QPixmap("gamedata/latkazombit/images/intro_5.png").scaled(1024, 534, QtCore.Qt.KeepAspectRatio)
 		scene.addPixmap(pixmap)
 		
 		left_frame_layout.addWidget(view)
@@ -99,7 +99,7 @@ class RoomWidget(QtGui.QWidget):
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
 		
-		pixmap = QtGui.QPixmap("gamedata/kiigame/images/character_panic.png")
+		pixmap = QtGui.QPixmap("gamedata/latkazombit/images/character_panic.png")
 		scene.addPixmap(pixmap)
 		
 		layout.addWidget(view)
@@ -131,7 +131,7 @@ class SettingsWidget(QtGui.QWidget):
 		nameEdit = QtGui.QLineEdit("Nalle1")
 		# Object image
 		imgTextLabel = QtGui.QLabel("Kuva")
-		imgPixmap = QtGui.QPixmap("gamedata/kiigame/images/teddybear.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		imgPixmap = QtGui.QPixmap("gamedata/latkazombit/images/teddybear.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		imgLabel = QtGui.QLabel(self)
 		imgLabel.setPixmap(imgPixmap)
 
@@ -210,7 +210,7 @@ class SettingsWidget(QtGui.QWidget):
 		nameEdit = QtGui.QLineEdit("Huone1")
 		# Room image
 		imgTextLabel = QtGui.QLabel("Kuva")
-		imgPixmap = QtGui.QPixmap("gamedata/kiigame/images/shower_room.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		imgPixmap = QtGui.QPixmap("gamedata/latkazombit/images/shower_room.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		imgLabel = QtGui.QLabel(self)
 		imgLabel.setPixmap(imgPixmap)
 
