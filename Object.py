@@ -61,7 +61,10 @@ class Object(object):
 			if (image.id == imageId):
 				return image
 		return None
-	
+		
+	def getClassname(self):
+		return self.objectAttributes["className"]
+		
 # Pickable item
 class Item(Object):
 	def __init__(self, data, location, itemId, images, objectAttributes):

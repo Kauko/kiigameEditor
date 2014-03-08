@@ -32,6 +32,9 @@ class View(object):
 		self.object = viewAttributes["object"]
 		self.classname = viewAttributes["className"]
 		
+	def getChildren(self):
+		return
+				
 # Game cutscenes
 class Sequence(View):
 	def __init__(self, data, sequenceId, sequenceAttributes, sequenceImages):
@@ -45,11 +48,14 @@ class Sequence(View):
 			sequenceImage = Object.Object(data, self, sequenceId, images, imageAttributes)
 			self.sequenceImages.append(sequenceImage)
 			
-	def deleteImage(self, imageId):
+	def deleteChild(self, imageId):
 		for image in self.images:
 			if (image.id == imageId):
 				self.images.remove(image)
 				
+	def getChildren(self):
+		return self.sequenceImages
+		
 # Start menu
 class Start(View):
 	def __init__(self, data, startAttributes, startImages):
@@ -72,6 +78,9 @@ class Start(View):
 			if (imageId == "start_empty"):
 				self.emptyButton = Object.JSONImage(data, self, imageAttributes, objectAttributes)
 				
+	def getChildren(self):
+		return [self.background, self.startButton, self.creditsButton, self.emptyButton, self.beginingImage]
+		
 # End menu
 class End(View):
 	def __init__(self, data, endAttributes, endImages):
@@ -89,11 +98,14 @@ class End(View):
 			else:
 				self.endImages.append(Object.JSONImage(data, self, imageAttributes, objectAttributes))
 				
-	def deleteImage(self, imageId):
+	def deleteChild(self, imageId):
 		for image in self.endImages:
 			if (image.id == imageId):
 				self.endImages.remove(image)
 
+	def getChildren(self):
+		return self.endImages + [self.endText]
+		
 # Any game room
 class Room(View):
 	def __init__(self, data, roomId, roomAttributes, roomImages):
@@ -122,10 +134,13 @@ class Room(View):
 			else:
 				self.objectList.append(Object.Object(data, self, imageId, images, imageAttributes))
 				
-	def deleteObject(self, objectId):
+	def deleteChild(self, objectId):
 		for obj in self.objectList:
 			if (obj.id == objectId):
 				self.objectList.remove(obj)
+	
+	def getChildren(self):
+		return [self.background] + self.objectList
 	
 	# TODO: To be done (where does "data" attribute come from?)
 	# TODO: "data" parameter seems stupid
@@ -151,3 +166,25 @@ class Room(View):
 	def addObstacle(self, objectAttributes, imageAttributes):
 		self.objectList.append(Object.Obstacle(data, self, imageId, images, imageAttributes))
 	"""
+
+# Custom view for custom layers
+class Custom(View):
+	def __init__(self, data, viewId, viewAttributes, viewImages):
+		super(Custom, self).__init__(viewAttributes, viewId)
+		
+		# Create objects inside the room including the background
+		self.objectList = []
+		for imageId in viewImages:
+			images = viewImages[imageId].pop("image")
+			imageAttributes = viewImages[imageId]
+			
+			self.objectList.append(Object.Object(data, self, imageId, images, imageAttributes))
+				
+	def deleteChild(self, objectId):
+		for obj in self.objectList:
+			if (obj.id == objectId):
+				self.objectList.remove(obj)
+	
+	def getChildren(self):
+		return self.objectList
+		
