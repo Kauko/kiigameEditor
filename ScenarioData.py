@@ -8,7 +8,8 @@ class ScenarioData(object):
 		self.roomList = []
 		self.objectList = []
 		self.sequenceList = []
-		self.characterImages = []
+		#self.characterImages = []
+		self.otherObjectsList = {}
 		self.menuView = None
 		self.endView = None
 		self.dataDir = "gamedata/latkazombit"
@@ -43,9 +44,9 @@ class ScenarioData(object):
 			objectCategory = child["attrs"]["category"]
 			
 			# Accept only certain types of views
-			allowedViews = ("start", "end", "sequence", "room", "room_background")
-			if not (objectCategory in allowedViews):
-				continue
+			#allowedViews = ("start", "end", "sequence", "room", "room_background")
+			#if not (objectCategory in allowedViews):
+			#	continue
 				
 			objectId = child["attrs"]["id"]
 			
@@ -65,8 +66,15 @@ class ScenarioData(object):
 			
 			if not (layerChildren):
 				continue
-				
-			# Go through objects in layers
+							
+			# Leave misc objects as they are
+			if (objectCategory == "misc"):
+			    if not ("misc" in objectsByCat):
+			        objectsByCat["misc"] = {}
+			    objectsByCat["misc"][objectId] = child
+			    continue
+			    
+			# Go through the objects in the layer
 			# And check for relation with objects.json objects
 			createdObjects = {}
 			for item in layerChildren:
@@ -76,38 +84,39 @@ class ScenarioData(object):
 				# Get possible attributes from objects.json
 				if ("object_name" in item["attrs"]):
 					itemId = item["attrs"]["object_name"]
-					
-					# Save related objects for later use
 					jsonObject = objects[itemId]
-					jsonObject["id"] = itemId
 					
 				elif (itemId in objects):
 					jsonObject = objects[itemId]
 					
 				elif not (itemId in objects):
 					jsonObject = {}
-					
-				jsonImage["classname"] = item["className"]
 				
+				# Create dict key for the item	
 				if not (itemId in createdObjects):
 					createdObjects[itemId] = {}
+					
 				createdObjects[itemId]["object"] = jsonObject
+				createdObjects[itemId]["className"] = item["className"]
 				
 				if not ("image" in createdObjects[itemId]):
 					createdObjects[itemId]["image"] = []
 				
 				createdObjects[itemId]["image"].append(jsonImage)
-				
-			objectsByCat[objectCategory][objectId] = createdObjects
-			objectsByCat[objectCategory][objectId]["attrs"] = child["attrs"]
+
+            # Compose the final dict key and values				
+			objectsByCat[objectCategory][objectId] = {}
+			objectsByCat[objectCategory][objectId]["image"] = createdObjects
 			objectsByCat[objectCategory][objectId]["object"] = layerObject
+			objectsByCat[objectCategory][objectId]["attrs"] = child["attrs"]
+			objectsByCat[objectCategory][objectId]["className"] = child["className"]
 			
 		import pprint
 		pp = pprint.PrettyPrinter(indent=4)
 		pp.pprint(objectsByCat)
 		
 		# Create room objects from background_layer
-		for layer in objectsByCat["room_background"]["background_layer"]:
+		"""for layer in objectsByCat["room_background"]["background_layer"]:
 			if (layer in ("attrs", "object")):
 				continue
 					
@@ -118,48 +127,59 @@ class ScenarioData(object):
 			self.addRoom(viewAttributes, imageAttributes[0])
 			
 		print("Rooms created:", len(self.roomList))
-		
+		"""
 		# Create objects from the gathered data		
 		for layer in objectsByCat:
-			if (layer == "room"):
+			if (layer == "misc"):
+				continue
 				
-				for child in objectsByCat[layer]:
-					currentRoom = self.getRoom(child[13:])
-					currentRoom.layerAttrs = objectsByCat[layer][child]["attrs"]
+			for child in objectsByCat[layer]:
+				#print(objectsByCat[layer][child])
+				viewImages = objectsByCat[layer][child].pop("image")
+				viewAttributes = objectsByCat[layer][child]
+				
+				#for obj in objectsByCat[layer][child]:
+					#obj = objectsByCat[layer][child][obj]
+					#objectAttributes = obj["object"]
+					#imageAttributes = obj["image"]
+				#	viewImages.append(objectsByCat[layer][child][obj])
+				"""
+				# Check category from either image or object
+				try:
+					objCat = obj["image"][0]["category"]
+				except KeyError:
+					objCat = obj["object"]["category"]
+				
+				if (objCat == "room_background"):
+					self.addRoom(viewAttributes, imageAttributes[0])
+				
+				elif (objCat == "object" and obj["image"][0]["classname"] == "Text"):
+					self.addText(currentRoom, imageAttributes[0])
 					
-					for obj in objectsByCat[layer][child]:
-						if (obj == "attrs" or obj == "object"):
-							continue
-							
-						obj = objectsByCat[layer][child][obj]
-						objectAttributes = obj["object"]
-						imageAttributes = obj["image"]
-						
-						# Check category from either image or object
-						try:
-							objCat = obj["image"][0]["category"]
-						except KeyError:
-							objCat = obj["object"]["category"]
-						
-						if (objCat == "object" and obj["image"][0]["classname"] == "Text"):
-							self.addText(currentRoom, imageAttributes[0])
-							
-						elif (objCat == "object"):
-							self.addObject(currentRoom, objectAttributes, imageAttributes)
-							
-						# TODO: Secret items - fix it in kiigame first
-						elif (objCat == "item"):
-							self.addItem(currentRoom, objectAttributes, imageAttributes)
-							
-						elif (objCat == "container"):
-							self.addContainer(currentRoom, objectAttributes, imageAttributes)
-							
-						elif (objCat == "door"):
-							self.addDoor(currentRoom, objectAttributes, imageAttributes)
-							
-						elif (objCat == "obstacle"):
-							self.addObstacle(currentRoom, objectAttributes, imageAttributes)
-			
+				elif (objCat == "object"):
+					self.addObject(currentRoom, objectAttributes, imageAttributes)
+					
+				# TODO: Secret items - fix it in kiigame first
+				elif (objCat == "item"):
+					self.addItem(currentRoom, objectAttributes, imageAttributes)
+					
+				elif (objCat == "container"):
+					self.addContainer(currentRoom, objectAttributes, imageAttributes)
+					
+				elif (objCat == "door"):
+					self.addDoor(currentRoom, objectAttributes, imageAttributes)
+					
+				elif (objCat == "obstacle"):
+					self.addObstacle(currentRoom, objectAttributes, imageAttributes)
+				"""
+				#print("loooo",viewImages)
+				if (layer == "room"):
+					self.addRoom(child, viewAttributes, viewImages)
+				elif (layer == "sequence"):
+				    print("seqq")
+				else:
+				    print("other")
+			"""		    
 			elif (layer == "sequence"):
 				for child in objectsByCat[layer]:
 					sequenceAttrs = objectsByCat[layer][child].pop("attrs")
@@ -193,8 +213,14 @@ class ScenarioData(object):
 				for image in endImages:
 					endImagesList.append(image["image"][0])
 					
-				self.addEnd(endAttrs, endText, endImagesList)
+				self.addEnd(endObject, endAttrs, endText, endImagesList)
 				
+			elif (layer == "misc" or layer == "custom"):
+				for child in objectsByCat[layer]:
+					
+					self.otherObjectsList[child] = objectsByCat[layer][child]
+			"""
+		#pp.pprint(self.otherObjectsList)
 		print(self.roomList)
 		
 		for obj in self.objectList:
@@ -222,20 +248,20 @@ class ScenarioData(object):
 			scenarioObjects[startAttrs["object_name"]] = self.menuView.objectAttributes
 		except KeyError:
 			pass
-				
-		# TODO: End view object json
+			
 		# End view
 		endObjects = []
-		endAttrs = {"id": "end_layer", "visible": False, "category": "end"}
+		endAttrs = self.endView.layerAttrs
 		
 		for image in self.endView.endImages:
 			endObjects.append(self.__createLayerChild__(image.objectAttributes))
 			
 		endObjects.append(self.__createLayerChild__(self.endView.endText.objectAttributes, "Text"))
-		print(self.endView.endText)
 		
 		endLayer = self.__createLayer__(endAttrs, endObjects)
 		scenarioChildren.append(endLayer)
+		
+		scenarioObjects[self.endView.layerAttrs["object_name"]] = self.endView.objectAttributes
 		
 		# Sequences
 		for sequence in self.sequenceList:
@@ -254,36 +280,77 @@ class ScenarioData(object):
 		
 		for room in self.roomList:
 			roomObjects = []
-			backgroundChildren.append(room.background.objectAttributes)
+			backgroundChildren.append(self.__createLayerChild__(room.background.objectAttributes))
 			
+			# Image JSONs from room objects
 			for obj in room.objectList:
-				#print(obj.id,obj.imageAttributes)
-				#roomObjects.append(obj.)
 				objImages = obj.getImages()
-				#print(obj, obj.id)
+				
 				for image in objImages:
 					objClassName = image.objectAttributes["classname"]
 					roomObjects.append(self.__createLayerChild__(image.objectAttributes, objClassName))
-				roomLayer = self.__createLayer__(room.layerAttrs, roomObjects)
-				scenarioChildren.append(roomLayer)
-				
-			print("asd",room.viewAttributes)
-			#scenarioObjects[sequenceAttrs["object_name"]] = sequence.objectAttributes
+					
+				# Object JSONs can be created too
+				objType = type(obj)
+				if (objType == Object.Item):
+					if (len(obj.objectAttributes) != 0):
+						scenarioObjects[obj.id] = obj.objectAttributes
+						
+				elif (objType != Object.JSONText):
+					if ("object_name" in obj.image.objectAttributes):
+						scenarioObjects[obj.image.objectAttributes["object_name"]] = obj.objectAttributes
+						
+			roomLayer = self.__createLayer__(room.layerAttributes, roomObjects)
+			scenarioChildren.append(roomLayer)				
+			
+			try:
+				scenarioObjects[room.layerAttributes["object_name"]] = room.objectAttributes
+			except KeyError:
+				pass
 		
 		# Background layer
 		backgroundLayerAttrs = {"id": "background_layer", "visible": False, "category": "room_background"}
 		backgroundLayer = self.__createLayer__(backgroundLayerAttrs, backgroundChildren)
 		scenarioChildren.append(backgroundLayer)
 		
+		# Other objects
+		for obj in self.otherObjectsList:
+			layerAttrs = self.otherObjectsList[obj].pop("attrs")
+			layerObject = self.otherObjectsList[obj].pop("object")
+			
+			layerObjects = []
+			for image in self.otherObjectsList[obj]:
+				imageAttrs = self.otherObjectsList[obj][image]["image"][0]
+				imageClassname = imageAttrs["classname"]
+				
+				layerObjects.append(self.__createLayerChild__(imageAttrs, imageClassname))
+				#print(imageAttrs["object_name"])
+				try:
+					scenarioObjects[imageAttrs["object_name"]] = self.otherObjectsList[obj][image]["object"]
+				except KeyError:
+					pass
+				
+			otherLayer = self.__createLayer__(layerAttrs, layerObjects)
+			scenarioChildren.append(otherLayer)
+			
 		# Bundle everything together
 		scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
 		scenarioData = self.__createLayer__(scenarioAttrs, scenarioChildren, "Stage")
 		
-		#import pprint
-		#pp = pprint.PrettyPrinter(indent=4)
-		#pp.pprint(scenarioData)
-		#print(json.dumps(scenarioData, sort_keys=True, indent=4, separators=(',', ': ')))
-		print(json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': ')))
+		imagesJSON = json.dumps(scenarioData, sort_keys=True, indent=4, separators=(',', ': '))
+		objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
+		#print(imagesJSON)
+		#print(objectsJSON)
+		
+		# Save into file
+		#f = open(self.dataDir + "/images.json", "w")
+		#f.write(imagesJSON)
+		#f.close()
+		
+		#f = open(self.dataDir + "/objects.json", "w")
+		#f.write(objectsJSON)
+		#f.close()
+		
 	# Game object layers
 	def __createLayer__(self, attrs, children, className="Layer"):
 		return {"attrs": attrs, "className": className, "children": children}
@@ -367,8 +434,8 @@ class ScenarioData(object):
 			if (roomObject):
 				room.deleteObject(objectId)
 				
-	def addEnd(self, layerAttrs, endText, endImages):
-		newView = View.End(self, layerAttrs, endText, endImages)
+	def addEnd(self, endObject, layerAttrs, endText, endImages):
+		newView = View.End(self, endObject, layerAttrs, endText, endImages)
 		self.endView = newView
 		
 	def addMenu(self, objectAttrs, layerAttrs, beginningImage, background, startButton, creditsButton, emptyButton):
@@ -380,9 +447,8 @@ class ScenarioData(object):
 		newView = View.Sequence(self, layerAttrs, objectAttributes, imageAttributes)
 		self.sequenceList.append(newView)
 
-	#, objectAttributes taken away, wasn't used
-	def addRoom(self, viewAttributes, imageAttributes):
-		newView = View.Room(self, viewAttributes, imageAttributes)
+	def addRoom(self, roomId, roomAttributes, roomImages):
+		newView = View.Room(self, roomId, roomAttributes, roomImages)
 		self.roomList.append(newView)
 
 	# Create new generic object

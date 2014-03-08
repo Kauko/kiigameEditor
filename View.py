@@ -3,7 +3,7 @@ from random import randint
 
 # Virtual class for views
 class View(object):
-	def __init__(self, layerAttrs, id=None):
+	def __init__(self, viewAttributes, id=None):
 		# TODO: Check id collision, "running" id instead randint?
 		#		Static ID counter?
 		if not (id):
@@ -11,9 +11,10 @@ class View(object):
 		else:
 			self.id = id
 		
-		# TODO: layerAttrs already includes id	
-		self.layerAttrs = layerAttrs
-
+		self.attrs = viewAttributes["attrs"]
+		self.object = viewAttributes["object"]
+		self.classname = viewAttributes["className"]
+		
 # Game cutscenes
 class Sequence(View):
 	def __init__(self, data, layerAttrs, objectAttributes, imageAttributes):
@@ -46,7 +47,7 @@ class Menu(View):
 
 # End menu
 class End(View):
-	def __init__(self, data, layerAttrs, endText, endImages):
+	def __init__(self, data, objectAttributes, layerAttrs, endText, endImages):
 		super(End, self).__init__(layerAttrs, "end")
 		
 		self.endImages = []
@@ -54,6 +55,7 @@ class End(View):
 			self.endImages.append(Object.JSONImage(data, self, image))
 			
 		self.endText = Object.JSONText(data, self, endText)
+		self.objectAttributes = objectAttributes
 		
 	def deleteImage(self, imageId):
 		for image in self.endImages:
@@ -62,14 +64,31 @@ class End(View):
 
 # Any game room
 class Room(View):
-	def __init__(self, data, viewAttributes, imageAttributes):
-		super(Room, self).__init__(None, imageAttributes["id"])
+	def __init__(self, data, roomId, roomAttributes, roomImages):
+		super(Room, self).__init__(roomAttributes, roomId)
 		
+		# Create objects inside the room
 		self.objectList = []
-		self.background = Object.JSONImage(data, self, imageAttributes)
-		self.layerAttrs = None # Hopefully set later
-		self.viewAttributes = viewAttributes
-		
+		for imageId in roomImages:
+			images = roomImages[imageId].pop("image")
+			imageAttributes = roomImages[imageId]
+			imageCategory = images[0]["category"]
+			
+			# Create objects according to the category
+			if (imageCategory == "room_background"):
+				self.background = Object.JSONImage(data, self, images[0])
+			# TODO: Secret items - fix it in kiigame first
+			elif (imageCategory == "item"):
+				self.objectList.append(Object.Item(data, self, imageId, images, imageAttributes))
+			elif (imageCategory == "container"):
+				self.objectList.append(Object.Container(data, self, imageId, images, imageAttributes))
+			elif (imageCategory == "door"):
+				self.objectList.append(Object.Door(data, self, imageId, images, imageAttributes))
+			elif (imageCategory == "obstacle"):
+				self.objectList.append(Object.Obstacle(data, self, imageId, images, imageAttributes))
+			else:
+				self.objectList.append(Object.Object(data, self, imageId, images, imageAttributes))
+				
 	def deleteObject(self, objectId):
 		for obj in self.objectList:
 			if (obj.id == objectId):

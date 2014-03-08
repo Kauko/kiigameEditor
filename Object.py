@@ -2,24 +2,42 @@ from random import randint
 
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
-	def __init__(self, data, location, objectAttributes, imageAttributes):
-		# TODO: Check id collision, "running" id instead of randint?
-		#		Static ID counter?
-		if ("id" in objectAttributes):
-			self.id = objectAttributes["id"]
-		elif ("id" in imageAttributes[0]):
-			self.id = imageAttributes[0]["id"]
+
+	# Static method to create unique object ID
+	usedIds = []
+	def createUniqueId(newId=None):
+		if not (newId):
+			newId = str(randint(0, 10))
+			
+		failed = False
+		failCount = 0
+		originalId = newId
+		
+		# Loop till unique ID found
+		while (True):
+			if not (newId in Object.usedIds):
+				Object.usedIds.append(newId)
+				return newId
+			failCount += 1
+			newId = "%s_%i" %(originalId, failCount)
+			
+	def __init__(self, data, location, objectId, images, objectAttributes):
+		if (objectId):
+			self.id = Object.createUniqueId(objectId)
 		else:
-			self.id = int(randint(0, 1000000000))
+			self.id = Object.createUniqueId()
 			
 		#self.whatBlocks = None # TODO: In interaction instead?
 		self.location = location
 		self.objectAttributes = objectAttributes
 		self.texts = data.getText(self.id)
 		
-		# JSONText and JSONImages don't need image
-		if (imageAttributes):
-			self.image = JSONImage(data, location, imageAttributes[0])
+		#print("instance",isinstance(self, Object), super())
+		# JSONImage doesn't need an image object
+		self.images = []
+		if not (isinstance(self, JSONImage)):
+			for image in images:
+				self.images.append(JSONImage(data, location, image))
 			
 	# Return attributed object image (closed_image etc.) from imageAttributes
 	def __getAttributeImage__(self, attribute, imageAttributes):
@@ -30,18 +48,25 @@ class Object(object):
 					return attr
 		return None
 		
+	# Fill in attributes from objects that were missing during __init__
 	def postInit(self, getGameObject):
 		return
 		
 	def getImages(self):
-		images = [self.image]
-		return list(filter((None).__ne__, images))
+		#images = [self.image]
+		#return list(filter((None).__ne__, images))
+		return self.images
 		
+	def getImage(self, imageId):
+		for image in self.images:
+			if (image.id == imageId):
+				return image
+		return None
 	
 # Pickable item
 class Item(Object):
-	def __init__(self, data, room, objectAttributes, imageAttributes):
-		super(Item, self).__init__(data, room, objectAttributes, imageAttributes)
+	def __init__(self, data, location, itemId, images, objectAttributes):
+		super(Item, self).__init__(data, location, itemId, images, objectAttributes)
 		#self.interaction = interaction
 		#self.interaction.parentItem = self
 		
@@ -61,24 +86,23 @@ class Item(Object):
 			pass
 			
 class Container(Object):
-	def __init__(self, data, room, objectAttributes, imageAttributes):
-		super(Container, self).__init__(data, room, objectAttributes, imageAttributes)
+	def __init__(self, data, location, itemId, images, objectAttributes):
+		super(Container, self).__init__(data, location, itemId, images, objectAttributes)
 		
-		# Create the available door image objects
-		self.emptyImage = None
-		self.lockedImage = None
-		self.fullImage = None
-		emptyImage = self.__getAttributeImage__("empty_image", imageAttributes)
-		lockedImage = self.__getAttributeImage__("locked_image", imageAttributes)
-		fullImage = self.__getAttributeImage__("full_image", imageAttributes)
-		
-		if (emptyImage):
-			self.emptyImage = JSONImage(data, self, emptyImage)
-		if (lockedImage):
-			self.lockedImage = JSONImage(data, self, lockedImage)
-		if (fullImage):
-			self.fullImage = JSONImage(data, self, fullImage)
-		
+		# Create the available image objects
+		try:
+			self.emptyImage = self.getImage(objectAttributes["object"]["empty_image"])
+		except KeyError:
+			self.emptyImage = None
+		try:
+			self.lockedImage = self.getImage(objectAttributes["object"]["locked_image"])
+		except KeyError:
+			self.lockedImage = None
+		try:
+			self.fullImage = self.getImage(objectAttributes["object"]["full_image"])
+		except KeyError:
+			self.fullImage = None
+			
 		# Handle these in postInit
 		self.key = None
 		self.inItem = None
@@ -105,24 +129,23 @@ class Container(Object):
 		return list(filter((None).__ne__, images))
 		
 class Door(Object):
-	def __init__(self, data, room, objectAttributes, imageAttributes):
-		super(Door, self).__init__(data, room, objectAttributes, imageAttributes)
+	def __init__(self, data, location, itemId, images, objectAttributes):
+		super(Door, self).__init__(data, location, itemId, images, objectAttributes)
 		
-		# Create the available door image objects
-		self.closedImage = None
-		self.lockedImage = None
-		self.openImage = None
-		closedImage = self.__getAttributeImage__("closed_image", imageAttributes)
-		lockedImage = self.__getAttributeImage__("locked_image", imageAttributes)
-		openImage = self.__getAttributeImage__("open_image", imageAttributes)
-		
-		if (closedImage):
-			self.closedImage = JSONImage(data, self, closedImage)
-		if (lockedImage):
-			self.lockedImage = JSONImage(data, self, lockedImage)
-		if (openImage):
-			self.openImage = JSONImage(data, self, openImage)
-		
+		# Create the available image objects
+		try:
+			self.emptyImage = self.getImage(objectAttributes["object"]["closed_image"])
+		except KeyError:
+			self.emptyImage = None
+		try:
+			self.lockedImage = self.getImage(objectAttributes["object"]["locked_image"])
+		except KeyError:
+			self.lockedImage = None
+		try:
+			self.fullImage = self.getImage(objectAttributes["object"]["open_image"])
+		except KeyError:
+			self.fullImage = None
+			
 		# Handle these in postInit
 		self.key = None
 		self.transition = None
@@ -143,20 +166,18 @@ class Door(Object):
 		return list(filter((None).__ne__, images))
 		
 class Obstacle(Object):
-	def __init__(self, data, room, objectAttributes, imageAttributes):
-		super(Obstacle, self).__init__(data, room, objectAttributes, imageAttributes)
-		
-		# Create the available door image objects
-		self.blockingImage = None
-		self.unblockingImage = None
-		blockingImage = self.__getAttributeImage__("blocking_image", imageAttributes)
-		# TODO: Unblocking not implemented in kiigame
-		unblockingImage = self.__getAttributeImage__("unblocking_image", imageAttributes)
-		
-		if (blockingImage):
-			self.blockingImage = JSONImage(self, blockingImage)
-		if (unblockingImage):
-			self.unblockingImage = JSONImage(self, unblockingImage)
+	def __init__(self, data, location, itemId, images, objectAttributes):
+		super(Obstacle, self).__init__(data, location, itemId, images, objectAttributes)
+		# Create the available image objects
+		try:
+			self.blockingImage = self.getImage(objectAttributes["object"]["blocking_image"])
+		except KeyError:
+			self.blockingImage = None
+		try:
+			# TODO: To be implemented in kiigame
+			self.unblockingImage = self.getImage(objectAttributes["object"]["unblocking_image"])
+		except KeyError:
+			self.unblockingImage = None
 			
 		# Handle these in postInit
 		self.blockTarget = None
@@ -177,66 +198,8 @@ class Obstacle(Object):
 		images = [self.blockingImage, self.unblockingImage]
 		return list(filter((None).__ne__, images))
 		
-# Interaction data for pickable items
-class Interaction(object):
-	def __init__(self):
-		self.parentItem = None
-				
-		self.comesFrom = None # Container
-		
-		# TODO: Implicit and explicit triggers are silly.
-		#		Why couldn't the triggered item have the triggering item info
-		# 		in implicit manner?
-		
-		self.triggerType = "" # goesInto/keyTo/triggerTo
-		self.triggerTarget = None
-		self.triggerOutcome = None # Only when triggerTo used
-		
-		self.interactionTexts = {} # From texts.json
-		self.consume = False
-		
-		#self.setTriggerType(triggerType, triggerTarget)
-		
-	# Three kinds of item triggers
-	# goesInto = item goes into a locker
-	# keyTo = item opens locker or door
-	# triggerTo = what item triggers
-	def setTriggerType(self, triggerType, triggerTarget, triggerOutcome=None):
-		if not (triggerType in ("goesInto", "keyTo", "triggerTo")):
-			return
-			
-		# triggerTo requires outcome parameter
-		if (triggerType == "triggerTo"):
-			#if not (triggerOutcome):
-			#	raise Exception("triggerTo requires triggerOutcome")
-			#else:
-			self.triggerOutcome = triggerOutcome
-			
-		# TODO: Check triggerTarget type?
-		# TODO: When setting triggerTo, goesInto or keyTo
-		#		the corresponding target item's attribute needs setting
-		# 		(glue and poster for example)
-		self.triggerTarget = triggerTarget
-		
-	def setText(self, objectId, text):
-		if (not text or len(text) == 0):
-			if (objectId in self.interactionTexts):
-				self.interactionTexts.pop(objectId, None)
-		else:
-			self.interactionTexts[objectId] = text
-			
-	# If no default text in this item, use the master default value
-	def setDefaultText(self, text):
-		self.setText("default", text)
-		
 class JSONImage(Object):
 	def __init__(self, data, location, imageAttributes):
-		super(JSONImage, self).__init__(data, location, imageAttributes, None)
-		
-class JSONText(Object):
-	def __init__(self, data, location, textAttributes):
-		super(JSONText, self).__init__(data, location, textAttributes, None)
-		
-	def getImages(self):
-		return [self]
+		super(JSONImage, self).__init__(data, location, imageAttributes["id"], imageAttributes, None)
+		self.imageAttributes = self.objectAttributes
 		
