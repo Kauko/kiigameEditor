@@ -196,6 +196,11 @@ class ScenarioData(object):
 		for room in self.roomList:
 			if (room.id == roomId):
 				return room
+	
+	def getRoomBackLoc(self, i):
+		room = self.roomList[i]
+		loc = self.dataDir + '/' + room.background.objectAttributes['src']
+		return loc
 
 	def getSequence(self, sequenceId):
 		for sequence in self.sequenceList:
@@ -206,6 +211,11 @@ class ScenarioData(object):
 		for obj in self.objectList:
 			if (obj.id == objectId):
 				return obj
+	
+	def getObjectImgLoc(self, i):
+		o = self.objectList[i]
+		loc = self.dataDir + '/' + o.image.objectAttributes['src']
+		return loc
 	
 	def getText(self, objectId):
 		try:

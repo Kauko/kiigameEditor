@@ -73,9 +73,10 @@ class Editor(QtGui.QMainWindow):
 		# Display room image
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
-		#print(ScenarioData.sc.roomList[0].background.objectAttributes['src'])
-		pixmap = QtGui.QPixmap(ScenarioData.sc.roomList[0].background.objectAttributes['src']).scaled(1024, 534, QtCore.Qt.KeepAspectRatio)
-		scene.addPixmap(pixmap)
+		#print(ScenarioData.sc.getRoomBackLoc(0))
+		#print(ScenarioData.sc.getObjectImgLoc(0))
+		#pixmap = QtGui.QPixmap(ScenarioData.sc.roomList[0].background.objectAttributes['src']).scaled(1024, 534, QtCore.Qt.KeepAspectRatio)
+		#scene.addPixmap(pixmap)
 		
 		left_frame_layout.addWidget(view)
 
