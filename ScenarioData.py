@@ -8,7 +8,7 @@ class ScenarioData(object):
 		self.roomList = []
 		self.sequenceList = []
 		self.customObjectList = []
-		self.miscObjects = {}
+		self.miscObjects = []
 		self.startView = None
 		self.endView = None
 		
@@ -49,7 +49,7 @@ class ScenarioData(object):
 								
 			# Leave misc objects as they are
 			if (objectCategory == "misc"):
-				self.miscObjects[objectId] = child
+				self.miscObjects.append(child)
 				continue
 			    
 			layerChildren = None
@@ -167,7 +167,7 @@ class ScenarioData(object):
 		
 		# Miscellaneous objects
 		for misc in self.miscObjects:
-			scenarioImages.append(self.miscObjects[misc])
+			scenarioImages.append(misc)
 		
 		# Bundle everything together
 		scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
