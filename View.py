@@ -140,6 +140,9 @@ class Room(View):
 				self.objectList.remove(obj)
 	
 	def getChildren(self):
+		#print("\nObjects for",self.id)
+		#for x in self.objectList:
+		#	print("    ",x.id)
 		return [self.background] + self.objectList
 	
 	# TODO: To be done (where does "data" attribute come from?)

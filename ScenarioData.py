@@ -1,10 +1,9 @@
-import json
-import View
-import Object
+import json, View, Object
+from collections import OrderedDict
 
 class ScenarioData(object):
 	def __init__(self):
-		self.texts = {}
+		self.texts = OrderedDict()
 		self.roomList = []
 		self.sequenceList = []
 		self.customObjectList = []
@@ -34,8 +33,8 @@ class ScenarioData(object):
 			objects = json.load(f)
 			f.close()
 			
-		objectsByCat = {}
-		
+		# Parse objects from images.json and objects.json into categorized dict
+		objectsByCat = OrderedDict()
 		for child in images["children"]:
 			layerObject = {}
 			if ("object_name" in child["attrs"]):
@@ -45,7 +44,7 @@ class ScenarioData(object):
 			objectId = child["attrs"]["id"]
 			
 			if not (objectCategory in objectsByCat):
-				objectsByCat[objectCategory] = {}
+				objectsByCat[objectCategory] = OrderedDict()
 								
 			# Leave misc objects as they are
 			if (objectCategory == "misc"):
@@ -64,14 +63,13 @@ class ScenarioData(object):
 			    
 			# Go through the objects in the layer
 			# And check for relation with objects.json objects
-			createdObjects = {}
+			createdObjects = OrderedDict()
 			for item in layerChildren:
 				itemId = item["attrs"]["id"]
 				jsonImage = item["attrs"]
 				
 				# Get possible attributes from objects.json
 				if ("object_name" in item["attrs"]):
-					print(item)
 					itemId = item["attrs"]["object_name"]
 					
 					try:
@@ -85,7 +83,7 @@ class ScenarioData(object):
 				elif not (itemId in objects):
 					jsonObject = {}
 				
-				# Create dict key for the item	
+				# Create dict key for the item
 				if not (itemId in createdObjects):
 					createdObjects[itemId] = {}
 					
@@ -104,11 +102,11 @@ class ScenarioData(object):
 			objectsByCat[objectCategory][objectId]["attrs"] = child["attrs"]
 			objectsByCat[objectCategory][objectId]["className"] = child["className"]
 			
-		import pprint
-		pp = pprint.PrettyPrinter(indent=4)
+		#import pprint
+		#pp = pprint.PrettyPrinter(indent=4)
 		#pp.pprint(objectsByCat)
 		
-		# Create objects from the gathered data		
+		# Create objects from the categorized dict
 		for layer in objectsByCat:
 			if (layer == "misc"):
 				continue
@@ -120,15 +118,13 @@ class ScenarioData(object):
 				if (layer == "room"):
 					self.addRoom(child, viewAttributes, viewImages)
 				elif (layer == "sequence"):
-				    self.addSequence(child, viewAttributes, viewImages)
+					self.addSequence(child, viewAttributes, viewImages)
 				elif (layer == "start"):
 					self.addStart(viewAttributes, viewImages)
 				elif (layer == "end"):
 					self.addEnd(viewAttributes, viewImages)
 				elif (layer == "custom"):
 					self.addCustomView(child, viewAttributes, viewImages)
-					
-		#pp.pprint(self.otherObjectsList)
 		
 		# TODO: Post-init
 		#for obj in self.objectList:
