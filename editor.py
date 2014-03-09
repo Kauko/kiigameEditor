@@ -30,11 +30,25 @@ class Editor(QtGui.QMainWindow):
 		
 		# Room preview
 		left_frame = QtGui.QGroupBox("Huoneet")
-		left_frame_layout = QtGui.QGridLayout()
+		left_frame_layout = QtGui.QVBoxLayout()
 		left_frame.setLayout(left_frame_layout)
+		
+		left_scene = QtGui.QGraphicsScene(self)
+		
+		left_view = QtGui.QGraphicsView(left_scene)
+		left_frame_layout.addWidget(left_view, 1, 1)
 		layout.addWidget(left_frame)
 		
+		#All the pictures are in the same place
+		#TODO: implement QGraphicsGridLayout
+		#TODO: Also parser the other attributes and show them (names, etc.)
+		for i in range(len(ScenarioData.sc.roomList)):
+			pixmap = QtGui.QPixmap(ScenarioData.sc.getRoomBackLoc(i)).scaled(150, 150, QtCore.Qt.KeepAspectRatio)
+			pixItem = QtGui.QGraphicsPixmapItem(pixmap)
+			left_scene.addItem(pixItem)
+			
 		# Room items
+		#TODO: Same parsering as above
 		middle_frame = QtGui.QGroupBox("Huoneen esineet")
 		middle_frame_layout = QtGui.QVBoxLayout()
 		middle_frame.setLayout(middle_frame_layout)
@@ -45,11 +59,6 @@ class Editor(QtGui.QMainWindow):
 		right_frame_layout = QtGui.QVBoxLayout()
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
-		
-		left_frame_layout.addWidget(RoomWidget("Hello world!"), 0, 0)
-		left_frame_layout.addWidget(RoomWidget("Hello world!"), 1, 0)
-		left_frame_layout.addWidget(RoomWidget("Hello world!"), 0, 1)
-		left_frame_layout.addWidget(RoomWidget("Hello world!"), 1, 1)
 
 		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
 		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
