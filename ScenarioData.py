@@ -71,8 +71,13 @@ class ScenarioData(object):
 				
 				# Get possible attributes from objects.json
 				if ("object_name" in item["attrs"]):
+					print(item)
 					itemId = item["attrs"]["object_name"]
-					jsonObject = objects[itemId]
+					
+					try:
+						jsonObject = objects[itemId]
+					except KeyError:
+						print("Warning: Could not find object.json object for '%s' (object_name -> '%s')" %(item["attrs"]["id"], itemId))
 					
 				elif (itemId in objects):
 					jsonObject = objects[itemId]
