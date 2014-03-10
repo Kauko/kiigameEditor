@@ -17,10 +17,13 @@ class View(object):
 		# Loop till unique ID found
 		while (True):
 			if not (newId in View.usedIds):
+				if (failed):
+					print("Warning: Duplicate view ID '%s', new ID set as '%s'" %(originalId, newId))
 				View.usedIds.append(newId)
 				return newId
 			failCount += 1
-			newId = "%s_%i" %(originalId, failCount)
+			failed = True
+			newId = "%s_duplicate_%i" %(originalId, failCount)
 			
 	def __init__(self, viewAttributes, viewId=None):
 		if (viewId):
@@ -115,6 +118,7 @@ class Room(View):
 		# TODO: This could be done in super
 		self.objectList = []
 		for imageId in roomImages:
+			print("    iidididid", imageId)
 			images = roomImages[imageId].pop("image")
 			imageAttributes = roomImages[imageId]
 			imageCategory = images[0]["category"]
@@ -132,6 +136,7 @@ class Room(View):
 			elif (imageCategory == "obstacle"):
 				self.objectList.append(Object.Obstacle(data, self, imageId, images, imageAttributes))
 			else:
+				#self.addObject()
 				self.objectList.append(Object.Object(data, self, imageId, images, imageAttributes))
 				
 	def deleteChild(self, objectId):
@@ -144,7 +149,6 @@ class Room(View):
 	
 	# TODO: To be done (where does "data" attribute come from?)
 	# TODO: "data" parameter seems stupid
-	"""
 
 	# Create new generic object
 	def addObject(self, objectAttributes, imageAttributes):
@@ -165,7 +169,6 @@ class Room(View):
 	# Create new obstacle
 	def addObstacle(self, objectAttributes, imageAttributes):
 		self.objectList.append(Object.Obstacle(data, self, imageId, images, imageAttributes))
-	"""
 
 # Custom view for custom layers
 class Custom(View):
