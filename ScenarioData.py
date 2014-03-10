@@ -215,7 +215,7 @@ class ScenarioData(object):
 	
 	def getObjectImgLoc(self, room, i):
 		r = self.roomList[room]
-		o = r.objectList[i]
+		o = r.objectList[
 		loc = self.dataDir + '/' + o.images[0].imageAttributes['src']
 		return loc
 	
@@ -247,23 +247,23 @@ class ScenarioData(object):
 				room.deleteObject(objectId)
 				
 	def addEnd(self, endAttributes, endImages):
-		newView = View.End(self, endAttributes, endImages)
+		newView = View.End(self.texts, endAttributes, endImages)
 		self.endView = newView
 		
 	def addStart(self, startAttributes, startImages):
-		newView = View.Start(self, startAttributes, startImages)
+		newView = View.Start(self.texts, startAttributes, startImages)
 		self.startView = newView
 		
 	def addSequence(self, sequenceId, sequenceAttributes, sequenceImages):
-		newView = View.Sequence(self, sequenceId, sequenceAttributes, sequenceImages)
+		newView = View.Sequence(self.texts, sequenceId, sequenceAttributes, sequenceImages)
 		self.sequenceList.append(newView)
 
 	def addRoom(self, roomId, roomAttributes, roomImages):
-		newView = View.Room(self, roomId, roomAttributes, roomImages)
+		newView = View.Room(self.texts, roomId, roomAttributes, roomImages)
 		self.roomList.append(newView)
 		
 	def addCustomView(self, viewId, viewAttributes, viewImages):
-		newView = View.Custom(self, viewId, viewAttributes, viewImages)
+		newView = View.Custom(self.texts, viewId, viewAttributes, viewImages)
 		self.customObjectList.append(newView)
 		
 	def deleteView(self):
