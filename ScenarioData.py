@@ -9,7 +9,7 @@ class ScenarioData(object):
 		self.customObjectList = []
 		self.miscObjects = []
 		self.startView = None
-		self.endView = None
+		self.endViewList = []
 		
 		self.dataDir = "gamedata/latkazombit"
 
@@ -136,7 +136,7 @@ class ScenarioData(object):
 		scenarioImages = []
 		
 		# Go through views
-		for view in self.roomList + self.sequenceList + [self.startView] + [self.endView] + self.customObjectList:
+		for view in self.roomList + self.sequenceList + [self.startView] + self.endViewList + self.customObjectList:
 			viewChildren = []
 			
 			# Contents for objects.json from view
@@ -215,7 +215,7 @@ class ScenarioData(object):
 	
 	def getObjectImgLoc(self, room, i):
 		r = self.roomList[room]
-		o = r.objectList[
+		#o = r.objectList[
 		loc = self.dataDir + '/' + o.images[0].imageAttributes['src']
 		return loc
 	
@@ -248,7 +248,7 @@ class ScenarioData(object):
 				
 	def addEnd(self, endAttributes, endImages):
 		newView = View.End(self.texts, endAttributes, endImages)
-		self.endView = newView
+		self.endViewList.append(newView)
 		
 	def addStart(self, startAttributes, startImages):
 		newView = View.Start(self.texts, startAttributes, startImages)
