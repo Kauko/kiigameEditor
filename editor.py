@@ -8,6 +8,11 @@ import ScenarioData
 class Editor(QtGui.QMainWindow):
 	def __init__(self, parent=None):
 		super(Editor, self).__init__(parent)
+		
+		self.scenarioData = ScenarioData.ScenarioData()
+		self.scenarioData.loadScenario()
+		self.scenarioData.saveScenario()
+
 		self.setWindowTitle("Kiigame - Pelieditori")
 		
 		# TODO: Menubar
@@ -30,22 +35,39 @@ class Editor(QtGui.QMainWindow):
 		
 		# Room preview
 		left_frame = QtGui.QGroupBox("Huoneet")
-		left_frame_layout = QtGui.QVBoxLayout()
+		left_frame_layout = QtGui.QGridLayout()
 		left_frame.setLayout(left_frame_layout)
 		
-		left_scene = QtGui.QGraphicsScene(self)
+		left_scene = QtGui.QListView(self)
+		left_scene.setIconSize(QtCore.QSize(200, 200))
+		left_scene.setViewMode(QtGui.QListView.IconMode)
+		left_scene_model = QtGui.QStandardItemModel()
+		left_scene.setModel(left_scene_model)
+		left_frame_layout.addWidget(left_scene)
 		
-		left_view = QtGui.QGraphicsView(left_scene)
-		left_frame_layout.addWidget(left_view, 1, 1)
 		layout.addWidget(left_frame)
 		
 		#All the pictures are in the same place
 		#TODO: implement QGraphicsGridLayout
 		#TODO: Also parser the other attributes and show them (names, etc.)
-		for i in range(len(ScenarioData.sc.roomList)):
-			pixmap = QtGui.QPixmap(ScenarioData.sc.getRoomBackLoc(i)).scaled(150, 150, QtCore.Qt.KeepAspectRatio)
-			pixItem = QtGui.QGraphicsPixmapItem(pixmap)
-			left_scene.addItem(pixItem)
+		
+		for i in range(len(self.scenarioData.roomList)):
+			print(self.scenarioData.getRoomBackLoc(i))
+			room = self.scenarioData.roomList[i]
+			imagePath = self.scenarioData.getRoomBackLoc(i)
+			
+			roomName = room.getName()
+			if not (roomName):
+				roomName = "Huoneella ei ole nimeä"
+			
+			item = QtGui.QStandardItem()
+			
+			item.setText(roomName)
+	
+			icon = QtGui.QIcon(imagePath)
+			item.setIcon(icon)
+	
+			left_scene_model.appendRow(item)
 			
 		# Room items
 		#TODO: Same parsering as above
@@ -60,10 +82,10 @@ class Editor(QtGui.QMainWindow):
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
 
-		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
-		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
-		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
-		middle_frame_layout.addWidget(RoomWidget("Hello world!"))
+		middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
+		middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
+		middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
+		middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
 
 		right_frame_layout.addWidget(SettingsWidget())
 
@@ -82,9 +104,10 @@ class Editor(QtGui.QMainWindow):
 		# Display room image
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
-		print(ScenarioData.sc.getRoomBackLoc(0))
-		print(ScenarioData.sc.getObjectImgLoc(0, 0))
-		pixmap = QtGui.QPixmap(ScenarioData.sc.getRoomBackLoc(0)).scaled(790, 534, QtCore.Qt.KeepAspectRatio)
+		#print(ScenarioData.sc.getRoomBackLoc(0))
+		#print(ScenarioData.sc.getObjectImgLoc(0, 0))
+		
+		pixmap = QtGui.QPixmap(self.scenarioData.getRoomBackLoc(0)).scaled(790, 534, QtCore.Qt.KeepAspectRatio)
 		scene.addPixmap(pixmap)
 		
 		left_frame_layout.addWidget(view)
@@ -99,9 +122,13 @@ class Editor(QtGui.QMainWindow):
 
 # Room image with caption used in the main view
 class RoomWidget(QtGui.QWidget):
-	def __init__(self, caption_text, parent=None):
+	def __init__(self, imageText, imagePath, parent=None):
 		super(RoomWidget, self).__init__(parent)
 		self.setAutoFillBackground(True)
+		
+		#pixmap = QtGui.QPixmap(imagePath).scaled(150, 150, QtCore.Qt.KeepAspectRatio)
+		#pixItem = QtGui.QGraphicsPixmapItem(pixmap)
+		#pixItem.setPos(0, i*100)
 		
 		layout = QtGui.QVBoxLayout()
 		self.setLayout(layout)
@@ -110,16 +137,20 @@ class RoomWidget(QtGui.QWidget):
 		scene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(scene)
 		
-		pixmap = QtGui.QPixmap("gamedata/latkazombit/images/character_panic.png")
+		pixmap = QtGui.QPixmap(imagePath).scaled(150, 150, QtCore.Qt.KeepAspectRatio)
+		pixItem = QtGui.QGraphicsPixmapItem(pixmap)
+		pixItem.setPos(100, 100)
+		
 		scene.addPixmap(pixmap)
 		
 		layout.addWidget(view)
 		
 		# Image caption text
 		caption = QtGui.QLabel(self)
-		caption.setText(caption_text)
+		caption.setText(imageText)
 		
-		layout.addWidget(caption)
+		scene.addWidget(caption)
+		pixItem.setPos(100, 100)
 
 # Item and room settings widget
 class SettingsWidget(QtGui.QWidget):

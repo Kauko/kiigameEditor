@@ -25,13 +25,12 @@ class Object(object):
 			failed = True
 			newId = "%s_duplicate_%i" %(originalId, failCount)
 			
-	def __init__(self, text, location, objectId, images, objectAttributes):
+	def __init__(self, texts, location, objectId, images, objectAttributes):
 		# JSONImage doesn't need an image or an ID check
 		self.images = []
-		print("    object", objectId, isinstance(self, JSONImage))
 		if not (isinstance(self, JSONImage)):
 			for image in images:
-				self.images.append(JSONImage(text, location, image, objectAttributes))
+				self.images.append(JSONImage(texts, location, image, objectAttributes))
 			if (objectId):
 				self.id = Object.createUniqueId(objectId)
 			else:
@@ -43,10 +42,10 @@ class Object(object):
 		self.location = location
 		self.objectAttributes = objectAttributes
 		try:
-			self.text = text[self.id]
+			self.texts = texts[self.id]
 		except KeyError:
-			self.text = None
-			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
+			self.texts = None
+			print("Warning: Could not find textss.json entry for object '%s'" %(self.id))
 		
 	# Return attributed object image (closed_image etc.) from imageAttributes
 	def __getAttributeImage__(self, attribute, imageAttributes):
@@ -77,8 +76,8 @@ class Object(object):
 		
 # Pickable item
 class Item(Object):
-	def __init__(self, text, location, itemId, images, objectAttributes):
-		super(Item, self).__init__(text, location, itemId, images, objectAttributes)
+	def __init__(self, texts, location, itemId, images, objectAttributes):
+		super(Item, self).__init__(texts, location, itemId, images, objectAttributes)
 		#self.interaction = interaction
 		#self.interaction.parentItem = self
 		
@@ -98,8 +97,8 @@ class Item(Object):
 			pass
 			
 class Container(Object):
-	def __init__(self, text, location, itemId, images, objectAttributes):
-		super(Container, self).__init__(text, location, itemId, images, objectAttributes)
+	def __init__(self, texts, location, itemId, images, objectAttributes):
+		super(Container, self).__init__(texts, location, itemId, images, objectAttributes)
 		
 		# Create the available image objects
 		try:
@@ -141,8 +140,8 @@ class Container(Object):
 		return list(filter((None).__ne__, images))
 		
 class Door(Object):
-	def __init__(self, text, location, itemId, images, objectAttributes):
-		super(Door, self).__init__(text, location, itemId, images, objectAttributes)
+	def __init__(self, texts, location, itemId, images, objectAttributes):
+		super(Door, self).__init__(texts, location, itemId, images, objectAttributes)
 		
 		# Create the available image objects
 		try:
@@ -178,8 +177,8 @@ class Door(Object):
 		return list(filter((None).__ne__, images))
 		
 class Obstacle(Object):
-	def __init__(self, text, location, itemId, images, objectAttributes):
-		super(Obstacle, self).__init__(text, location, itemId, images, objectAttributes)
+	def __init__(self, texts, location, itemId, images, objectAttributes):
+		super(Obstacle, self).__init__(texts, location, itemId, images, objectAttributes)
 		# Create the available image objects
 		try:
 			self.blockingImage = self.getImage(objectAttributes["object"]["blocking_image"])
@@ -210,12 +209,11 @@ class Obstacle(Object):
 		images = [self.blockingImage, self.unblockingImage]
 		return list(filter((None).__ne__, images))
 		
-# Image object representing what is in the JSON text
+# Image object representing what is in the JSON texts
 class JSONImage(Object):
 	# imageAttributes has to be dict, not a list as with other objects
 	# objectAttributes is a dict with object, attrs and className keys
-	def __init__(self, text, location, imageAttributes, objectAttributes):
-		print("    jsonImage",imageAttributes)
-		super(JSONImage, self).__init__(text, location, imageAttributes["id"], None, objectAttributes)
+	def __init__(self, texts, location, imageAttributes, objectAttributes):
+		super(JSONImage, self).__init__(texts, location, imageAttributes["id"], None, objectAttributes)
 		self.imageAttributes = imageAttributes
 		

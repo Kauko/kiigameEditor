@@ -218,12 +218,6 @@ class ScenarioData(object):
 		#o = r.objectList[
 		loc = self.dataDir + '/' + o.images[0].imageAttributes['src']
 		return loc
-	
-	def getText(self, objectId):
-		try:
-			return self.texts[objectId]
-		except KeyError:
-			return None
 		
 	# Get room, sequence or object
 	def getGameObject(self, entityType, entityId):
@@ -275,7 +269,8 @@ class ScenarioData(object):
 	def editUse(self):
 		return
 
-sc = ScenarioData()
-sc.loadScenario()
-sc.saveScenario()
+if (__name__ == "__main__"):
+	sc = ScenarioData()
+	sc.loadScenario()
+	sc.saveScenario()
 
