@@ -14,36 +14,31 @@ class Object(object):
 		originalId = newId
 		
 		# Loop till unique ID found
-		print("CJECKING", newId)
 		while (True):
 			if not (newId in Object.usedIds):
 				if (failed):
-					print(Object.usedIds)
 					print("Warning: Duplicate object ID '%s', new ID set as '%s'" %(originalId, newId))
 				Object.usedIds.append(newId)
-				print("CHECK OK", newId)
 				return newId
-			print("??", Object.usedIds)
+				
 			failCount += 1
 			failed = True
 			newId = "%s_duplicate_%i" %(originalId, failCount)
 			
 	def __init__(self, text, location, objectId, images, objectAttributes):
-		print("obje", objectId)
 		# JSONImage doesn't need an image or an ID check
 		self.images = []
+		print("    object", objectId, isinstance(self, JSONImage))
 		if not (isinstance(self, JSONImage)):
 			for image in images:
 				self.images.append(JSONImage(text, location, image, objectAttributes))
 			if (objectId):
-				print("idset", objectId)
 				self.id = Object.createUniqueId(objectId)
 			else:
-				print("idset2", objectId)
 				self.id = Object.createUniqueId()
 		else:
 			self.id = objectId
-			print("id is now", self.id)
+		
 		#self.whatBlocks = None # TODO: In interaction instead?
 		self.location = location
 		self.objectAttributes = objectAttributes
@@ -52,7 +47,6 @@ class Object(object):
 		except KeyError:
 			self.text = None
 			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
-		print("END obje", self.id)
 		
 	# Return attributed object image (closed_image etc.) from imageAttributes
 	def __getAttributeImage__(self, attribute, imageAttributes):
@@ -221,6 +215,7 @@ class JSONImage(Object):
 	# imageAttributes has to be dict, not a list as with other objects
 	# objectAttributes is a dict with object, attrs and className keys
 	def __init__(self, text, location, imageAttributes, objectAttributes):
+		print("    jsonImage",imageAttributes)
 		super(JSONImage, self).__init__(text, location, imageAttributes["id"], None, objectAttributes)
 		self.imageAttributes = imageAttributes
 		

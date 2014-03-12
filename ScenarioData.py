@@ -136,7 +136,7 @@ class ScenarioData(object):
 		scenarioImages = []
 		
 		# Go through views
-		for view in self.roomList + self.sequenceList + [self.startView] + [self.endView] + self.customObjectList:
+		for view in self.roomList + [self.startView] + [self.endView] + self.sequenceList + self.customObjectList:
 			viewChildren = []
 			
 			# Contents for objects.json from view
@@ -215,7 +215,7 @@ class ScenarioData(object):
 	
 	def getObjectImgLoc(self, room, i):
 		r = self.roomList[room]
-		o = r.objectList[
+		#o = r.objectList[
 		loc = self.dataDir + '/' + o.images[0].imageAttributes['src']
 		return loc
 	

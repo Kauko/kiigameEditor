@@ -46,9 +46,12 @@ class Sequence(View):
 		# Create sequence image objects
 		self.sequenceImages = []
 		for image in sequenceImages:
-			images = sequenceImages[image].pop("image")
+			images = sequenceImages[image].pop("image")[0]
 			imageAttributes = sequenceImages[image]
-			sequenceImage = Object.Object(data, self, sequenceId, images, imageAttributes)
+			print("    sequenceiamge", sequenceId)
+			#sequenceImage = Object.JSONImage(data, self, sequenceId, images, imageAttributes)
+			print("    seqimage", images)
+			sequenceImage = Object.JSONImage(data, self, images, imageAttributes)
 			self.sequenceImages.append(sequenceImage)
 			
 	def deleteChild(self, imageId):
@@ -118,7 +121,6 @@ class Room(View):
 		# TODO: This could be done in super
 		self.objectList = []
 		for imageId in roomImages:
-			print("    iidididid", imageId)
 			images = roomImages[imageId].pop("image")
 			imageAttributes = roomImages[imageId]
 			imageCategory = images[0]["category"]
@@ -136,7 +138,6 @@ class Room(View):
 			elif (imageCategory == "obstacle"):
 				self.objectList.append(Object.Obstacle(data, self, imageId, images, imageAttributes))
 			else:
-				#self.addObject()
 				self.objectList.append(Object.Object(data, self, imageId, images, imageAttributes))
 				
 	def deleteChild(self, objectId):
