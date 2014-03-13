@@ -198,6 +198,9 @@ class ScenarioData(object):
 			if (room.id == roomId):
 				return room
 	
+	def getRooms(self):
+		return self.roomList
+	
 	def getRoomBackLoc(self, i):
 		room = self.roomList[i]
 		loc = self.dataDir + '/' + room.background.imageAttributes['src']

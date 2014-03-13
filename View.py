@@ -49,6 +49,12 @@ class View(object):
 		except:
 			return None
 			
+	def getMusic(self):
+		try:
+			return self.object["music"]
+		except KeyError:
+			return
+			
 # Game cutscenes
 class Sequence(View):
 	def __init__(self, texts, sequenceId, sequenceAttributes, sequenceImages):

@@ -11,7 +11,6 @@ class Editor(QtGui.QMainWindow):
 		
 		self.scenarioData = ScenarioData.ScenarioData()
 		self.scenarioData.loadScenario()
-		self.scenarioData.saveScenario()
 
 		self.setWindowTitle("Kiigame - Pelieditori")
 		
@@ -46,6 +45,7 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setFlow(QtGui.QListView.LeftToRight)
 		self.left_scene.setMovement(QtGui.QListView.Static)
 		self.left_scene.itemClicked.connect(self.roomClicked)
+		# TODO: Double click room, display the room view
 		
 		left_frame_layout.addWidget(self.left_scene)
 		
@@ -55,7 +55,6 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setCurrentItem(selectedRoom)
 		
 		# Room items
-		#TODO: Same parsering as above
 		middle_frame = QtGui.QGroupBox("Huoneen esineet")
 		middle_frame_layout = QtGui.QVBoxLayout()
 		middle_frame.setLayout(middle_frame_layout)
@@ -70,8 +69,8 @@ class Editor(QtGui.QMainWindow):
 		middle_frame_layout.addWidget(self.middle_scene)
 		
 		self.drawRoomItems(selectedRoom.room.getItems())
-		selectedItem = self.middle_scene.itemAt(0, 0)
-		self.middle_scene.setCurrentItem(selectedItem)
+		#selectedItem = self.middle_scene.itemAt(0, 0)
+		#self.middle_scene.setCurrentItem(selectedItem)
 		
 		# Settings for items and rooms
 		right_frame = QtGui.QGroupBox("Asetukset")
@@ -79,8 +78,11 @@ class Editor(QtGui.QMainWindow):
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
 		
-		right_frame_layout.addWidget(SettingsWidget())
-
+		self.settingsWidget = SettingsWidget(self)
+		right_frame_layout.addWidget(self.settingsWidget)
+		
+		self.settingsWidget.showRoomOptions(selectedRoom.room)
+		
 	def createSpaceTab(self):
 		self.spaceTab = QtGui.QWidget()
 
@@ -133,15 +135,20 @@ class Editor(QtGui.QMainWindow):
 	def drawRoomItems(self, roomItems):
 		self.middle_scene.clear()
 		for item in roomItems:
-			# TODO: Resolve this (issue #8)
+			# TODO: Resolve handling text objects (issue #8)
 			if (item.getClassname() == "Text"):
 				continue
 				
 			widgetItem = ItemWidget(item, self.scenarioData.dataDir)
 			
 			self.middle_scene.addItem(widgetItem)
-			#print(item)
 			
+	def getImageDir(self):
+		return self.scenarioData.dataDir
+		
+	def getRoomObjects(self):
+		return self.scenarioData.getRooms()
+		
 # Room image with caption used in the main view
 class RoomWidget(QtGui.QListWidgetItem):
 	def __init__(self, room, imageDir, parent=None):
@@ -149,13 +156,12 @@ class RoomWidget(QtGui.QListWidgetItem):
 		
 		self.room = room
 		
-		imagePath = imageDir+"/"+room.getBackground().getLocation()
-		
 		roomName = room.getName()
 		if not (roomName):
 			roomName = "Huoneella ei ole nimeä"
 		self.setText(roomName)
 		
+		imagePath = imageDir+"/"+room.getBackground().getLocation()
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
 		
@@ -169,13 +175,13 @@ class ItemWidget(QtGui.QListWidgetItem):
 		
 		self.item = item
 		imageObject = item.getRepresentingImage()
-		imagePath = imageDir+"/"+imageObject.getLocation()
 		
 		itemName = imageObject.getName()
 		if not (itemName):
 			itemName = "Esineellä ei ole nimeä"
 		self.setText(itemName)
 		
+		imagePath = imageDir+"/"+imageObject.getLocation()
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
 		
@@ -183,14 +189,20 @@ class ItemWidget(QtGui.QListWidgetItem):
 class SettingsWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
 		super(SettingsWidget, self).__init__(parent)
-
+		self.parent = parent
+		
+		self.musicTextEdit = QtGui.QLineEdit()
+		self.musicTextEdit.setReadOnly(True)
+		
+		self.imgLabel = QtGui.QLabel(self)
+		self.imgLabel.mousePressEvent = lambda s: self.showImageDialog()
 		# For testing the different options:
-		self.showObjectOptions()
+		#self.showObjectOptions()
 		#self.showRoomOptions()
 		
 	#Settings for the object view
 	#TODO: Reduce redundancy; similar settings layout, "Name", "Picture" etc., are defined many times
-	def showObjectOptions(self):
+	def showObjectOptions(self, gameObject):
 		layout = QtGui.QGridLayout()
 		self.setLayout(layout)
 		self.setSizePolicy(QtGui.QSizePolicy(
@@ -268,7 +280,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 	
 	#Settings for the room view
-	def showRoomOptions(self):
+	def showRoomOptions(self, gameRoom):
+		#TODO: Change room attributes in real time or after closing the dialog?
+		
 		# TODO: Align the layout to the top
 		layout = QtGui.QGridLayout()
 		self.setLayout(layout)
@@ -276,55 +290,84 @@ class SettingsWidget(QtGui.QWidget):
 		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
 		
 		nameLabel = QtGui.QLabel("Nimi")
-		nameEdit = QtGui.QLineEdit("Huone1")
+		roomName = gameRoom.getName()
+		if not (roomName):
+			roomName = "Huoneella ei ole nimeä"
+		nameEdit = QtGui.QLineEdit(roomName)
+		
 		# Room image
 		imgTextLabel = QtGui.QLabel("Kuva")
-		imgPixmap = QtGui.QPixmap("gamedata/latkazombit/images/shower_room.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
-		imgLabel = QtGui.QLabel(self)
-		imgLabel.setPixmap(imgPixmap)
-
+		self.setRoomBackground(self.parent.getImageDir()+"/"+gameRoom.getBackground().getLocation())
+		
 		musicLabel = QtGui.QLabel("Musiikki")
-		musicTextEdit = QtGui.QLineEdit("Placeholder.mp3")
-		musicTextEdit.setReadOnly(True)
-		# TODO: QFileDialog to select the music, doesn't work yet
+		# TODO: Splitting requires detecting OS file slash direction?
+		# Get the plain filename for the music
+		try:
+			roomMusic = gameRoom.getMusic().split("/")[-1]
+		except AttributeError:
+			# May return None which doesn't have split
+			roomMusic = ""
+		self.musicTextEdit.setText(roomMusic)
+		# TODO: How to clear music?
+		
 		musicBtn = QtGui.QPushButton('Selaa...', self)
 		musicBtn.setToolTip('Valitse musiikkitiedosto')
 		musicBtn.resize(musicBtn.sizeHint())
-		musicBtn.clicked.connect(self.showDialog)
+		musicBtn.clicked.connect(self.showMusicDialog)
 		
-		whereFromLabel = QtGui.QLabel("Mista sinne paasee?")
+		whereFromLabel = QtGui.QLabel("Mistä sinne pääsee?")
 		whereFromCombo = QtGui.QComboBox(self)
 		whereFromCombo.setIconSize(QtCore.QSize(50,50))
-		roomIcon = QtGui.QIcon(imgPixmap)
+		
+		self.createRoomComboBox(whereFromCombo)
+		#roomIcon = QtGui.QIcon(imgPixmap)
 		# Example rooms
-		whereFromCombo.addItem(roomIcon, "Huone2")
-		whereFromCombo.addItem(roomIcon, "Huone3")
-		whereFromCombo.addItem(roomIcon, "Huone4")
+		#whereFromCombo.addItem(roomIcon, "Huone2")
+		#whereFromCombo.addItem(roomIcon, "Huone3")
+		#whereFromCombo.addItem(roomIcon, "Huone4")
 		
 		layout.addWidget(nameLabel, 0, 0)
 		layout.addWidget(nameEdit, 0, 1, 1, 2)
 		layout.addWidget(imgTextLabel, 1, 0)
-		layout.addWidget(imgLabel, 1, 1, 2, 2)
+		layout.addWidget(self.imgLabel, 1, 1, 2, 2)
 		layout.addWidget(musicLabel, 4, 0)
-		layout.addWidget(musicTextEdit, 4, 1)
+		layout.addWidget(self.musicTextEdit, 4, 1)
 		layout.addWidget(musicBtn, 4, 2)
 		layout.addWidget(whereFromLabel, 6, 0)
 		layout.addWidget(whereFromCombo, 6, 1, 1, 2)
-	
-	def showDialog(self):
-		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
-		'Valitse musiikkitiedosto','/home/', "Musiikkitiedostot (*.mp3 *.ogg)")
 		
-		#f = open(fname, 'r')
-		#with f:
-		#	data = f.read()
-		#	self.musicTextEdit.setText(fname.selectedFiles)
-
-class DropDownWidget(QtGui.QWidget):
-	def __init__(self, parent=None):
-		super(SettingsWidget, self).__init__(parent)
-		print("Dropdown widget!")
-
+	def showMusicDialog(self):
+		# TODO: How to remember last folder? (Did adding ~ do this suddenly?)
+		# TODO: OS file slash detection here too
+		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
+		'Valitse musiikkitiedosto','~', "Musiikkitiedostot (*.mp3 *.ogg)")
+		# TODO: Modified object requires filename in format "audio/filename.xxx"
+		self.musicTextEdit.setText(fname.split("/")[-1])
+		
+	def showImageDialog(self):
+		# TODO: How to remember last folder? (Did adding ~ do this suddenly?)
+		# TODO: OS file slash detection here too
+		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
+		'Valitse taustakuva','~', "Taustakuvat (*.png)")
+		# TODO: Modified object requires filename in format "images/filename.png"
+		self.setRoomBackground(fname)
+		
+	def setRoomBackground(self, imagePath):
+		imgPixmap = QtGui.QPixmap(imagePath).scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		self.imgLabel.setPixmap(imgPixmap)
+		
+	def createRoomComboBox(self, combobox):
+		for room in self.parent.getRoomObjects():
+			# TODO: Some model to eliminate redundancy of this kind of getName/filename patterns
+			roomName = room.getName()
+			if not (roomName):
+				roomName = "Huoneella ei ole nimeä"
+			imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
+			
+			roomIcon = QtGui.QIcon(imgPixmap)
+			combobox.addItem(roomIcon, roomName)
+		#whereFromCombo.addItem(roomIcon, "Huone2")
+		
 if __name__ == '__main__':
 	from sys import argv, exit
 
