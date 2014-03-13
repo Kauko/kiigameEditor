@@ -156,9 +156,13 @@ class Room(View):
 	def getChildren(self):
 		return [self.background] + self.objectList
 	
-	# TODO: To be done (where does "texts" attribute come from?)
-	# TODO: "texts" parameter seems stupid
-
+	def getItems(self):
+		return self.objectList
+	
+	def getBackground(self):
+		return self.background
+		
+	# TODO: These addX methods
 	# Create new generic object
 	def addObject(self, objectAttributes, imageAttributes):
 		self.objectList.append(Object.Object(texts, self, imageId, images, imageAttributes))
@@ -178,6 +182,8 @@ class Room(View):
 	# Create new obstacle
 	def addObstacle(self, objectAttributes, imageAttributes):
 		self.objectList.append(Object.Obstacle(texts, self, imageId, images, imageAttributes))
+
+	
 
 # Custom view for custom layers
 class Custom(View):

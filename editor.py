@@ -38,37 +38,32 @@ class Editor(QtGui.QMainWindow):
 		left_frame_layout = QtGui.QGridLayout()
 		left_frame.setLayout(left_frame_layout)
 		
-		left_scene = QtGui.QListView(self)
+		# Set-up widget for showing rooms
+		left_scene = QtGui.QListWidget(self)
 		left_scene.setIconSize(QtCore.QSize(200, 200))
 		left_scene.setViewMode(QtGui.QListView.IconMode)
-		left_scene_model = QtGui.QStandardItemModel()
-		left_scene.setModel(left_scene_model)
-		left_frame_layout.addWidget(left_scene)
+		left_scene.setFlow(QtGui.QListView.LeftToRight)
+		left_scene.setMovement(QtGui.QListView.Static)
+		left_scene.itemClicked.connect(self.roomClicked)
 		
+		left_frame_layout.addWidget(left_scene)
 		layout.addWidget(left_frame)
 		
-		#All the pictures are in the same place
+		# All the pictures are in the same place
 		#TODO: implement QGraphicsGridLayout
 		#TODO: Also parser the other attributes and show them (names, etc.)
 		
 		for i in range(len(self.scenarioData.roomList)):
-			print(self.scenarioData.getRoomBackLoc(i))
 			room = self.scenarioData.roomList[i]
 			imagePath = self.scenarioData.getRoomBackLoc(i)
+			roomItem = RoomWidget(room, self.scenarioData.dataDir)
 			
-			roomName = room.getName()
-			if not (roomName):
-				roomName = "Huoneella ei ole nimeä"
+			left_scene.addItem(roomItem)
 			
-			item = QtGui.QStandardItem()
-			
-			item.setText(roomName)
-	
-			icon = QtGui.QIcon(imagePath)
-			item.setIcon(icon)
-	
-			left_scene_model.appendRow(item)
-			
+		#print(roomItems)
+		#left_scene_model.setColumnCount(3)
+		#left_scene_model.appendRow(roomItems)
+		
 		# Room items
 		#TODO: Same parsering as above
 		middle_frame = QtGui.QGroupBox("Huoneen esineet")
@@ -82,10 +77,10 @@ class Editor(QtGui.QMainWindow):
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
 
-		middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
-		middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
-		middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
-		middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
+		#middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
+		#middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
+		#middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
+		#middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
 
 		right_frame_layout.addWidget(SettingsWidget())
 
@@ -119,39 +114,33 @@ class Editor(QtGui.QMainWindow):
 		layout.addWidget(right_frame)
 
 		right_frame_layout.addWidget(SettingsWidget(self))
-
+		
+	# Click on a room in the main tab
+	def roomClicked(self, widgetItem):
+		roomItems = widgetItem.room.getItems()
+		self.populateRoomItems(roomItems)
+		
+	# Populate the middle frame with room items
+	def populateRoomItems(self, roomItems):
+		print("populate items", roomItems)
+		
 # Room image with caption used in the main view
-class RoomWidget(QtGui.QWidget):
-	def __init__(self, imageText, imagePath, parent=None):
+class RoomWidget(QtGui.QListWidgetItem):
+	def __init__(self, room, imageDir, parent=None):
 		super(RoomWidget, self).__init__(parent)
-		self.setAutoFillBackground(True)
 		
-		#pixmap = QtGui.QPixmap(imagePath).scaled(150, 150, QtCore.Qt.KeepAspectRatio)
-		#pixItem = QtGui.QGraphicsPixmapItem(pixmap)
-		#pixItem.setPos(0, i*100)
+		self.room = room
 		
-		layout = QtGui.QVBoxLayout()
-		self.setLayout(layout)
-
-		# Display image
-		scene = QtGui.QGraphicsScene(self)
-		view = QtGui.QGraphicsView(scene)
+		imagePath = imageDir+"/"+room.getBackground().getLocation()
 		
-		pixmap = QtGui.QPixmap(imagePath).scaled(150, 150, QtCore.Qt.KeepAspectRatio)
-		pixItem = QtGui.QGraphicsPixmapItem(pixmap)
-		pixItem.setPos(100, 100)
+		roomName = room.getName()
+		if not (roomName):
+			roomName = "Huoneella ei ole nimeä"
+		self.setText(roomName)
 		
-		scene.addPixmap(pixmap)
+		icon = QtGui.QIcon(imagePath)
+		self.setIcon(icon)
 		
-		layout.addWidget(view)
-		
-		# Image caption text
-		caption = QtGui.QLabel(self)
-		caption.setText(imageText)
-		
-		scene.addWidget(caption)
-		pixItem.setPos(100, 100)
-
 # Item and room settings widget
 class SettingsWidget(QtGui.QWidget):
 	def __init__(self, parent=None):

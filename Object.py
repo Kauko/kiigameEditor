@@ -45,7 +45,7 @@ class Object(object):
 			self.texts = texts[self.id]
 		except KeyError:
 			self.texts = None
-			print("Warning: Could not find textss.json entry for object '%s'" %(self.id))
+			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
 		
 	# Return attributed object image (closed_image etc.) from imageAttributes
 	def __getAttributeImage__(self, attribute, imageAttributes):
@@ -216,4 +216,7 @@ class JSONImage(Object):
 	def __init__(self, texts, location, imageAttributes, objectAttributes):
 		super(JSONImage, self).__init__(texts, location, imageAttributes["id"], None, objectAttributes)
 		self.imageAttributes = imageAttributes
+		
+	def getLocation(self):
+		return self.imageAttributes["src"]		
 		
