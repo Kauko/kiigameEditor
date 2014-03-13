@@ -64,28 +64,21 @@ class Editor(QtGui.QMainWindow):
 		# Set-up widget for showing room items
 		self.middle_scene = QtGui.QListWidget(self)
 		self.middle_scene.setIconSize(QtCore.QSize(100, 100))
-		#self.middle_scene.setViewMode(QtGui.QListView.IconMode)
-		#self.middle_scene.setFlow(QtGui.QListView.LeftToRight)
 		self.middle_scene.setMovement(QtGui.QListView.Static)
-		self.middle_scene.itemClicked.connect(self.roomClicked)
+		self.middle_scene.itemClicked.connect(self.roomItemClicked)
 		
 		middle_frame_layout.addWidget(self.middle_scene)
 		
 		self.drawRoomItems(selectedRoom.room.getItems())
 		selectedItem = self.middle_scene.itemAt(0, 0)
-		self.left_scene.setCurrentItem(selectedItem)
+		self.middle_scene.setCurrentItem(selectedItem)
 		
 		# Settings for items and rooms
 		right_frame = QtGui.QGroupBox("Asetukset")
 		right_frame_layout = QtGui.QVBoxLayout()
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
-
-		#middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
-		#middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
-		#middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
-		#middle_frame_layout.addWidget(RoomWidget("Hello world!", imagePath))
-
+		
 		right_frame_layout.addWidget(SettingsWidget())
 
 	def createSpaceTab(self):
@@ -123,6 +116,10 @@ class Editor(QtGui.QMainWindow):
 	def roomClicked(self, widgetItem):
 		roomItems = widgetItem.room.getItems()
 		self.drawRoomItems(roomItems)
+		
+	# Clicm on an item in thre main tab room preview
+	def roomItemClicked(self, widgetItem):
+		print("Room item clicked", widgetItem)
 	
 	# Draw the leftmost frame rooms
 	def drawRooms(self):
@@ -144,7 +141,7 @@ class Editor(QtGui.QMainWindow):
 			
 			self.middle_scene.addItem(widgetItem)
 			#print(item)
-		
+			
 # Room image with caption used in the main view
 class RoomWidget(QtGui.QListWidgetItem):
 	def __init__(self, room, imageDir, parent=None):
@@ -166,6 +163,9 @@ class RoomWidget(QtGui.QListWidgetItem):
 class ItemWidget(QtGui.QListWidgetItem):
 	def __init__(self, item, imageDir, parent=None):
 		super(ItemWidget, self).__init__(parent)
+		
+		# Row size, especially height
+		self.setSizeHint(QtCore.QSize(100,100))
 		
 		self.item = item
 		imageObject = item.getRepresentingImage()
