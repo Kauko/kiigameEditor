@@ -37,32 +37,22 @@ class Editor(QtGui.QMainWindow):
 		left_frame = QtGui.QGroupBox("Huoneet")
 		left_frame_layout = QtGui.QGridLayout()
 		left_frame.setLayout(left_frame_layout)
-		
-		# Set-up widget for showing rooms
-		left_scene = QtGui.QListWidget(self)
-		left_scene.setIconSize(QtCore.QSize(200, 200))
-		left_scene.setViewMode(QtGui.QListView.IconMode)
-		left_scene.setFlow(QtGui.QListView.LeftToRight)
-		left_scene.setMovement(QtGui.QListView.Static)
-		left_scene.itemClicked.connect(self.roomClicked)
-		
-		left_frame_layout.addWidget(left_scene)
 		layout.addWidget(left_frame)
 		
-		# All the pictures are in the same place
-		#TODO: implement QGraphicsGridLayout
-		#TODO: Also parser the other attributes and show them (names, etc.)
+		# Set-up widget for showing rooms
+		self.left_scene = QtGui.QListWidget(self)
+		self.left_scene.setIconSize(QtCore.QSize(200, 200))
+		self.left_scene.setViewMode(QtGui.QListView.IconMode)
+		self.left_scene.setFlow(QtGui.QListView.LeftToRight)
+		self.left_scene.setMovement(QtGui.QListView.Static)
+		self.left_scene.itemClicked.connect(self.roomClicked)
 		
-		for i in range(len(self.scenarioData.roomList)):
-			room = self.scenarioData.roomList[i]
-			imagePath = self.scenarioData.getRoomBackLoc(i)
-			roomItem = RoomWidget(room, self.scenarioData.dataDir)
-			
-			left_scene.addItem(roomItem)
-			
-		#print(roomItems)
-		#left_scene_model.setColumnCount(3)
-		#left_scene_model.appendRow(roomItems)
+		left_frame_layout.addWidget(self.left_scene)
+		
+		# Draw rooms and select the first one
+		self.drawRooms()
+		selectedRoom = self.left_scene.itemAt(0, 0)
+		self.left_scene.setCurrentItem(selectedRoom)
 		
 		# Room items
 		#TODO: Same parsering as above
@@ -70,6 +60,20 @@ class Editor(QtGui.QMainWindow):
 		middle_frame_layout = QtGui.QVBoxLayout()
 		middle_frame.setLayout(middle_frame_layout)
 		layout.addWidget(middle_frame)
+		
+		# Set-up widget for showing room items
+		self.middle_scene = QtGui.QListWidget(self)
+		self.middle_scene.setIconSize(QtCore.QSize(100, 100))
+		#self.middle_scene.setViewMode(QtGui.QListView.IconMode)
+		#self.middle_scene.setFlow(QtGui.QListView.LeftToRight)
+		self.middle_scene.setMovement(QtGui.QListView.Static)
+		self.middle_scene.itemClicked.connect(self.roomClicked)
+		
+		middle_frame_layout.addWidget(self.middle_scene)
+		
+		self.drawRoomItems(selectedRoom.room.getItems())
+		selectedItem = self.middle_scene.itemAt(0, 0)
+		self.left_scene.setCurrentItem(selectedItem)
 		
 		# Settings for items and rooms
 		right_frame = QtGui.QGroupBox("Asetukset")
@@ -118,11 +122,28 @@ class Editor(QtGui.QMainWindow):
 	# Click on a room in the main tab
 	def roomClicked(self, widgetItem):
 		roomItems = widgetItem.room.getItems()
-		self.populateRoomItems(roomItems)
-		
-	# Populate the middle frame with room items
-	def populateRoomItems(self, roomItems):
-		print("populate items", roomItems)
+		self.drawRoomItems(roomItems)
+	
+	# Draw the leftmost frame rooms
+	def drawRooms(self):
+		for i in range(len(self.scenarioData.roomList)):
+			room = self.scenarioData.roomList[i]
+			widgetItem = RoomWidget(room, self.scenarioData.dataDir)
+			
+			self.left_scene.addItem(widgetItem)
+			
+	# Draw the middle frame room items
+	def drawRoomItems(self, roomItems):
+		self.middle_scene.clear()
+		for item in roomItems:
+			# TODO: Resolve this (issue #8)
+			if (item.getClassname() == "Text"):
+				continue
+				
+			widgetItem = ItemWidget(item, self.scenarioData.dataDir)
+			
+			self.middle_scene.addItem(widgetItem)
+			#print(item)
 		
 # Room image with caption used in the main view
 class RoomWidget(QtGui.QListWidgetItem):
@@ -137,6 +158,23 @@ class RoomWidget(QtGui.QListWidgetItem):
 		if not (roomName):
 			roomName = "Huoneella ei ole nimeä"
 		self.setText(roomName)
+		
+		icon = QtGui.QIcon(imagePath)
+		self.setIcon(icon)
+		
+# Item widget that represents items in game rooms
+class ItemWidget(QtGui.QListWidgetItem):
+	def __init__(self, item, imageDir, parent=None):
+		super(ItemWidget, self).__init__(parent)
+		
+		self.item = item
+		imageObject = item.getRepresentingImage()
+		imagePath = imageDir+"/"+imageObject.getLocation()
+		
+		itemName = imageObject.getName()
+		if not (itemName):
+			itemName = "Esineellä ei ole nimeä"
+		self.setText(itemName)
 		
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)

@@ -107,10 +107,10 @@ class End(View):
 			imageId = imageAttributes["id"]
 			
 			# Create objects according to its category
-			if (imageId == "rewards_text"):
-				self.endText = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
-			else:
-				self.endImages.append(Object.JSONImage(texts, self, imageAttributes, objectAttributes))
+			#if (imageId == "rewards_text"):
+			#	self.endText = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
+			#else:
+			self.endImages.append(Object.JSONImage(texts, self, imageAttributes, objectAttributes))
 				
 	def deleteChild(self, imageId):
 		for image in self.endImages:
@@ -118,7 +118,7 @@ class End(View):
 				self.endImages.remove(image)
 
 	def getChildren(self):
-		return self.endImages + [self.endText]
+		return self.endImages
 		
 # Any game room
 class Room(View):
@@ -182,9 +182,7 @@ class Room(View):
 	# Create new obstacle
 	def addObstacle(self, objectAttributes, imageAttributes):
 		self.objectList.append(Object.Obstacle(texts, self, imageId, images, imageAttributes))
-
-	
-
+		
 # Custom view for custom layers
 class Custom(View):
 	def __init__(self, texts, viewId, viewAttributes, viewImages):

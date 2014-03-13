@@ -44,7 +44,7 @@ class Object(object):
 		try:
 			self.texts = texts[self.id]
 		except KeyError:
-			self.texts = None
+			self.texts = {}
 			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
 		
 	# Return attributed object image (closed_image etc.) from imageAttributes
@@ -57,12 +57,11 @@ class Object(object):
 		return None
 		
 	# Fill in attributes from objects that were missing during __init__
+	# Every item needs to implement this
 	def postInit(self, getGameObject):
 		return
 		
 	def getImages(self):
-		#images = [self.image]
-		#return list(filter((None).__ne__, images))
 		return self.images
 		
 	def getImage(self, imageId):
@@ -73,6 +72,18 @@ class Object(object):
 		
 	def getClassname(self):
 		return self.objectAttributes["className"]
+		
+	def getName(self):
+		try:
+			return self.texts["name"]
+		except:
+			return None
+		
+	# Returns of the most "representing" image for an item such as open door
+	# instead closed door image
+	# Every item needs to override this to act properly
+	def getRepresentingImage(self):
+		return self.images[0]
 		
 # Pickable item
 class Item(Object):
@@ -139,23 +150,26 @@ class Container(Object):
 		images = [self.emptyImage, self.lockedImage, self.fullImage]
 		return list(filter((None).__ne__, images))
 		
+	def getRepresentingImage(self):
+		return self.emptyImage
+		
 class Door(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Door, self).__init__(texts, location, itemId, images, objectAttributes)
 		
 		# Create the available image objects
 		try:
-			self.emptyImage = self.getImage(objectAttributes["object"]["closed_image"])
+			self.closedImage = self.getImage(objectAttributes["object"]["closed_image"])
 		except KeyError:
-			self.emptyImage = None
+			self.closedImage = None
 		try:
 			self.lockedImage = self.getImage(objectAttributes["object"]["locked_image"])
 		except KeyError:
 			self.lockedImage = None
 		try:
-			self.fullImage = self.getImage(objectAttributes["object"]["open_image"])
+			self.openImage = self.getImage(objectAttributes["object"]["open_image"])
 		except KeyError:
-			self.fullImage = None
+			self.openImage = None
 			
 		# Handle these in postInit
 		self.key = None
@@ -175,6 +189,9 @@ class Door(Object):
 	def getImages(self):
 		images = [self.closedImage, self.lockedImage, self.openImage]
 		return list(filter((None).__ne__, images))
+		
+	def getRepresentingImage(self):
+		return self.openImage
 		
 class Obstacle(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
@@ -208,6 +225,9 @@ class Obstacle(Object):
 	def getImages(self):
 		images = [self.blockingImage, self.unblockingImage]
 		return list(filter((None).__ne__, images))
+		
+	def getRepresentingImage(self):
+		return self.blockingImage
 		
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
