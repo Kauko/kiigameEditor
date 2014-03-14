@@ -107,6 +107,18 @@ class Item(Object):
 		except KeyError:
 			pass
 			
+	def getExamineText(self):
+		try:
+			return self.texts["examine"]
+		except:
+			return
+			
+	def getPickupText(self):
+		try:
+			return self.texts["pickup"]
+		except:
+			return
+			
 class Container(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Container, self).__init__(texts, location, itemId, images, objectAttributes)

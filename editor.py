@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# TODO: Encoding that works better with Pyside
+# TODO: Pre-cache rooms, images, texts etc. ?
 
 from PySide import QtGui, QtCore
 import ScenarioData
@@ -81,7 +81,7 @@ class Editor(QtGui.QMainWindow):
 		self.settingsWidget = SettingsWidget(self)
 		right_frame_layout.addWidget(self.settingsWidget)
 		
-		self.settingsWidget.showRoomOptions(selectedRoom.room)
+		self.settingsWidget.setRoomOptions(selectedRoom.room)
 		
 	def createSpaceTab(self):
 		self.spaceTab = QtGui.QWidget()
@@ -111,18 +111,20 @@ class Editor(QtGui.QMainWindow):
 		right_frame_layout = QtGui.QVBoxLayout()
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
-
-		right_frame_layout.addWidget(SettingsWidget(self))
+		
+		settingsWidget = SettingsWidget(self)
+		right_frame_layout.addWidget(settingsWidget)
 		
 	# Click on a room in the main tab
 	def roomClicked(self, widgetItem):
 		roomItems = widgetItem.room.getItems()
 		self.drawRoomItems(roomItems)
+		self.settingsWidget.setRoomOptions(widgetItem.room)
 		
-	# Clicm on an item in thre main tab room preview
+	# Click on an item in thre main tab room preview
 	def roomItemClicked(self, widgetItem):
-		print("Room item clicked", widgetItem)
-	
+		self.settingsWidget.setItemOptions(widgetItem.item)
+		
 	# Draw the leftmost frame rooms
 	def drawRooms(self):
 		for i in range(len(self.scenarioData.roomList)):
@@ -146,8 +148,19 @@ class Editor(QtGui.QMainWindow):
 	def getImageDir(self):
 		return self.scenarioData.dataDir
 		
+	# Get View.Room objects
 	def getRoomObjects(self):
 		return self.scenarioData.getRooms()
+		
+	# Get given types of objects found in rooms
+	def getObjectsByType(self, objectType):
+		return self.scenarioData.getObjectsByType(objectType)
+		
+	# Get the target that is activated by the given item
+	# TODO: Implement properly
+	def getItemUse(self, item):
+		targetObject = item
+		return targetObject
 		
 # Room image with caption used in the main view
 class RoomWidget(QtGui.QListWidgetItem):
@@ -189,185 +202,341 @@ class ItemWidget(QtGui.QListWidgetItem):
 class SettingsWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
 		super(SettingsWidget, self).__init__(parent)
+		
+		self.currentObject = None
+		self.useTypes = {0: "Ei käyttöä", 1: "Käytä toiseen esineeseen",
+			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Poista este"}
+			
+		# Own widgets for object and room options
+		self.objectLayout = QtGui.QGridLayout()
+		self.objectWidget = QtGui.QWidget()
+		self.objectWidget.setLayout(self.objectLayout)
+		
+		self.roomLayout = QtGui.QGridLayout()
+		self.roomWidget = QtGui.QWidget()
+		self.roomWidget.setLayout(self.roomLayout)
+		
+		layout = QtGui.QGridLayout()
+		self.setLayout(layout)
+		layout.addWidget(self.objectWidget)
+		layout.addWidget(self.roomWidget)
+		
+		self.setSizePolicy(QtGui.QSizePolicy(
+		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
+		
 		self.parent = parent
+		
+		# Game item input fields
+		self.objectNameEdit =  QtGui.QLineEdit()
+		
+		self.itemImage = QtGui.QLabel(self)
+		self.itemImage.mousePressEvent = lambda s: self.showImageDialog(self.setRoomBackground)
+		
+		self.clickTextEdit = QtGui.QTextEdit()
+		self.clickTextEdit.setMaximumHeight(50)
+		
+		self.pickupTextEdit = QtGui.QTextEdit()
+		self.pickupTextEdit.setMaximumHeight(50)
+		
+		self.pickupBlockCombo = QtGui.QComboBox(self)
+		self.pickupBlockCombo.setIconSize(QtCore.QSize(50,50))
+		# TODO: This combobox should be taller with the item chosen
+		self.useTargetCombo = QtGui.QComboBox(self)
+		self.useTargetCombo.setIconSize(QtCore.QSize(50,50))
+		self.useTargetCombo.currentIndexChanged.connect(self.setUseTarget)
+		
+		self.useTextEdit = QtGui.QTextEdit()
+		self.useTextEdit.setMaximumHeight(50)
+		
+		# Room options input fields
+		self.roomNameEdit = QtGui.QLineEdit()
 		
 		self.musicTextEdit = QtGui.QLineEdit()
 		self.musicTextEdit.setReadOnly(True)
 		
-		self.imgLabel = QtGui.QLabel(self)
-		self.imgLabel.mousePressEvent = lambda s: self.showImageDialog()
-		# For testing the different options:
-		#self.showObjectOptions()
-		#self.showRoomOptions()
+		self.roomBackground = QtGui.QLabel(self)
+		self.roomBackground.mousePressEvent = lambda s: self.showImageDialog(self.setRoomBackground)
+		
+		self.whereFromCombo = QtGui.QComboBox(self)
+		self.whereFromCombo.setIconSize(QtCore.QSize(50,50))
+		
+		self.createItemOptions()
+		self.createRoomOptions()
 		
 	#Settings for the object view
 	#TODO: Reduce redundancy; similar settings layout, "Name", "Picture" etc., are defined many times
-	def showObjectOptions(self, gameObject):
-		layout = QtGui.QGridLayout()
-		self.setLayout(layout)
-		self.setSizePolicy(QtGui.QSizePolicy(
-		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
-		
+	def createItemOptions(self):
 		nameLabel = QtGui.QLabel("Nimi")
-		nameEdit = QtGui.QLineEdit("Nalle1")
+		
 		# Object image
 		imgTextLabel = QtGui.QLabel("Kuva")
-		imgPixmap = QtGui.QPixmap("gamedata/latkazombit/images/teddybear.png").scaled(200, 200, QtCore.Qt.KeepAspectRatio)
-		imgLabel = QtGui.QLabel(self)
-		imgLabel.setPixmap(imgPixmap)
-
-		clickTextLabel = QtGui.QLabel("Teksti klikatessa:")
-		clickTextEdit = QtGui.QTextEdit("Sopo nalle etc.")
-		clickTextEdit.setMaximumHeight(50)
 		
+		clickTextLabel = QtGui.QLabel("Teksti klikatessa:")
+		
+		# Pickup text section
 		pickupLabel = QtGui.QLabel("Poiminta")
 		pickupLabelLine = QtGui.QLabel("")
 		pickupLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		
 		pickupTextLabel = QtGui.QLabel("Teksti poimittaessa:")
-		pickupTextEdit = QtGui.QTextEdit("Mitahan tama taalla tekee?")
-		pickupTextEdit.setMaximumHeight(50)
 		
-		pickupBlockLabel = QtGui.QLabel("Estaako jokin poiminnan?")
-		pickupBlockCombo = QtGui.QComboBox(self)
-		pickupBlockCombo.setIconSize(QtCore.QSize(50,50))
-		obstacleIcon = QtGui.QIcon(imgPixmap)
-		# Example obstacles
-		pickupBlockCombo.addItem(obstacleIcon, "Morko1")
-		pickupBlockCombo.addItem(obstacleIcon, "Morko2")
-		pickupBlockCombo.addItem(obstacleIcon, "Morko3")
+		pickupBlockLabel = QtGui.QLabel("Estääkö jokin poiminnan?")
+		self.populateBlockingCombobox()
 		
-		useLabel = QtGui.QLabel("Kaytto")
+		# Object usage
+		useLabel = QtGui.QLabel("Käyttö")
 		useLabelLine = QtGui.QLabel("")
 		useLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
+		
+		# Object type of usage
 		useTypeCombo = QtGui.QComboBox(self)
-		#TODO: Change according to what is chosen here
-		useTypeCombo.addItem("Ei kayttoa")
-		useTypeCombo.addItem("Kayta toiseen esineeseen")
-		useTypeCombo.addItem("Avaa jotakin")
-		useTypeCombo.addItem("Laita johonkin")
-		useTargetCombo = QtGui.QComboBox(self)
-		useTargetCombo.setIconSize(QtCore.QSize(50,50))
-		targetIcon = QtGui.QIcon(imgPixmap)
-		useTargetCombo.addItem(targetIcon, "Kohde1")
-		useTargetCombo.addItem(targetIcon, "Kohde2")
-		useTargetCombo.addItem(targetIcon, "Kohde3")
-		useTextLabel = QtGui.QLabel("Teksti kaytettaessa:")
-		useTextEdit = QtGui.QTextEdit("Kaappihan aukesi!")
-		useTextEdit.setMaximumHeight(50)
+		for i in self.useTypes:
+			useTypeCombo.addItem(self.useTypes[i])
+		useTypeCombo.currentIndexChanged.connect(self.changeUseType)
+			
+		self.populateUseTargetCombobox(0)
 		
-		allTextsButton = QtGui.QPushButton("Nama ja muut tekstit")
+		useTextLabel = QtGui.QLabel("Teksti käytettäessä:")
 		
-		layout.addWidget(nameLabel, 0, 0)
-		layout.addWidget(nameEdit, 0, 1, 1, 2)
-		layout.addWidget(imgTextLabel, 1, 0)
-		layout.addWidget(imgLabel, 1, 1, 2, 2)
-		layout.addWidget(clickTextLabel, 4, 0)
-		layout.addWidget(clickTextEdit, 4, 1)
-		layout.addWidget(pickupLabelLine, 5, 0, 1, 2)
-		layout.addWidget(pickupLabel, 6, 0)
-		layout.addWidget(pickupTextLabel, 7, 0)
-		layout.addWidget(pickupTextEdit, 7, 1)
-		layout.addWidget(pickupBlockLabel, 8, 0)
-		layout.addWidget(pickupBlockCombo, 8, 1)
-		layout.addWidget(useLabelLine, 9, 0, 1, 2)
-		layout.addWidget(useLabel, 10, 0)
-		layout.addWidget(useTypeCombo, 11, 1)
-		layout.addWidget(useTargetCombo, 12, 1)
-		layout.addWidget(useTextLabel, 13, 0)
-		layout.addWidget(useTextEdit, 13, 1)
-		layout.addWidget(allTextsButton, 14, 1)
+		allTextsButton = QtGui.QPushButton("Nämä ja muut tekstit")
+		allTextsButton.clicked.connect(self.showAllTexts)
 		
+		self.objectLayout.addWidget(nameLabel, 0, 0)
+		self.objectLayout.addWidget(self.objectNameEdit, 0, 1, 1, 2)
+		self.objectLayout.addWidget(imgTextLabel, 1, 0)
+		self.objectLayout.addWidget(self.itemImage, 1, 1, 2, 2)
+		self.objectLayout.addWidget(clickTextLabel, 4, 0)
+		self.objectLayout.addWidget(self.clickTextEdit, 4, 1)
+		self.objectLayout.addWidget(pickupLabelLine, 5, 0, 1, 2)
+		self.objectLayout.addWidget(pickupLabel, 6, 0)
+		self.objectLayout.addWidget(pickupTextLabel, 7, 0)
+		self.objectLayout.addWidget(self.pickupTextEdit, 7, 1)
+		self.objectLayout.addWidget(pickupBlockLabel, 8, 0)
+		self.objectLayout.addWidget(self.pickupBlockCombo, 8, 1)
+		self.objectLayout.addWidget(useLabelLine, 9, 0, 1, 2)
+		self.objectLayout.addWidget(useLabel, 10, 0)
+		self.objectLayout.addWidget(useTypeCombo, 11, 1)
+		self.objectLayout.addWidget(self.useTargetCombo, 12, 1)
+		self.objectLayout.addWidget(useTextLabel, 13, 0)
+		self.objectLayout.addWidget(self.useTextEdit, 13, 1)
+		self.objectLayout.addWidget(allTextsButton, 14, 1)
 	
-	#Settings for the room view
-	def showRoomOptions(self, gameRoom):
+	# Create the input fields for object options
+	def setItemOptions(self, item):
+		self.roomWidget.hide()
+		self.objectWidget.show()
+		
+		self.currentObject = item
+		imageObject = item.getRepresentingImage()
+		
+		# Object name
+		itemName = imageObject.getName()
+		if not (itemName):
+			itemName = "Esineellä ei ole nimeä"
+		self.objectNameEdit.setText(itemName)
+		
+		# Item background
+		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
+		
+		# Examine text
+		examineText = item.getExamineText()
+		if not (examineText):
+			examineText = ""
+		self.clickTextEdit.setText(examineText)
+		
+		# Pickup text
+		pickupText = item.getPickupText()
+		if not (pickupText):
+			pickupText = ""
+		self.pickupTextEdit.setText(pickupText)
+		
+		# Use type of the item
+		# TODO: Implement getItemUse properly
+		itemTarget = self.parent.getItemUse(item)
+		itemTargetType = itemTarget.__class__.__name__
+		if (itemTargetType == "Item"):
+			self.setUseType(1)
+		elif (itemTargetType == "Obstacle"):
+			self.setUseType(4)
+		elif (itemTargetType in ("Door", "Container")):
+			# Item may unlock door or container or may go into a container
+			if (itemTarget.key == item):
+				self.setUseType(2)
+			else:
+				try:
+					if (itemTarget.inItem == item):
+						self.setUseType(3)
+				except AttributeError:
+					self.setUseType(0)
+					
+		# Use text
+		# TODO: After getItemUse
+		
+	# Create the input fields for game rooms
+	def createRoomOptions(self):
 		#TODO: Change room attributes in real time or after closing the dialog?
-		
 		# TODO: Align the layout to the top
-		layout = QtGui.QGridLayout()
-		self.setLayout(layout)
-		self.setSizePolicy(QtGui.QSizePolicy(
-		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
-		
 		nameLabel = QtGui.QLabel("Nimi")
-		roomName = gameRoom.getName()
-		if not (roomName):
-			roomName = "Huoneella ei ole nimeä"
-		nameEdit = QtGui.QLineEdit(roomName)
 		
 		# Room image
 		imgTextLabel = QtGui.QLabel("Kuva")
-		self.setRoomBackground(self.parent.getImageDir()+"/"+gameRoom.getBackground().getLocation())
 		
-		musicLabel = QtGui.QLabel("Musiikki")
-		# TODO: Splitting requires detecting OS file slash direction?
-		# Get the plain filename for the music
-		try:
-			roomMusic = gameRoom.getMusic().split("/")[-1]
-		except AttributeError:
-			# May return None which doesn't have split
-			roomMusic = ""
-		self.musicTextEdit.setText(roomMusic)
+		# Music
 		# TODO: How to clear music?
-		
+		musicLabel = QtGui.QLabel("Musiikki")
 		musicBtn = QtGui.QPushButton('Selaa...', self)
 		musicBtn.setToolTip('Valitse musiikkitiedosto')
 		musicBtn.resize(musicBtn.sizeHint())
 		musicBtn.clicked.connect(self.showMusicDialog)
 		
+		# Where from dropdown box
 		whereFromLabel = QtGui.QLabel("Mistä sinne pääsee?")
-		whereFromCombo = QtGui.QComboBox(self)
-		whereFromCombo.setIconSize(QtCore.QSize(50,50))
+		self.populateRoomCombobox()
 		
-		self.createRoomComboBox(whereFromCombo)
-		#roomIcon = QtGui.QIcon(imgPixmap)
-		# Example rooms
-		#whereFromCombo.addItem(roomIcon, "Huone2")
-		#whereFromCombo.addItem(roomIcon, "Huone3")
-		#whereFromCombo.addItem(roomIcon, "Huone4")
+		self.roomLayout.addWidget(nameLabel, 0, 0)
+		self.roomLayout.addWidget(self.roomNameEdit, 0, 1, 1, 2)
+		self.roomLayout.addWidget(imgTextLabel, 1, 0)
+		self.roomLayout.addWidget(self.roomBackground, 1, 1, 2, 2)
+		self.roomLayout.addWidget(musicLabel, 4, 0)
+		self.roomLayout.addWidget(self.musicTextEdit, 4, 1)
+		self.roomLayout.addWidget(musicBtn, 4, 2)
+		self.roomLayout.addWidget(whereFromLabel, 6, 0)
+		self.roomLayout.addWidget(self.whereFromCombo, 6, 1, 1, 2)
+	
+	# Set settings for the room view
+	def setRoomOptions(self, room):
+		self.objectWidget.hide()
+		self.roomWidget.show()
 		
-		layout.addWidget(nameLabel, 0, 0)
-		layout.addWidget(nameEdit, 0, 1, 1, 2)
-		layout.addWidget(imgTextLabel, 1, 0)
-		layout.addWidget(self.imgLabel, 1, 1, 2, 2)
-		layout.addWidget(musicLabel, 4, 0)
-		layout.addWidget(self.musicTextEdit, 4, 1)
-		layout.addWidget(musicBtn, 4, 2)
-		layout.addWidget(whereFromLabel, 6, 0)
-		layout.addWidget(whereFromCombo, 6, 1, 1, 2)
+		self.currentObject = room
+		
+		# Room name
+		roomName = room.getName()
+		if not (roomName):
+			roomName = "Huoneella ei ole nimeä"
+		self.roomNameEdit.setText(roomName)
+		
+		# Room background
+		self.setRoomBackground(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
+		
+		# Room music may return None which doesn't have split
+		try:
+			roomMusic = room.getMusic().split("/")[-1]
+		except AttributeError:
+			roomMusic = ""
+		self.musicTextEdit.setText(roomMusic)
+		
+	def showAllTexts(self):
+		print("Clicked show all texts")
+		
+	# Change object use type
+	def changeUseType(self, index):
+		print("Change item use type", index)
+		self.populateUseTargetCombobox(index)
+		
+	# Set object use type
+	def setUseType(self, index):
+		self.useTargetCombo.setCurrentIndex(index)
+		
+	# Set object use target
+	def setUseTarget(self, index):
+		print("Use target set", self.useTargetCombo.itemData(index))
 		
 	def showMusicDialog(self):
-		# TODO: How to remember last folder? (Did adding ~ do this suddenly?)
-		# TODO: OS file slash detection here too
 		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
 		'Valitse musiikkitiedosto','~', "Musiikkitiedostot (*.mp3 *.ogg)")
 		# TODO: Modified object requires filename in format "audio/filename.xxx"
-		self.musicTextEdit.setText(fname.split("/")[-1])
+		if (len(fname) != 0):
+			self.musicTextEdit.setText(fname.split("/")[-1])
 		
-	def showImageDialog(self):
-		# TODO: How to remember last folder? (Did adding ~ do this suddenly?)
-		# TODO: OS file slash detection here too
+	def showImageDialog(self, callBack):
 		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
 		'Valitse taustakuva','~', "Taustakuvat (*.png)")
 		# TODO: Modified object requires filename in format "images/filename.png"
-		self.setRoomBackground(fname)
+		
+		if (len(fname) != 0):
+			callBack(fname)
 		
 	def setRoomBackground(self, imagePath):
 		imgPixmap = QtGui.QPixmap(imagePath).scaled(200, 200, QtCore.Qt.KeepAspectRatio)
-		self.imgLabel.setPixmap(imgPixmap)
+		self.roomBackground.setPixmap(imgPixmap)
 		
-	def createRoomComboBox(self, combobox):
+	def setItemImage(self, imagePath):
+		imgPixmap = QtGui.QPixmap(imagePath)
+		# TODO: Have spacing for smaller items
+		if (imgPixmap.size().height() > 200):
+			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		self.itemImage.setPixmap(imgPixmap)
+		
+	# TODO: Maybe have doors here instead of rooms (categorized by rooms maybe)
+	# TODO: Need to set this box value in settings
+	def populateRoomCombobox(self):
 		for room in self.parent.getRoomObjects():
-			# TODO: Some model to eliminate redundancy of this kind of getName/filename patterns
+			# TODO: Some model to eliminate redundancy of this kind of getName/roomName patterns
 			roomName = room.getName()
 			if not (roomName):
 				roomName = "Huoneella ei ole nimeä"
 			imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
 			
 			roomIcon = QtGui.QIcon(imgPixmap)
-			combobox.addItem(roomIcon, roomName)
-		#whereFromCombo.addItem(roomIcon, "Huone2")
+			self.whereFromCombo.addItem(roomIcon, roomName)
+			
+	# TODO: Implement me properly
+	def populateUseTargetCombobox(self, useType):
+		if (useType == 0):
+			self.useTargetCombo.clear()
+			return
+		elif (useType == 1):
+			objectTypes = ("item", "object")
+		elif (useType == 2):
+			objectTypes = ("door", "container")
+		elif (useType == 3):
+			objectTypes = ("container",)
+		else:
+			objectTypes = ("obstacle",)
 		
+		self.populateCombobox(objectTypes, self.useTargetCombo)
+		
+	# TODO: Create a combo icon of multi-part objects such as cieni
+	#		(those with "related" attribute)
+	def populateBlockingCombobox(self):
+		self.pickupBlockCombo.addItem("Ei estä")
+		self.populateCombobox(("obstacle",), self.pickupBlockCombo)
+					
+	def populateCombobox(self, objectTypes, combobox):
+		# TODO: Disconnect combobox from events when populating it
+		combobox.clear()
+		combobox.addItem("Ei valittu")
+		
+		for objType in objectTypes:
+			objRooms = self.parent.getObjectsByType(objType)
+			
+			# Combobox has rooms with their obstacles under them
+			for room in objRooms:
+				roomObject = room["room"]
+				roomName = roomObject.getName()
+				if not (roomName):
+					roomName = "Huoneella ei ole nimeä"
+				imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+roomObject.getBackground().getLocation())
+				roomIcon = QtGui.QIcon(imgPixmap)
+				
+				# TODO: Disable ability to choose rooms
+				self.useTargetCombo.addItem(roomIcon, roomName)
+				
+				# TODO: Indendation of objects in the combobox
+				# Add objects under the room
+				for obj in room["objects"]:
+					# Don't display the triggering item itself
+					if (obj == self.currentObject):
+						continue
+					if (obj.getClassname() == "Text"):
+						continue
+					
+					imageObject = obj.getRepresentingImage()
+					imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+imageObject.getLocation())
+					targetIcon = QtGui.QIcon(imgPixmap)
+					combobox.addItem(targetIcon, imageObject.getName(), userData=obj)
+					
 if __name__ == '__main__':
 	from sys import argv, exit
 

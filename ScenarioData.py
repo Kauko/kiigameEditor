@@ -215,14 +215,26 @@ class ScenarioData(object):
 		for obj in self.objectList:
 			if (obj.id == objectId):
 				return obj
-	
-	def getObjectImgLoc(self, room, i):
-		r = self.roomList[room]
-		#o = r.objectList[
-		loc = self.dataDir + '/' + o.images[0].imageAttributes['src']
-		return loc
+				
+	# Get given types of objects found in rooms
+	def getObjectsByType(self, objectType):
+		retObjects = []
+		for room in self.roomList:
+			roomObjects = {"room": room, "objects": []}
+			for item in room.getItems():
+				if (item.__class__.__name__.lower() == objectType):
+					roomObjects["objects"].append(item)
+			if (len(roomObjects["objects"]) != 0):
+				retObjects.append(roomObjects)
+		return retObjects		
 		
-	# Get room, sequence or object
+	#def getObjectImgLoc(self, room, i):
+	#	r = self.roomList[room]
+	#	#o = r.objectList[
+	#	loc = self.dataDir + '/' + o.images[0].imageAttributes['src']
+	#	return loc
+		
+	# Get room, sequence or other object
 	def getGameObject(self, entityType, entityId):
 		if (entityType == "room"):
 			return self.getRoom(entityId)
