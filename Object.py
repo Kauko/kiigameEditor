@@ -48,13 +48,13 @@ class Object(object):
 			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
 		
 	# Return attributed object image (closed_image etc.) from imageAttributes
-	def __getAttributeImage__(self, attribute, imageAttributes):
-		if (attribute in self.objectAttributes):
-			imageId = self.objectAttributes[attribute]
-			for attr in imageAttributes:
-				if (attr["id"] == imageId):
-					return attr
-		return None
+	#def __getAttributeImage__(self, attribute, imageAttributes):
+	#	if (attribute in self.objectAttributes):
+	#		imageId = self.objectAttributes[attribute]
+	#		for attr in imageAttributes:
+	#			if (attr["id"] == imageId):
+	#				return attr
+	#	return None
 		
 	# Fill in attributes from objects that were missing during __init__
 	# Every item needs to implement this
@@ -84,7 +84,12 @@ class Object(object):
 	# Every item needs to override this to act properly
 	def getRepresentingImage(self):
 		return self.images[0]
-		
+
+	# Get the image activated by the given item
+	# Should be overriden by other objects
+	def getUseImage(self, useItem):
+		return self.images[0]
+
 # Pickable item
 class Item(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
@@ -93,17 +98,22 @@ class Item(Object):
 		#self.interaction.parentItem = self
 		
 		# Handle these in postInit
-		self.trigger = None
+		self.trigger = None # Use on object
 		self.outcome = None
+		
+		self.target = None # Can be any other object
+		self.goesInto = None
+		self.comesFrom = None
 		
 	def postInit(self, getGameObject):
 		try:
-			self.trigger = getGameObject("object", self.objectAttributes["trigger"])
+			self.trigger = getGameObject("object", self.objectAttributes["object"]["trigger"])
+			self.target = self.trigger
 		except KeyError:
 			pass
 			
 		try:
-			self.outcome = getGameObject("object", self.objectAttributes["outcome"])
+			self.outcome = getGameObject("object", self.objectAttributes["object"]["outcome"])
 		except KeyError:
 			pass
 			
@@ -118,7 +128,49 @@ class Item(Object):
 			return self.texts["pickup"]
 		except:
 			return
+
+	def getUse(self):
+		if (self.target):
+			return self.target
+		elif (self.goesInto):
+			return self.goesInto
+		elif (self.comesFrom):
+			return self.comesFrom
 			
+	def setTarget(self, target):
+		self.target = target
+		
+	def setGoesInto(self, target):
+		self.goesInto = target
+		self.target = target
+		
+	def setComesFrom(self, target):
+		self.comesFrom = target
+		self.target = target
+		
+	# Get the text displayed when this item is used on its target
+	def getTargetUseText(self):
+		print("WTF", self.trigger, self.goesInto)
+		#useImage = self.target.getUseImage(self)
+		
+		#if (self.goesInto):
+		#	return self.getUseText()
+			
+		useImage = self.target.getUseImage(self)
+		return useImage.getUseText()
+		
+	# Get the text when this object is triggered
+	def getUseText(self):
+		try:
+			return self.texts[self.target.id]
+		except:
+			return
+
+	# Get the image activated by the given item
+	def getUseImage(self, useItem):
+		if (self.trigger == useItem):
+			return self.images[0]
+
 class Container(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Container, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -144,17 +196,20 @@ class Container(Object):
 		
 	def postInit(self, getGameObject):
 		try:
-			self.key = getGameObject("object", self.objectAttributes["key"])
+			self.key = getGameObject("object", self.objectAttributes["object"]["key"])
+			self.key.setTarget(self)
+		except KeyError:
+			pass
+
+		try:
+			self.inItem = getGameObject("object", self.objectAttributes["object"]["in"])
+			self.inItem.setGoesInto(self)
 		except KeyError:
 			pass
 			
 		try:
-			self.inItem = getGameObject("object", self.objectAttributes["in"])
-		except KeyError:
-			pass
-			
-		try:
-			self.outItem = getGameObject("object", self.objectAttributes["out"])
+			self.outItem = getGameObject("object", self.objectAttributes["object"]["out"])
+			self.outItem.setComesFrom(self)
 		except KeyError:
 			pass
 			
@@ -164,7 +219,16 @@ class Container(Object):
 		
 	def getRepresentingImage(self):
 		return self.emptyImage
-		
+
+	# Get the image activated by the given item
+	def getUseImage(self, useItem):
+		if (self.key == useItem):
+			return self.lockedImage
+		elif (self.inItem == useItem):
+			return self.emptyImage
+		elif (self.outItem == useItem):
+			return self.fullImage
+
 class Door(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Door, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -189,12 +253,13 @@ class Door(Object):
 		
 	def postInit(self, getGameObject):
 		try:
-			self.key = getGameObject("object", self.objectAttributes["key"])
+			self.key = getGameObject("object", self.objectAttributes["object"]["key"])
+			self.key.setTarget(self)
 		except KeyError:
 			pass
 			
 		try:
-			self.transition = getGameObject("room", self.objectAttributes["transition"])
+			self.transition = getGameObject("room", self.objectAttributes["object"]["transition"])
 		except KeyError:
 			pass
 			
@@ -204,7 +269,12 @@ class Door(Object):
 		
 	def getRepresentingImage(self):
 		return self.openImage
-		
+
+	# Get the image activated by the given item
+	def getUseImage(self, useItem):
+		if (self.key == useItem):
+			return self.lockedImage
+
 class Obstacle(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Obstacle, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -225,12 +295,13 @@ class Obstacle(Object):
 
 	def postInit(self, getGameObject):
 		try:
-			self.blockTarget = getGameObject("object", self.objectAttributes["target"])
+			self.blockTarget = getGameObject("object", self.objectAttributes["object"]["target"])
 		except KeyError:
 			pass
 			
 		try:
-			self.trigger = getGameObject("object", self.objectAttributes["trigger"])
+			self.trigger = getGameObject("object", self.objectAttributes["object"]["trigger"])
+			self.trigger.setTarget(self)
 		except KeyError:
 			pass
 			
@@ -240,7 +311,12 @@ class Obstacle(Object):
 		
 	def getRepresentingImage(self):
 		return self.blockingImage
-		
+
+	# Get the image activated by the given item
+	def getUseImage(self, useItem):
+		if (self.trigger == useItem):
+			return self.blockingImage
+
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
 	# imageAttributes has to be dict, not a list as with other objects
@@ -250,5 +326,4 @@ class JSONImage(Object):
 		self.imageAttributes = imageAttributes
 		
 	def getLocation(self):
-		return self.imageAttributes["src"]		
-		
+		return self.imageAttributes["src"]

@@ -156,11 +156,9 @@ class Editor(QtGui.QMainWindow):
 	def getObjectsByType(self, objectType):
 		return self.scenarioData.getObjectsByType(objectType)
 		
-	# Get the target that is activated by the given item
-	# TODO: Implement properly
+	# Get the target object that is triggered by the given item
 	def getItemUse(self, item):
-		targetObject = item
-		return targetObject
+		return item.getUse()
 		
 # Room image with caption used in the main view
 class RoomWidget(QtGui.QListWidgetItem):
@@ -240,6 +238,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 		self.pickupBlockCombo = QtGui.QComboBox(self)
 		self.pickupBlockCombo.setIconSize(QtCore.QSize(50,50))
+		
+		self.useTypeCombo = QtGui.QComboBox(self)
+		
 		# TODO: This combobox should be taller with the item chosen
 		self.useTargetCombo = QtGui.QComboBox(self)
 		self.useTargetCombo.setIconSize(QtCore.QSize(50,50))
@@ -289,10 +290,9 @@ class SettingsWidget(QtGui.QWidget):
 		useLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		
 		# Object type of usage
-		useTypeCombo = QtGui.QComboBox(self)
 		for i in self.useTypes:
-			useTypeCombo.addItem(self.useTypes[i])
-		useTypeCombo.currentIndexChanged.connect(self.changeUseType)
+			self.useTypeCombo.addItem(self.useTypes[i])
+		self.useTypeCombo.currentIndexChanged.connect(self.changeUseType)
 			
 		self.populateUseTargetCombobox(0)
 		
@@ -315,7 +315,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.objectLayout.addWidget(self.pickupBlockCombo, 8, 1)
 		self.objectLayout.addWidget(useLabelLine, 9, 0, 1, 2)
 		self.objectLayout.addWidget(useLabel, 10, 0)
-		self.objectLayout.addWidget(useTypeCombo, 11, 1)
+		self.objectLayout.addWidget(self.useTypeCombo, 11, 1)
 		self.objectLayout.addWidget(self.useTargetCombo, 12, 1)
 		self.objectLayout.addWidget(useTextLabel, 13, 0)
 		self.objectLayout.addWidget(self.useTextEdit, 13, 1)
@@ -351,26 +351,31 @@ class SettingsWidget(QtGui.QWidget):
 		self.pickupTextEdit.setText(pickupText)
 		
 		# Use type of the item
-		# TODO: Implement getItemUse properly
+		print("HERE")
 		itemTarget = self.parent.getItemUse(item)
 		itemTargetType = itemTarget.__class__.__name__
-		if (itemTargetType == "Item"):
-			self.setUseType(1)
+		useType = 0
+		if (itemTargetType in ("Object", "Item")):
+			useType = 1
 		elif (itemTargetType == "Obstacle"):
-			self.setUseType(4)
+			useType = 4
 		elif (itemTargetType in ("Door", "Container")):
 			# Item may unlock door or container or may go into a container
 			if (itemTarget.key == item):
-				self.setUseType(2)
+				useType = 2
 			else:
 				try:
 					if (itemTarget.inItem == item):
-						self.setUseType(3)
+						useType = 3
 				except AttributeError:
-					self.setUseType(0)
-					
+					useType = 0
+		self.setItemUse(useType, itemTarget)
+		print("typoa", useType, itemTarget)
 		# Use text
-		# TODO: After getItemUse
+		useText = item.getTargetUseText()
+		if not (useText):
+			useText = ""
+		self.useTextEdit.setText(useText)
 		
 	# Create the input fields for game rooms
 	def createRoomOptions(self):
@@ -435,9 +440,14 @@ class SettingsWidget(QtGui.QWidget):
 		self.populateUseTargetCombobox(index)
 		
 	# Set object use type
-	def setUseType(self, index):
-		self.useTargetCombo.setCurrentIndex(index)
+	def setItemUse(self, typeIndex, useItem):
+		self.useTypeCombo.setCurrentIndex(typeIndex)
 		
+		# Find the combobox item with the given item
+		for i in range(self.useTargetCombo.count()):
+			if (self.useTargetCombo.itemData(i) == useItem):
+				self.useTargetCombo.setCurrentIndex(i)
+				
 	# Set object use target
 	def setUseTarget(self, index):
 		print("Use target set", self.useTargetCombo.itemData(index))

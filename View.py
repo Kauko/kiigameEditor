@@ -54,6 +54,10 @@ class View(object):
 			return self.object["music"]
 		except KeyError:
 			return
+
+	# Post-init should be overriden by views
+	def postInit(self, getGameObject):
+		return
 			
 # Game cutscenes
 class Sequence(View):
@@ -167,6 +171,10 @@ class Room(View):
 	
 	def getBackground(self):
 		return self.background
+		
+	def postInit(self, getGameObject):
+		for obj in self.objectList:
+			obj.postInit(getGameObject)
 		
 	# TODO: These addX methods
 	# Create new generic object

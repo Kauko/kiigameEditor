@@ -126,10 +126,10 @@ class ScenarioData(object):
 				elif (layer == "custom"):
 					self.addCustomView(child, viewAttributes, viewImages)
 		
-		# TODO: Post-init
-		#for obj in self.objectList:
-		#	obj.postInit(self.getGameObject)
-			
+		# Post-init sets triggers, outcomes etc.
+		for obj in self.roomList:
+			obj.postInit(self.getGameObject)
+
 	# Save scenario to JSON files
 	def saveScenario(self):
 		scenarioObjects = {}
@@ -212,9 +212,10 @@ class ScenarioData(object):
 				return sequence
 
 	def getObject(self, objectId):
-		for obj in self.objectList:
-			if (obj.id == objectId):
-				return obj
+		for room in self.roomList:
+			for obj in room.objectList:
+				if (obj.id == objectId):
+					return obj
 				
 	# Get given types of objects found in rooms
 	def getObjectsByType(self, objectType):
