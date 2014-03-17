@@ -146,30 +146,16 @@ class Item(Object):
 		
 	def setComesFrom(self, target):
 		self.comesFrom = target
-		self.target = target
+		#self.target = target
 		
 	# Get the text displayed when this item is used on its target
-	def getTargetUseText(self):
-		print("WTF", self.trigger, self.goesInto)
-		#useImage = self.target.getUseImage(self)
-		
-		#if (self.goesInto):
-		#	return self.getUseText()
-			
-		useImage = self.target.getUseImage(self)
-		return useImage.getUseText()
-		
-	# Get the text when this object is triggered
 	def getUseText(self):
-		try:
-			return self.texts[self.target.id]
-		except:
-			return
-
+		useImage = self.target.getUseImage(self)
+		return self.texts[useImage.id]
+		
 	# Get the image activated by the given item
 	def getUseImage(self, useItem):
-		if (self.trigger == useItem):
-			return self.images[0]
+		return self.images[0]
 
 class Container(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
@@ -327,3 +313,9 @@ class JSONImage(Object):
 		
 	def getLocation(self):
 		return self.imageAttributes["src"]
+		
+	#def getUseText(self):
+	#	try:
+	#		return self.texts[self.target.id]
+	#	except:
+	#		return

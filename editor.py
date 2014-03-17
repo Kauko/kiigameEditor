@@ -372,7 +372,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setItemUse(useType, itemTarget)
 		print("typoa", useType, itemTarget)
 		# Use text
-		useText = item.getTargetUseText()
+		useText = item.getUseText()
 		if not (useText):
 			useText = ""
 		self.useTextEdit.setText(useText)
