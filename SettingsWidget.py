@@ -10,7 +10,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTypes = {0: "Ei käyttöä", 1: "Käytä toiseen esineeseen",
 			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Poista este"}
 			
-		self.layout = QtGui.QGridLayout()
+		self.layout = QtGui.QVBoxLayout()
 		self.setLayout(self.layout)
 		
 		self.setSizePolicy(QtGui.QSizePolicy(
@@ -34,6 +34,8 @@ class SettingsWidget(QtGui.QWidget):
 			self.setItemOptions(gameObject)
 		elif (objectType == "Object"):
 			self.setGenericOptions(gameObject)
+		elif (objectType == "Door"):
+			self.setDoorOptions(gameObject)
 		
 	def showWidgets(self, objectType):
 		if (self.lastObjectType):
@@ -49,14 +51,14 @@ class SettingsWidget(QtGui.QWidget):
 		self.musicTextEdit = QtGui.QLineEdit()
 		self.musicTextEdit.setReadOnly(True)
 		
-		self.whereFromCombo = QtGui.QComboBox(self)
-		self.whereFromCombo.setIconSize(QtCore.QSize(50,50))
+		self.roomCombo = QtGui.QComboBox(self)
+		self.roomCombo.setIconSize(QtCore.QSize(50,50))
 		
 		self.objectNameEdit =  QtGui.QLineEdit()
 		
 		self.itemImage = QtGui.QLabel(self)
 		self.itemImage.mousePressEvent = lambda s: self.showImageDialog(self.setRoomBackground)
-
+		
 		self.useTypeCombo = QtGui.QComboBox(self)
 		
 		# TODO: This combobox should be taller with the item chosen
@@ -77,6 +79,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Where from dropdown box
 		self.whereFromLabel = QtGui.QLabel("Mistä sinne pääsee?")
+		
+		# Where located
+		self.whereLocatedLabel = QtGui.QLabel("Missä sijaitsee?")
 		self.populateRoomCombobox()
 		
 		# Object image
@@ -89,7 +94,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Pickup text section
 		self.pickupLabel = QtGui.QLabel("Poiminta")
-		self.pickupLabelLine = QtGui.QLabel("")
+		self.pickupLabelLine = self.createSeparator()
 		self.pickupLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		
 		self.pickupTextLabel = QtGui.QLabel("Teksti poimittaessa:")
@@ -105,8 +110,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Object usage
 		self.useLabel = QtGui.QLabel("Käyttö")
-		self.useLabelLine = QtGui.QLabel("")
-		self.useLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
+		self.useLabelLine = self.createSeparator()
+		#self.createSeparator(self.useLabelLine)
+		#self.useLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		
 		# Object type of usage
 		for i in self.useTypes:
@@ -120,33 +126,76 @@ class SettingsWidget(QtGui.QWidget):
 		self.allTextsButton = QtGui.QPushButton("Nämä ja muut tekstit")
 		self.allTextsButton.clicked.connect(self.showAllTexts)
 		
+		self.openDoorLabelLine = self.createSeparator()
+		self.openDoorLabel = QtGui.QLabel("Avoin ovi")
+		self.openDoorTextLabel = QtGui.QLabel("Avoimen oven nimi")
+		self.openDoorTextEdit = QtGui.QLineEdit()
+		self.doorImageOpen = QtGui.QLabel(self)
+		self.doorImageOpen.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("open", imagePath))
+		
+		self.closedDoorLabelLine = self.createSeparator()
+		self.closedDoorLabel = QtGui.QLabel("Suljettu ovi")
+		self.closedDoorTextLabel = QtGui.QLabel("Suljetun oven nimi")
+		self.closedDoorTextEdit = QtGui.QLineEdit()
+		self.doorImageClosed = QtGui.QLabel(self)
+		self.doorImageClosed.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("closed", imagePath))
+		
+		self.lockedDoorLabelLine = self.createSeparator()
+		self.lockedDoorLabel = QtGui.QLabel("Lukittu ovi")
+		self.lockedDoorTextLabel = QtGui.QLabel("Lukitun oven nimi")
+		self.lockedDoorTextEdit = QtGui.QLineEdit()
+		self.doorImageLocked = QtGui.QLabel(self)
+		self.doorImageLocked.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("locked", imagePath))
+		
+		self.layout.addWidget(self.nameLabel)
+		self.layout.addWidget(self.objectNameEdit)
+		self.layout.addWidget(self.imgTextLabel)
+		self.layout.addWidget(self.itemImage)
+		
 		# Room
-		self.layout.addWidget(self.musicLabel, 4, 0)
-		self.layout.addWidget(self.musicTextEdit, 4, 1)
-		self.layout.addWidget(self.musicBtn, 4, 2)
-		self.layout.addWidget(self.whereFromLabel, 6, 0)
-		self.layout.addWidget(self.whereFromCombo, 6, 1, 1, 2)
+		self.layout.addWidget(self.musicLabel)
+		self.layout.addWidget(self.musicTextEdit)
+		self.layout.addWidget(self.musicBtn)
+		self.layout.addWidget(self.whereFromLabel)
+		self.layout.addWidget(self.whereLocatedLabel)
+		self.layout.addWidget(self.roomCombo)
 		
 		# Items
-		self.layout.addWidget(self.nameLabel, 0, 0)
-		self.layout.addWidget(self.objectNameEdit, 0, 1, 1, 2)
-		self.layout.addWidget(self.imgTextLabel, 1, 0)
-		self.layout.addWidget(self.itemImage, 1, 1, 2, 2)
-		self.layout.addWidget(self.clickTextLabel, 4, 0)
-		self.layout.addWidget(self.clickTextEdit, 4, 1)
-		self.layout.addWidget(self.pickupLabelLine, 5, 0, 1, 2)
-		self.layout.addWidget(self.pickupLabel, 6, 0)
-		self.layout.addWidget(self.pickupTextLabel, 7, 0)
-		self.layout.addWidget(self.pickupTextEdit, 7, 1)
-		self.layout.addWidget(self.pickupBlockLabel, 8, 0)
-		self.layout.addWidget(self.pickupBlockCombo, 8, 1)
-		self.layout.addWidget(self.useLabelLine, 9, 0, 1, 2)
-		self.layout.addWidget(self.useLabel, 10, 0)
-		self.layout.addWidget(self.useTypeCombo, 11, 1)
-		self.layout.addWidget(self.useTargetCombo, 12, 1)
-		self.layout.addWidget(self.useTextLabel, 13, 0)
-		self.layout.addWidget(self.useTextEdit, 13, 1)
-		self.layout.addWidget(self.allTextsButton, 14, 1)
+		self.layout.addWidget(self.clickTextLabel)
+		self.layout.addWidget(self.clickTextEdit)
+		self.layout.addWidget(self.pickupLabelLine)
+		self.layout.addWidget(self.pickupLabel)
+		self.layout.addWidget(self.pickupTextLabel)
+		self.layout.addWidget(self.pickupTextEdit)
+		self.layout.addWidget(self.pickupBlockLabel)
+		self.layout.addWidget(self.pickupBlockCombo)
+		self.layout.addWidget(self.useLabelLine)
+		self.layout.addWidget(self.useLabel)
+		self.layout.addWidget(self.useTypeCombo)
+		self.layout.addWidget(self.useTargetCombo)
+		self.layout.addWidget(self.useTextLabel)
+		self.layout.addWidget(self.useTextEdit)
+		self.layout.addWidget(self.allTextsButton)
+		
+		# Door
+		self.layout.addWidget(self.openDoorLabelLine)
+		self.layout.addWidget(self.openDoorLabel)
+		self.layout.addWidget(self.openDoorTextLabel)
+		self.layout.addWidget(self.openDoorTextEdit)
+		self.layout.addWidget(self.doorImageOpen)
+		
+		self.layout.addWidget(self.closedDoorLabelLine)
+		self.layout.addWidget(self.closedDoorLabel)
+		self.layout.addWidget(self.closedDoorTextLabel)
+		self.layout.addWidget(self.closedDoorTextEdit)
+		self.layout.addWidget(self.doorImageClosed)
+		
+		self.layout.addWidget(self.lockedDoorLabelLine)
+		self.layout.addWidget(self.lockedDoorLabel)
+		self.layout.addWidget(self.lockedDoorTextLabel)
+		self.layout.addWidget(self.lockedDoorTextEdit)
+		self.layout.addWidget(self.doorImageLocked)
+		
 		
 		# Which widgets are shown with each object
 		self.itemSettings = {
@@ -158,8 +207,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.musicLabel,
 				self.musicTextEdit,
 				self.musicBtn,
-				self.whereFromLabel,
-				self.whereFromCombo
+				# TODO: doorCombo for where from
 			],
 			"Item": [
 				self.nameLabel,
@@ -180,7 +228,8 @@ class SettingsWidget(QtGui.QWidget):
 				self.useTargetCombo,
 				self.useTextLabel,
 				self.useTextEdit,
-				self.allTextsButton
+				self.allTextsButton,
+				self.roomCombo
 			],
 			"Object": [
 				self.nameLabel,
@@ -188,13 +237,35 @@ class SettingsWidget(QtGui.QWidget):
 				self.imgTextLabel,
 				self.itemImage,
 				self.clickTextLabel,
-				self.clickTextEdit
+				self.clickTextEdit,
+				self.roomCombo
+			],
+			"Door": [
+				self.nameLabel,
+				self.objectNameEdit,
+				self.openDoorLabelLine,
+				self.openDoorLabel,
+				self.doorImageOpen,
+				self.lockedDoorLabelLine,
+				self.lockedDoorLabel,
+				self.doorImageLocked,
+				self.closedDoorLabelLine,
+				self.closedDoorLabel,
+				self.doorImageClosed,
+				self.clickTextLabel,
+				self.clickTextEdit,
+				self.roomCombo
 			]
 		}
 		
 		for key in self.itemSettings:
 			for item in self.itemSettings[key]:
 				item.hide()
+		
+	def createSeparator(self):
+		label = QtGui.QLabel("")
+		label.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
+		return label
 		
 	# Set settings for the room view
 	def setRoomOptions(self, room):
@@ -226,6 +297,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Item image
 		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
+		
+		# Location
+		self.setItemLocation(item)
 		
 		# Examine text
 		examineText = item.getExamineText()
@@ -275,12 +349,29 @@ class SettingsWidget(QtGui.QWidget):
 		imageObject = gObject.getRepresentingImage()
 		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
 		
+		# Location
+		self.setItemLocation(gObject)
+		
 		# Examine text
 		examineText = gObject.getExamineText()
 		if not (examineText):
 			examineText = ""
 		self.clickTextEdit.setText(examineText)
 		
+	def setDoorOptions(self, doorObject):
+		self.setDoorImage(doorObject.openImage, "open")
+		self.setDoorImage(doorObject.closedImage, "closed")
+		self.setDoorImage(doorObject.lockedImage, "locked")
+		
+		# Location
+		self.setItemLocation(doorObject)
+		
+		# Examine text
+		examineText = doorObject.getExamineText()
+		if not (examineText):
+			examineText = ""
+		self.clickTextEdit.setText(examineText)	
+	
 	def showAllTexts(self):
 		print("Clicked show all texts")
 		
@@ -317,6 +408,7 @@ class SettingsWidget(QtGui.QWidget):
 		if (len(fname) != 0):
 			callBack(fname)
 		
+	# TODO: Is this obsolete?
 	def setRoomBackground(self, imagePath):
 		imgPixmap = QtGui.QPixmap(imagePath).scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		self.itemImage.setPixmap(imgPixmap)
@@ -328,6 +420,60 @@ class SettingsWidget(QtGui.QWidget):
 			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		self.itemImage.setPixmap(imgPixmap)
 		
+	def setDoorImage(self, image, state):
+		if not (image):
+			return
+		
+		doorName = image.getName()
+		
+		if (state == "locked"):
+			doorImage = self.doorImageLocked
+			noNameText = "Lukitulla"
+			self.doorImageLocked.show()
+		elif (state == "closed"):
+			doorImage = self.doorImageClosed
+			noNameText = "Suljetulla"
+			self.doorImageClosed.show()
+			doorNameLabel = self.closedDoorLabel
+		elif (state == "open"):
+			doorImage = self.doorImageOpen
+			noNameText = "Avoimella"
+			self.doorImageOpen.show()
+			doorNameEdit = self.openDoorLabel
+		else:
+			return
+			
+		if not (doorName):
+			doorname = noNameText + " ovella ei ole nimeä"
+		self.objectNameEdit.setText(doorName)
+		
+		imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+image.getLocation())
+		if (imgPixmap.size().height() > 200):
+			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		doorImage.setPixmap(imgPixmap)
+		
+	# Change door image after image dialog
+	def changeDoorImage(self, state, imagePath):
+		if (state == "locked"):
+			doorImage = self.doorImageLocked
+		elif (state == "closed"):
+			doorImage = self.doorImageClosed
+		elif (state == "open"):
+			doorImage = self.doorImageOpen
+		else:
+			return
+			
+		imgPixmap = QtGui.QPixmap(imagePath)
+		if (imgPixmap.size().height() > 200):
+			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+		doorImage.setPixmap(imgPixmap)
+		
+	def setItemLocation(self, item):
+		# Find the combobox item with the given item
+		for i in range(self.roomCombo.count()):
+			if (self.roomCombo.itemData(i) == item.location):
+				self.roomCombo.setCurrentIndex(i)
+	
 	# TODO: Maybe have doors here instead of rooms (categorized by rooms maybe)
 	# TODO: Need to set this box value in settings
 	def populateRoomCombobox(self):
@@ -339,7 +485,7 @@ class SettingsWidget(QtGui.QWidget):
 			imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
 			
 			roomIcon = QtGui.QIcon(imgPixmap)
-			self.whereFromCombo.addItem(roomIcon, roomName)
+			self.roomCombo.addItem(roomIcon, roomName, userData=room)
 			
 	# TODO: Implement me properly
 	def populateUseTargetCombobox(self, useType):

@@ -79,10 +79,15 @@ class Editor(QtGui.QMainWindow):
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
 		
-		self.settingsWidget = SettingsWidget.SettingsWidget(self)
-		right_frame_layout.addWidget(self.settingsWidget)
 		
+		self.settingsWidget = SettingsWidget.SettingsWidget(self)
 		self.settingsWidget.displayOptions(selectedRoom.room)
+		
+		# Set settings widget scrollable instead resizing main window
+		scrollArea = QtGui.QScrollArea()
+		scrollArea.setWidgetResizable(True)
+		scrollArea.setWidget(self.settingsWidget)
+		right_frame_layout.addWidget(scrollArea)
 		
 	def createSpaceTab(self):
 		self.spaceTab = QtGui.QWidget()
