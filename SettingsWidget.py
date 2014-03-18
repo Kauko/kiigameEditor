@@ -51,9 +51,6 @@ class SettingsWidget(QtGui.QWidget):
 		self.musicTextEdit = QtGui.QLineEdit()
 		self.musicTextEdit.setReadOnly(True)
 		
-		self.roomCombo = QtGui.QComboBox(self)
-		self.roomCombo.setIconSize(QtCore.QSize(50,50))
-		
 		self.objectNameEdit =  QtGui.QLineEdit()
 		
 		self.itemImage = QtGui.QLabel(self)
@@ -82,7 +79,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Where located
 		self.whereLocatedLabel = QtGui.QLabel("Missä sijaitsee?")
-		self.populateRoomCombobox()
+		self.roomCombo = QtGui.QComboBox(self)
+		self.roomCombo.setIconSize(QtCore.QSize(50,50))
+		self.populateroomCombobox(self.roomCombo)
 		
 		# Object image
 		self.imgTextLabel = QtGui.QLabel("Kuva")
@@ -156,6 +155,13 @@ class SettingsWidget(QtGui.QWidget):
 		self.lockedDoorClickTextEdit = QtGui.QTextEdit()
 		self.lockedDoorClickTextEdit.setMaximumHeight(50)
 		
+		self.doorTransitionLabel = QtGui.QLabel("Mihin ovesta pääsee?")
+		self.doorTransitionCombo = QtGui.QComboBox(self)
+		self.doorTransitionCombo.setIconSize(QtCore.QSize(50,50))
+		self.populateroomCombobox(self.doorTransitionCombo)
+		self.doorTransitionLabelLine = self.createSeparator()
+		
+		# Used by all
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
 		self.layout.addWidget(self.imgTextLabel)
@@ -212,6 +218,10 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.lockedDoorClickTextLabel)
 		self.layout.addWidget(self.lockedDoorClickTextEdit)
 		
+		self.layout.addWidget(self.doorTransitionLabelLine)
+		self.layout.addWidget(self.doorTransitionLabel)
+		self.layout.addWidget(self.doorTransitionCombo)
+		
 		# Which widgets are shown with each object
 		self.itemSettings = {
 			"Room": [
@@ -262,6 +272,9 @@ class SettingsWidget(QtGui.QWidget):
 				self.nameLabel,
 				self.objectNameEdit,
 				
+				self.whereLocatedLabel,
+				self.roomCombo,
+				
 				self.openDoorLabelLine,
 				self.openDoorLabel,
 				self.openDoorTextLabel,
@@ -286,8 +299,9 @@ class SettingsWidget(QtGui.QWidget):
 				self.closedDoorClickTextLabel,
 				self.closedDoorClickTextEdit,
 				
-				self.whereLocatedLabel,
-				self.roomCombo
+				self.doorTransitionLabelLine,
+				self.doorTransitionLabel,
+				self.doorTransitionCombo
 			]
 		}
 		
@@ -529,16 +543,18 @@ class SettingsWidget(QtGui.QWidget):
 				self.roomCombo.setCurrentIndex(i)
 	
 	# TODO: Door combobox
-	def populateRoomCombobox(self):
+	
+	# Populate a given combobox with game rooms
+	def populateroomCombobox(self, combobox):
 		for room in self.parent.getRoomObjects():
-			# TODO: Some model to eliminate redundancy of this kind of getName/roomName patterns
+			# TODO: Some model to eliminate redundancy from getName/roomName patterns
 			roomName = room.getName()
 			if not (roomName):
 				roomName = "Huoneella ei ole nimeä"
 			imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
 			
 			roomIcon = QtGui.QIcon(imgPixmap)
-			self.roomCombo.addItem(roomIcon, roomName, userData=room)
+			combobox.addItem(roomIcon, roomName, userData=room)
 			
 	def populateUseTargetCombobox(self, useType):
 		if (useType == 0):
@@ -552,7 +568,7 @@ class SettingsWidget(QtGui.QWidget):
 			objectTypes = ("container",)
 		else:
 			objectTypes = ("obstacle",)
-		
+			
 		self.populateCombobox(objectTypes, self.useTargetCombo)
 		
 	# TODO: Create a combo icon of multi-part objects such as cieni
@@ -561,6 +577,8 @@ class SettingsWidget(QtGui.QWidget):
 		self.pickupBlockCombo.addItem("Ei estä")
 		self.populateCombobox(("obstacle",), self.pickupBlockCombo)
 					
+	# Populate a given combobox with given types of objects
+	# categorized by game rooms
 	def populateCombobox(self, objectTypes, combobox):
 		# TODO: Disconnect combobox from events when populating it
 		combobox.clear()
