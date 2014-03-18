@@ -243,15 +243,25 @@ class SettingsWidget(QtGui.QWidget):
 			"Door": [
 				self.nameLabel,
 				self.objectNameEdit,
+				
 				self.openDoorLabelLine,
 				self.openDoorLabel,
+				self.openDoorTextLabel,
+				self.openDoorTextEdit,
 				self.doorImageOpen,
+				
 				self.lockedDoorLabelLine,
 				self.lockedDoorLabel,
+				self.lockedDoorTextLabel,
+				self.lockedDoorTextEdit,
 				self.doorImageLocked,
+				
 				self.closedDoorLabelLine,
 				self.closedDoorLabel,
+				self.closedDoorTextLabel,
+				self.closedDoorTextEdit,
 				self.doorImageClosed,
+				
 				self.clickTextLabel,
 				self.clickTextEdit,
 				self.roomCombo
@@ -270,10 +280,7 @@ class SettingsWidget(QtGui.QWidget):
 	# Set settings for the room view
 	def setRoomOptions(self, room):
 		# Room name
-		roomName = room.getName()
-		if not (roomName):
-			roomName = "Huoneella ei ole nimeä"
-		self.objectNameEdit.setText(roomName)
+		self.setObjectName(room, "Huoneella")
 		
 		# Room background
 		self.setRoomBackground(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
@@ -290,10 +297,7 @@ class SettingsWidget(QtGui.QWidget):
 		imageObject = item.getRepresentingImage()
 		
 		# Object name
-		itemName = imageObject.getName()
-		if not (itemName):
-			itemName = "Esineellä ei ole nimeä"
-		self.objectNameEdit.setText(itemName)
+		self.setObjectName(imageObject, "Esineellä")
 		
 		# Item image
 		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
@@ -341,10 +345,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Create the input fields for generic objects
 	def setGenericOptions(self, gObject):
-		objectName = gObject.getName()
-		if not (objectName):
-			objectName = "Esineellä ei ole nimeä"
-		self.objectNameEdit.setText(objectName)
+		self.setObjectName(gObject, "Esineellä")
 		
 		imageObject = gObject.getRepresentingImage()
 		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
@@ -358,10 +359,32 @@ class SettingsWidget(QtGui.QWidget):
 			examineText = ""
 		self.clickTextEdit.setText(examineText)
 		
+	# Set any game object name
+	def setObjectName(self, image, textStart, textEdit=None):
+		# Given image may be None
+		try:
+			name = image.getName()
+		except AttributeError:
+			name = ""
+			print("ATAKSDJ")
+				
+		if (name == None):
+			name = "%s ei ole nimeä" %(textStart)
+			
+		# If textEdit is defined, set its text instead
+		if (textEdit):
+			textEdit.setText(name)
+		else:
+			self.objectNameEdit.setText(name)
+		
 	def setDoorOptions(self, doorObject):
 		self.setDoorImage(doorObject.openImage, "open")
 		self.setDoorImage(doorObject.closedImage, "closed")
 		self.setDoorImage(doorObject.lockedImage, "locked")
+		
+		self.setDoorName("open")
+		self.setDoorName("closed")
+		self.setDoorName("locked")
 		
 		# Location
 		self.setItemLocation(doorObject)
@@ -420,42 +443,46 @@ class SettingsWidget(QtGui.QWidget):
 			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		self.itemImage.setPixmap(imgPixmap)
 		
+	# Set the image of open, closed or locked door
 	def setDoorImage(self, image, state):
+		if (state == "locked"):
+			doorImage = self.doorImageLocked
+		elif (state == "closed"):
+			doorImage = self.doorImageClosed
+		elif (state == "open"):
+			doorImage = self.doorImageOpen
+		else:
+			return
+			
 		if (image):
-			doorName = image.getName()
-			
-			if not (doorName):
-				doorname = noNameText + " ovella ei ole nimeä"
-			self.objectNameEdit.setText(doorName)
-			
 			imagePath = self.parent.getImageDir()+"/"+image.getLocation()
 		else:
 			imagePath = "images/door_placeholder.png"
-		
-		if (state == "locked"):
-			doorImage = self.doorImageLocked
-			noNameText = "Lukitulla"
-			self.doorImageLocked.show()
-		elif (state == "closed"):
-			doorImage = self.doorImageClosed
-			noNameText = "Suljetulla"
-			self.doorImageClosed.show()
-			doorNameLabel = self.closedDoorLabel
-		elif (state == "open"):
-			doorImage = self.doorImageOpen
-			noNameText = "Avoimella"
-			self.doorImageOpen.show()
-			doorNameEdit = self.openDoorLabel
-		else:
-			return
-		
+			
 		imgPixmap = QtGui.QPixmap(imagePath)
 		if (imgPixmap.size().height() > 200):
 			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		doorImage.setPixmap(imgPixmap)
 		
-	def setDoorName(self, image, state):
-		pass
+	# Set the name of open, closed or locked door
+	def setDoorName(self, state):
+		if (state == "locked"):
+			textStart = "Lukitulla ovella"
+			textEdit = self.lockedDoorTextEdit
+			doorObject = self.currentObject.lockedImage
+		elif (state == "closed"):
+			textStart = "Suljetulla ovella"
+			textEdit = self.closedDoorTextEdit
+			doorObject = self.currentObject.closedImage
+		elif (state == "open"):
+			textStart = "Avoimella ovella"
+			textEdit = self.openDoorTextEdit
+			doorObject = self.currentObject.openImage
+		else:
+			return
+		print("SEt",doorObject,textStart)
+		self.setObjectName(doorObject, textStart, textEdit)
+			
 	# Change door image after image dialog
 	def changeDoorImage(self, state, imagePath):
 		if (state == "locked"):
