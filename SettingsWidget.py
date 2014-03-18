@@ -132,7 +132,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.openDoorTextEdit = QtGui.QLineEdit()
 		self.doorImageOpen = QtGui.QLabel(self)
 		self.doorImageOpen.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("open", imagePath))
-		self.openDoorClickTextLabel = QtGui.QLabel("Teksti klikatessa")
+		self.openDoorClickTextLabel = QtGui.QLabel("Teksti ovesta mentäessä")
 		self.openDoorClickTextEdit = QtGui.QTextEdit()
 		self.openDoorClickTextEdit.setMaximumHeight(50)
 		
@@ -438,6 +438,12 @@ class SettingsWidget(QtGui.QWidget):
 		self.setDoorName("closed")
 		self.setDoorName("locked")
 		
+		# Examine text for each door image
+		self.setDoorExamineText(self.openDoorClickTextEdit, self.currentObject.openImage)
+		self.setDoorExamineText(self.closedDoorClickTextEdit, self.currentObject.closedImage)
+		self.setDoorExamineText(self.lockedDoorClickTextEdit, self.currentObject.lockedImage)
+		
+		
 		# Location
 		self.setItemLocation(doorObject)
 		
@@ -446,6 +452,16 @@ class SettingsWidget(QtGui.QWidget):
 		if not (examineText):
 			examineText = ""
 		self.clickTextEdit.setText(examineText)	
+	
+	# Sets door examine text
+	# TODO: This could be generalized for every examine text
+	def setDoorExamineText(self, textEdit, image):
+		try:
+			text = image.getExamineText()
+		except AttributeError:
+			text = ""
+		#print("Txt",text)
+		textEdit.setText(text)
 	
 	# Changes door locked input fields according to the checkbox state
 	def changeDoorLocked(self):
