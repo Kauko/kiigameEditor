@@ -89,6 +89,12 @@ class Object(object):
 	# Should be overriden by other objects
 	def getUseImage(self, useItem):
 		return self.images[0]
+		
+	def getExamineText(self):
+		try:
+			return self.texts["examine"]
+		except:
+			return
 
 # Pickable item
 class Item(Object):
@@ -116,12 +122,6 @@ class Item(Object):
 			self.outcome = getGameObject("object", self.objectAttributes["object"]["outcome"])
 		except KeyError:
 			pass
-			
-	def getExamineText(self):
-		try:
-			return self.texts["examine"]
-		except:
-			return
 			
 	def getPickupText(self):
 		try:
