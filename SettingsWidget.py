@@ -421,10 +421,16 @@ class SettingsWidget(QtGui.QWidget):
 		self.itemImage.setPixmap(imgPixmap)
 		
 	def setDoorImage(self, image, state):
-		if not (image):
-			return
-		
-		doorName = image.getName()
+		if (image):
+			doorName = image.getName()
+			
+			if not (doorName):
+				doorname = noNameText + " ovella ei ole nimeä"
+			self.objectNameEdit.setText(doorName)
+			
+			imagePath = self.parent.getImageDir()+"/"+image.getLocation()
+		else:
+			imagePath = "images/door_placeholder.png"
 		
 		if (state == "locked"):
 			doorImage = self.doorImageLocked
@@ -442,16 +448,14 @@ class SettingsWidget(QtGui.QWidget):
 			doorNameEdit = self.openDoorLabel
 		else:
 			return
-			
-		if not (doorName):
-			doorname = noNameText + " ovella ei ole nimeä"
-		self.objectNameEdit.setText(doorName)
 		
-		imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+image.getLocation())
+		imgPixmap = QtGui.QPixmap(imagePath)
 		if (imgPixmap.size().height() > 200):
 			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		doorImage.setPixmap(imgPixmap)
 		
+	def setDoorName(self, image, state):
+		pass
 	# Change door image after image dialog
 	def changeDoorImage(self, state, imagePath):
 		if (state == "locked"):
@@ -474,8 +478,7 @@ class SettingsWidget(QtGui.QWidget):
 			if (self.roomCombo.itemData(i) == item.location):
 				self.roomCombo.setCurrentIndex(i)
 	
-	# TODO: Maybe have doors here instead of rooms (categorized by rooms maybe)
-	# TODO: Need to set this box value in settings
+	# TODO: Door combobox
 	def populateRoomCombobox(self):
 		for room in self.parent.getRoomObjects():
 			# TODO: Some model to eliminate redundancy of this kind of getName/roomName patterns
@@ -487,7 +490,6 @@ class SettingsWidget(QtGui.QWidget):
 			roomIcon = QtGui.QIcon(imgPixmap)
 			self.roomCombo.addItem(roomIcon, roomName, userData=room)
 			
-	# TODO: Implement me properly
 	def populateUseTargetCombobox(self, useType):
 		if (useType == 0):
 			self.useTargetCombo.clear()
