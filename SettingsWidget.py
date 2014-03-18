@@ -132,6 +132,9 @@ class SettingsWidget(QtGui.QWidget):
 		self.openDoorTextEdit = QtGui.QLineEdit()
 		self.doorImageOpen = QtGui.QLabel(self)
 		self.doorImageOpen.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("open", imagePath))
+		self.openDoorClickTextLabel = QtGui.QLabel("Teksti klikatessa")
+		self.openDoorClickTextEdit = QtGui.QTextEdit()
+		self.openDoorClickTextEdit.setMaximumHeight(50)
 		
 		self.closedDoorLabelLine = self.createSeparator()
 		self.closedDoorLabel = QtGui.QLabel("Suljettu ovi")
@@ -139,6 +142,9 @@ class SettingsWidget(QtGui.QWidget):
 		self.closedDoorTextEdit = QtGui.QLineEdit()
 		self.doorImageClosed = QtGui.QLabel(self)
 		self.doorImageClosed.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("closed", imagePath))
+		self.closedDoorClickTextLabel = QtGui.QLabel("Teksti klikatessa")
+		self.closedDoorClickTextEdit = QtGui.QTextEdit()
+		self.closedDoorClickTextEdit.setMaximumHeight(50)
 		
 		self.lockedDoorLabelLine = self.createSeparator()
 		self.lockedDoorLabel = QtGui.QLabel("Lukittu ovi")
@@ -146,6 +152,9 @@ class SettingsWidget(QtGui.QWidget):
 		self.lockedDoorTextEdit = QtGui.QLineEdit()
 		self.doorImageLocked = QtGui.QLabel(self)
 		self.doorImageLocked.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("locked", imagePath))
+		self.lockedDoorClickTextLabel = QtGui.QLabel("Teksti klikatessa")
+		self.lockedDoorClickTextEdit = QtGui.QTextEdit()
+		self.lockedDoorClickTextEdit.setMaximumHeight(50)
 		
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
@@ -183,19 +192,25 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.openDoorTextLabel)
 		self.layout.addWidget(self.openDoorTextEdit)
 		self.layout.addWidget(self.doorImageOpen)
+		self.layout.addWidget(self.openDoorClickTextLabel)
+		self.layout.addWidget(self.openDoorClickTextEdit)
 		
 		self.layout.addWidget(self.closedDoorLabelLine)
 		self.layout.addWidget(self.closedDoorLabel)
 		self.layout.addWidget(self.closedDoorTextLabel)
 		self.layout.addWidget(self.closedDoorTextEdit)
 		self.layout.addWidget(self.doorImageClosed)
+		self.layout.addWidget(self.closedDoorClickTextLabel)
+		self.layout.addWidget(self.closedDoorClickTextEdit)
 		
 		self.layout.addWidget(self.lockedDoorLabelLine)
 		self.layout.addWidget(self.lockedDoorLabel)
 		self.layout.addWidget(self.lockedDoorTextLabel)
 		self.layout.addWidget(self.lockedDoorTextEdit)
 		self.layout.addWidget(self.doorImageLocked)
-		
+		self.layout.addWidget(self.doorImageLocked)
+		self.layout.addWidget(self.lockedDoorClickTextLabel)
+		self.layout.addWidget(self.lockedDoorClickTextEdit)
 		
 		# Which widgets are shown with each object
 		self.itemSettings = {
@@ -207,6 +222,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.musicLabel,
 				self.musicTextEdit,
 				self.musicBtn,
+				self.whereFromLabel
 				# TODO: doorCombo for where from
 			],
 			"Item": [
@@ -229,6 +245,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.useTextLabel,
 				self.useTextEdit,
 				self.allTextsButton,
+				self.whereLocatedLabel,
 				self.roomCombo
 			],
 			"Object": [
@@ -238,6 +255,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.itemImage,
 				self.clickTextLabel,
 				self.clickTextEdit,
+				self.whereLocatedLabel,
 				self.roomCombo
 			],
 			"Door": [
@@ -249,25 +267,31 @@ class SettingsWidget(QtGui.QWidget):
 				self.openDoorTextLabel,
 				self.openDoorTextEdit,
 				self.doorImageOpen,
+				self.openDoorClickTextLabel,
+				self.openDoorClickTextEdit,
 				
 				self.lockedDoorLabelLine,
 				self.lockedDoorLabel,
 				self.lockedDoorTextLabel,
 				self.lockedDoorTextEdit,
 				self.doorImageLocked,
+				self.lockedDoorClickTextLabel,
+				self.lockedDoorClickTextEdit,
 				
 				self.closedDoorLabelLine,
 				self.closedDoorLabel,
 				self.closedDoorTextLabel,
 				self.closedDoorTextEdit,
 				self.doorImageClosed,
+				self.closedDoorClickTextLabel,
+				self.closedDoorClickTextEdit,
 				
-				self.clickTextLabel,
-				self.clickTextEdit,
+				self.whereLocatedLabel,
 				self.roomCombo
 			]
 		}
 		
+		# Hide every widget
 		for key in self.itemSettings:
 			for item in self.itemSettings[key]:
 				item.hide()
@@ -366,8 +390,7 @@ class SettingsWidget(QtGui.QWidget):
 			name = image.getName()
 		except AttributeError:
 			name = ""
-			print("ATAKSDJ")
-				
+			
 		if (name == None):
 			name = "%s ei ole nimeä" %(textStart)
 			
