@@ -183,6 +183,7 @@ class Container(Object):
 	def postInit(self, getGameObject):
 		try:
 			self.key = getGameObject("object", self.objectAttributes["object"]["key"])
+			print("KEYEYEY",self.id,self.key,self.key.id)
 			self.key.setTarget(self)
 		except KeyError:
 			pass

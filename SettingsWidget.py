@@ -262,9 +262,6 @@ class SettingsWidget(QtGui.QWidget):
 				self.lockedDoorImage
 			],
 			"Container": [
-				self.nameLabel,
-				self.objectNameEdit,
-				self.imgTextLabel,
 				self.whereLocatedLabel,
 				self.roomCombo,
 				
@@ -524,7 +521,7 @@ class SettingsWidget(QtGui.QWidget):
 	# Sets the index of a combobox according to given targetObject
 	def setComboboxIndex(self, targetObject, combobox):
 		# Find the combobox item with the given item
-		for i in range(self.roomCombo.count()):
+		for i in range(combobox.count()):
 			if (combobox.itemData(i) == targetObject):
 				combobox.setCurrentIndex(i)
 	
