@@ -152,6 +152,11 @@ class SettingsWidget(QtGui.QWidget):
 		self.fullContainerImage = ObjectImageSettings("Täysi säiliö", "Avoimen säiliön nimi", parent=self)
 		self.emptyContainerImage = ObjectImageSettings("Tyhjä säiliö", "Tyhjän säiliön nimi", parent=self)
 		
+		# Obstacle widgets
+		self.obstacleImage = ObjectImageSettings(None, "Esteen nimi", True, "Onko säiliö lukossa?", parent=self)
+		self.obstacleBlocksLabel = QtGui.QLabel("Mitä estää?")
+		self.obstacleBlocksCombo = self.createItemCombobox("Ei mitään", ("door",))
+		
 		self.whatGoesLabel = QtGui.QLabel("Mikä esine menee säiliöön?")
 		self.whatGoesCombo = self.createItemCombobox("Ei mikään")
 		
@@ -199,6 +204,10 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.lockedContainerImage)
 		self.layout.addWidget(self.fullContainerImage)
 		self.layout.addWidget(self.emptyContainerImage)
+		
+		self.layout.addWidget(self.obstacleImage)
+		self.layout.addWidget(self.obstacleBlocksLabel)
+		self.layout.addWidget(self.obstacleBlocksCombo)
 		
 		self.layout.addWidget(self.whatGoesLabel)
 		self.layout.addWidget(self.whatGoesCombo)
@@ -277,7 +286,12 @@ class SettingsWidget(QtGui.QWidget):
 				self.whatComesCombo
 			],
 			"Obstacle": [
-			
+				self.whereLocatedLabel,
+				self.roomCombo,
+				
+				self.obstacleImage,
+				self.obstacleBlocksLabel,
+				self.obstacleBlocksCombo
 			]
 		}
 		
@@ -375,11 +389,6 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Set the input field values for containers
 	def setContainerOptions(self, container):
-		self.setObjectName(container, "Säiliöllä")
-		
-		imageObject = container.getRepresentingImage()
-		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
-		
 		# Set image settings for each image
 		self.lockedContainerImage.setSettings(container, container.lockedImage)
 		self.fullContainerImage.setSettings(container, container.fullImage)
@@ -394,9 +403,12 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Set the input field values for obstacles
 	def setObstacleOptions(self, obstacle):
-		print("Obstacle options!")
-		return
+	
+		# Set image settings for each image
+		self.obstacleImage.setSettings(obstacle, obstacle.blockingImage)
 		
+		# Set location
+		self.setComboboxIndex(obstacle.location, self.roomCombo)
 		
 	# Set any game object name
 	def setObjectName(self, image, textStart, textEdit=None):

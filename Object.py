@@ -183,7 +183,6 @@ class Container(Object):
 	def postInit(self, getGameObject):
 		try:
 			self.key = getGameObject("object", self.objectAttributes["object"]["key"])
-			print("KEYEYEY",self.id,self.key,self.key.id)
 			self.key.setTarget(self)
 		except KeyError:
 			pass
@@ -224,6 +223,10 @@ class Container(Object):
 		except KeyError:
 			print("Warning: Attribute 'locked' not defined for door object '%s'" %(self.id))
 		return False
+
+	# Returns what unblocks the container
+	def getKey(self):
+		return self.key
 
 class Door(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
@@ -280,6 +283,10 @@ class Door(Object):
 			print("Warning: Attribute 'locked' not defined for door object '%s'" %(self.id))
 		return False
 
+	# Returns what unlocks the door
+	def getKey(self):
+		return self.key
+
 class Obstacle(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Obstacle, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -322,6 +329,10 @@ class Obstacle(Object):
 		if (self.trigger == useItem):
 			return self.blockingImage
 
+	# Returns what unblocks the obstacle
+	def getKey(self):
+		return self.trigger
+		
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
 	# imageAttributes has to be dict, not a list as with other objects
