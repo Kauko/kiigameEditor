@@ -1,6 +1,9 @@
 from PySide import QtGui, QtCore
 from ObjectImageSettings import ObjectImageSettings
 
+# TODO: On all comboboxes: What to do when item is in use? For example,
+#		if an item is already a key to an object, how to display it?
+
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
@@ -147,6 +150,12 @@ class SettingsWidget(QtGui.QWidget):
 		self.closedDoorImage = ObjectImageSettings("Suljettu ovi", "Suljetun oven nimi", parent=self)
 		self.lockedDoorImage = ObjectImageSettings("Lukittu ovi", "Lukitun oven nimi", True, "Onko ovi lukossa?", parent=self)
 		
+		# Container image widgets
+		self.lockedContainerImage = ObjectImageSettings("Lukittu säilö", "Lukitun säilön nimi", True, "Onko säilö lukossa?", parent=self)
+		self.fullContainerImage = ObjectImageSettings("Täysi säilö", "Avoimen säilön nimi", parent=self)
+		self.emptyContainerImage = ObjectImageSettings("Tyhjä säilö", "Tyhjän säilön nimi", parent=self)
+
+		
 		# Used by all
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
@@ -189,6 +198,10 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.openDoorImage)
 		self.layout.addWidget(self.closedDoorImage)
 		self.layout.addWidget(self.lockedDoorImage)
+		
+		self.layout.addWidget(self.lockedContainerImage)
+		self.layout.addWidget(self.fullContainerImage)
+		self.layout.addWidget(self.emptyContainerImage)
 		
 		# Which widgets are shown with each object
 		self.itemSettings = {
@@ -247,40 +260,17 @@ class SettingsWidget(QtGui.QWidget):
 				self.openDoorImage,
 				self.closedDoorImage,
 				self.lockedDoorImage
-				#self.openDoorLabelLine,
-				#self.openDoorLabel,
-				#self.openDoorTextLabel,
-				#self.openDoorTextEdit,
-				#self.doorImageOpen,
-				#self.openDoorClickTextLabel,
-				#self.openDoorClickTextEdit,
-				
-				#self.lockedDoorLabelLine,
-				#self.lockedDoorLabel,
-				#self.lockedDoorLockedCheckbox,
-				#self.lockedDoorTextLabel,
-				#self.lockedDoorTextEdit,
-				#self.doorImageLocked,
-				#self.lockedDoorClickTextLabel,
-				#self.lockedDoorClickTextEdit,
-				
-				#self.closedDoorLabelLine,
-				#self.closedDoorLabel,
-				#self.closedDoorTextLabel,
-				#self.closedDoorTextEdit,
-				#self.doorImageClosed,
-				#self.closedDoorClickTextLabel,
-				#self.closedDoorClickTextEdit
 			],
 			"Container": [
 				self.nameLabel,
 				self.objectNameEdit,
 				self.imgTextLabel,
-				self.itemImage,
-				self.clickTextLabel,
-				self.clickTextEdit,
 				self.whereLocatedLabel,
-				self.roomCombo
+				self.roomCombo,
+				
+				self.lockedContainerImage,
+				self.fullContainerImage,
+				self.emptyContainerImage
 			],
 			"Obstacle": [
 			
@@ -386,9 +376,12 @@ class SettingsWidget(QtGui.QWidget):
 		imageObject = container.getRepresentingImage()
 		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
 		
+		self.lockedContainerImage.setSettings(container, container.lockedImage)
+		self.fullContainerImage.setSettings(container, container.fullImage)
+		self.emptyContainerImage.setSettings(container, container.emptyImage)
+		
 		# Location
 		self.setComboboxIndex(container.location, self.roomCombo)
-		
 		
 	# Set the input field values for obstacles
 	def setObstacleOptions(self, obstacle):
@@ -418,39 +411,11 @@ class SettingsWidget(QtGui.QWidget):
 		self.closedDoorImage.setSettings(doorObject, doorObject.closedImage)
 		self.lockedDoorImage.setSettings(doorObject, doorObject.lockedImage)
 		
-		# Set images for each door found
-		#self.setDoorImage(doorObject.openImage, "open")
-		#self.setDoorImage(doorObject.closedImage, "closed")
-		#self.setDoorImage(doorObject.lockedImage, "locked")
-		
-		# Set names for each door image
-		#self.setDoorName("open")
-		#self.setDoorName("closed")
-		#self.setDoorName("locked")
-		
-		# Door general name is the same as open door image's name
-		#self.setObjectName(doorObject.openImage, "Ovella")
-		
-		# Examine text for each door image
-		#self.setDoorExamineText(self.openDoorClickTextEdit, self.currentObject.openImage)
-		#self.setDoorExamineText(self.closedDoorClickTextEdit, self.currentObject.closedImage)
-		#self.setDoorExamineText(self.lockedDoorClickTextEdit, self.currentObject.lockedImage)
-		
 		# Location
 		self.setComboboxIndex(doorObject.location, self.roomCombo)
 		
 		# Door transition room
 		self.setComboboxIndex(doorObject.transition, self.doorTransitionCombo)
-		
-	# Sets door examine text
-	# TODO: This could be generalized for every examine text
-	def setDoorExamineText(self, textEdit, image):
-		try:
-			text = image.getExamineText()
-		except AttributeError:
-			text = ""
-		#print("Txt",text)
-		textEdit.setText(text)
 		
 	def showAllTexts(self):
 		print("Clicked show all texts")
@@ -565,6 +530,17 @@ class SettingsWidget(QtGui.QWidget):
 	
 	# TODO: Door combobox
 	
+	# Create combobox from given items with default of all item types
+	def createItemCombobox(self, objectTypes=None):
+		if not (objectTypes):
+			objectTypes = ("object", "item", "door", "container", "obstacle")
+		
+		combobox = QtGui.QComboBox(self)
+		combobox.setIconSize(QtCore.QSize(50,50))
+		
+		self.populateCombobox(objectTypes, combobox)
+		return combobox
+		
 	# Populate a given combobox with game rooms
 	def populateRoomCombobox(self, combobox):
 		for room in self.parent.getRoomObjects():
@@ -577,6 +553,7 @@ class SettingsWidget(QtGui.QWidget):
 			roomIcon = QtGui.QIcon(imgPixmap)
 			combobox.addItem(roomIcon, roomName, userData=room)
 			
+	# Populate use target combobox
 	def populateUseTargetCombobox(self, useType):
 		if (useType == 0):
 			self.useTargetCombo.clear()
@@ -610,6 +587,7 @@ class SettingsWidget(QtGui.QWidget):
 			
 			# Combobox has rooms with their obstacles under them
 			for room in objRooms:
+				print("room", room)
 				roomObject = room["room"]
 				roomName = roomObject.getName()
 				if not (roomName):
@@ -618,7 +596,7 @@ class SettingsWidget(QtGui.QWidget):
 				roomIcon = QtGui.QIcon(imgPixmap)
 				
 				# TODO: Disable ability to choose rooms
-				self.useTargetCombo.addItem(roomIcon, roomName)
+				combobox.addItem(roomIcon, roomName)
 				
 				# TODO: Indendation of objects in the combobox
 				# Add objects under the room
