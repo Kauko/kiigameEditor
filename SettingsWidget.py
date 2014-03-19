@@ -1,5 +1,6 @@
 from PySide import QtGui, QtCore
 from ObjectImageSettings import ObjectImageSettings
+from ImageCache import ImageCache
 
 # TODO: On all comboboxes: What to do when item is in use? For example,
 #		if an item is already a key to an object, how to display it?
@@ -21,7 +22,8 @@ class SettingsWidget(QtGui.QWidget):
 		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
 		
 		self.parent = parent
-		
+		self.imageCache = ImageCache()
+			
 		self.createItemOptions()
 		#self.createRoomOptions()
 		
@@ -54,23 +56,17 @@ class SettingsWidget(QtGui.QWidget):
 			
 	# Settings for the object view
 	def createItemOptions(self):
+		# Name
 		self.nameLabel = QtGui.QLabel("Nimi")
-		
-		self.musicTextEdit = QtGui.QLineEdit()
-		self.musicTextEdit.setReadOnly(True)
-		
 		self.objectNameEdit =  QtGui.QLineEdit()
+		self.objectNameEdit.editingFinished.connect(self.changeName)
 		
-		self.itemImage = QtGui.QLabel(self)
-		self.itemImage.mousePressEvent = lambda s: self.showImageDialog(self.setRoomBackground)
+		# General image
+		self.objectImage = QtGui.QLabel(self)
+		self.objectImage.mousePressEvent = lambda s: self.showImageDialog(self.setobjectImage)
 		
-		self.useTypeCombo = QtGui.QComboBox(self)
-		
-		# TODO: This combobox should be taller with the item chosen
-		self.useTargetCombo = QtGui.QComboBox(self)
-		self.useTargetCombo.setIconSize(QtCore.QSize(50,50))
-		self.useTargetCombo.currentIndexChanged.connect(self.setUseTarget)
-		self.populateUseTargetCombobox(0)
+		self.useTargetCombo = self.createItemCombobox("Ei mikään")
+		self.useTargetCombo.currentIndexChanged.connect(self.changeUseTarget)
 		
 		self.useTextEdit = QtGui.QTextEdit()
 		self.useTextEdit.setMaximumHeight(50)
@@ -78,10 +74,17 @@ class SettingsWidget(QtGui.QWidget):
 		# Music
 		# TODO: How to clear music?
 		self.musicLabel = QtGui.QLabel("Musiikki")
+		
 		self.musicBtn = QtGui.QPushButton('Selaa...', self)
 		self.musicBtn.setToolTip('Valitse musiikkitiedosto')
 		self.musicBtn.resize(self.musicBtn.sizeHint())
 		self.musicBtn.clicked.connect(self.showMusicDialog)
+		
+		self.musicTextEdit = QtGui.QLineEdit()
+		self.musicTextEdit.setReadOnly(True)
+		
+		self.musicClear = QtGui.QPushButton('Ei musiikkia', self)
+		self.musicClear.clicked.connect(self.clearMusic)
 		
 		# Where from dropdown box
 		self.whereFromLabel = QtGui.QLabel("Mistä sinne pääsee?")
@@ -118,15 +121,14 @@ class SettingsWidget(QtGui.QWidget):
 		
 		self.pickupBlockLabel = QtGui.QLabel("Estääkö jokin poiminnan?")
 		
-		self.pickupBlockCombo = QtGui.QComboBox(self)
-		self.pickupBlockCombo.setIconSize(QtCore.QSize(50,50))
-		self.populateBlockingCombobox()
+		self.pickupBlockCombo = self.createItemCombobox(None, ("obstacle",))
 		
 		# Object usage
 		self.useLabel = QtGui.QLabel("Käyttö")
 		self.useLabelLine = self.createSeparator()
 		
 		# Object type of usage
+		self.useTypeCombo = QtGui.QComboBox(self)
 		for i in self.useTypes:
 			self.useTypeCombo.addItem(self.useTypes[i])
 		self.useTypeCombo.currentIndexChanged.connect(self.changeUseType)
@@ -166,11 +168,12 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
 		self.layout.addWidget(self.imgTextLabel)
-		self.layout.addWidget(self.itemImage)
+		self.layout.addWidget(self.objectImage)
 		
 		self.layout.addWidget(self.musicLabel)
 		self.layout.addWidget(self.musicTextEdit)
 		self.layout.addWidget(self.musicBtn)
+		self.layout.addWidget(self.musicClear)
 		self.layout.addWidget(self.whereFromLabel)
 		self.layout.addWidget(self.whereLocatedLabel)
 		self.layout.addWidget(self.roomCombo)
@@ -218,28 +221,27 @@ class SettingsWidget(QtGui.QWidget):
 		self.itemSettings = {
 			"Room": [
 				self.imgTextLabel,
-				self.itemImage,
+				self.objectImage,
 				self.nameLabel,
 				self.objectNameEdit,
 				self.musicLabel,
 				self.musicTextEdit,
 				self.musicBtn,
+				self.musicClear,
 				self.whereFromLabel
-				# TODO: doorCombo for where from
+				# TODO: doorCombo for "where from" values
 			],
 			"Item": [
 				self.nameLabel,
 				self.objectNameEdit,
 				self.imgTextLabel,
-				self.itemImage,
+				self.objectImage,
 				self.clickTextLabel,
 				self.clickTextEdit,
 				self.pickupLabelLine,
 				self.pickupLabel,
 				self.pickupTextLabel,
 				self.pickupTextEdit,
-				self.pickupBlockLabel,
-				self.pickupBlockCombo,
 				self.useLabelLine,
 				self.useLabel,
 				self.useTypeCombo,
@@ -254,7 +256,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.nameLabel,
 				self.objectNameEdit,
 				self.imgTextLabel,
-				self.itemImage,
+				self.objectImage,
 				self.clickTextLabel,
 				self.clickTextEdit,
 				self.whereLocatedLabel,
@@ -271,6 +273,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.openDoorImage,
 				self.closedDoorImage,
 				self.lockedDoorImage
+				# TODO: obstacleCombo for "who blocks" values
 			],
 			"Container": [
 				self.whereLocatedLabel,
@@ -299,19 +302,14 @@ class SettingsWidget(QtGui.QWidget):
 		for key in self.itemSettings:
 			for item in self.itemSettings[key]:
 				item.hide()
-		
-	def createSeparator(self):
-		label = QtGui.QLabel("")
-		label.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
-		return label
-		
+				
 	# Set the input field values for rooms
 	def setRoomOptions(self, room):
 		# Room name
 		self.setObjectName(room, "Huoneella")
 		
 		# Room background
-		self.setRoomBackground(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
+		self.setobjectImage(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
 		
 		# Room music may return None which doesn't have split
 		try:
@@ -328,7 +326,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(imageObject, "Esineellä")
 		
 		# Item image
-		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
+		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
 		
 		# Location
 		self.setComboboxIndex(item.location, self.roomComboItem)
@@ -341,6 +339,9 @@ class SettingsWidget(QtGui.QWidget):
 		if not (pickupText):
 			pickupText = ""
 		self.pickupTextEdit.setText(pickupText)
+		
+		# Set who blocks
+		self.setComboboxIndex(item, self.pickupBlockCombo)
 		
 		# Use type of the item
 		itemTarget = self.parent.getItemUse(item)
@@ -373,7 +374,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(gObject, "Esineellä")
 		
 		imageObject = gObject.getRepresentingImage()
-		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
+		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
 		
 		# Location
 		self.setComboboxIndex(gObject.location, self.roomCombo)
@@ -383,6 +384,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Set the input field values for containers
 	def setContainerOptions(self, container):
+	
 		# Set image settings for each image
 		self.lockedContainerImage.setSettings(container, container.lockedImage)
 		self.fullContainerImage.setSettings(container, container.fullImage)
@@ -403,6 +405,40 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Set location
 		self.setComboboxIndex(obstacle.location, self.roomCombo)
+	
+	def setobjectImage(self, imagePath, objectImage=None):
+		imgPixmap = self.imageCache.createPixmap(imagePath)
+		
+		# TODO: Have spacing for smaller items
+		if (imgPixmap.size().height() > 200):
+			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
+			
+		if (objectImage):
+			objectImage.setPixmap(imgPixmap)
+		else:
+			self.objectImage.setPixmap(imgPixmap)
+		
+	# Set object use type
+	def setItemUse(self, typeIndex, useItem):
+		self.useTypeCombo.setCurrentIndex(typeIndex)
+		
+		# Find the combobox item with the given item
+		for i in range(self.useTargetCombo.count()):
+			if (self.useTargetCombo.itemData(i) == useItem):
+				self.useTargetCombo.setCurrentIndex(i)
+		
+	# TODO: Door needs "who blocks" field?
+	def setDoorOptions(self, doorObject):
+		# Set each image's settings
+		self.openDoorImage.setSettings(doorObject, doorObject.openImage)
+		self.closedDoorImage.setSettings(doorObject, doorObject.closedImage)
+		self.lockedDoorImage.setSettings(doorObject, doorObject.lockedImage)
+		
+		# Location
+		self.setComboboxIndex(doorObject.location, self.roomCombo)
+		
+		# Door transition room
+		self.setComboboxIndex(doorObject.transition, self.doorTransitionCombo)
 		
 	# Set examine text for the given object
 	def setExamineText(self, gameObject, textEdit=None):
@@ -432,121 +468,24 @@ class SettingsWidget(QtGui.QWidget):
 			textEdit.setText(name)
 		else:
 			self.objectNameEdit.setText(name)
+				
+	def changeName(self):
+		print("Name changed!")
 		
-	def setDoorOptions(self, doorObject):
-		self.openDoorImage.setSettings(doorObject, doorObject.openImage)
-		self.closedDoorImage.setSettings(doorObject, doorObject.closedImage)
-		self.lockedDoorImage.setSettings(doorObject, doorObject.lockedImage)
+	# Change object use type
+	def changeUseType(self, index):
+		print("Use type set!")
+		self.updateUseTargetCombobox(index, self.useTargetCombo)
 		
-		# Location
-		self.setComboboxIndex(doorObject.location, self.roomCombo)
-		
-		# Door transition room
-		self.setComboboxIndex(doorObject.transition, self.doorTransitionCombo)
+	# Set object use target
+	def changeUseTarget(self, index):
+		print("Use target set", self.useTargetCombo.itemData(index))
 		
 	def showAllTexts(self):
 		print("Clicked show all texts")
 		
-	# Change object use type
-	def changeUseType(self, index):
-		print("Change item use type", index)
-		self.populateUseTargetCombobox(index)
-		
-	# Set object use type
-	def setItemUse(self, typeIndex, useItem):
-		self.useTypeCombo.setCurrentIndex(typeIndex)
-		
-		# Find the combobox item with the given item
-		for i in range(self.useTargetCombo.count()):
-			if (self.useTargetCombo.itemData(i) == useItem):
-				self.useTargetCombo.setCurrentIndex(i)
-				
-	# Set object use target
-	def setUseTarget(self, index):
-		print("Use target set", self.useTargetCombo.itemData(index))
-		
-	def showMusicDialog(self):
-		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
-		'Valitse musiikkitiedosto','~', "Musiikkitiedostot (*.mp3 *.ogg)")
-		# TODO: Modified object requires filename in format "audio/filename.xxx"
-		if (len(fname) != 0):
-			self.musicTextEdit.setText(fname.split("/")[-1])
-		
-	def showImageDialog(self, callBack):
-		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
-		'Valitse taustakuva','~', "Taustakuvat (*.png)")
-		# TODO: Modified object requires filename in format "images/filename.png"
-		
-		if (len(fname) != 0):
-			callBack(fname)
-		
-	# TODO: Is this obsolete?
-	def setRoomBackground(self, imagePath):
-		imgPixmap = QtGui.QPixmap(imagePath).scaled(200, 200, QtCore.Qt.KeepAspectRatio)
-		self.itemImage.setPixmap(imgPixmap)
-		
-	def setItemImage(self, imagePath):
-		imgPixmap = QtGui.QPixmap(imagePath)
-		# TODO: Have spacing for smaller items
-		if (imgPixmap.size().height() > 200):
-			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
-		self.itemImage.setPixmap(imgPixmap)
-		
-	# Set the image of open, closed or locked door
-	def setDoorImage(self, image, state):
-		if (state == "locked"):
-			doorImage = self.doorImageLocked
-		elif (state == "closed"):
-			doorImage = self.doorImageClosed
-		elif (state == "open"):
-			doorImage = self.doorImageOpen
-		else:
-			return
-			
-		if (image):
-			imagePath = self.parent.getImageDir()+"/"+image.getLocation()
-		else:
-			imagePath = "images/door_placeholder.png"
-			
-		imgPixmap = QtGui.QPixmap(imagePath)
-		if (imgPixmap.size().height() > 200):
-			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
-		doorImage.setPixmap(imgPixmap)
-		
-	# Set the name of open, closed or locked door
-	def setDoorName(self, state):
-		if (state == "locked"):
-			textStart = "Lukitulla ovella"
-			textEdit = self.lockedDoorTextEdit
-			doorObject = self.currentObject.lockedImage
-		elif (state == "closed"):
-			textStart = "Suljetulla ovella"
-			textEdit = self.closedDoorTextEdit
-			doorObject = self.currentObject.closedImage
-		elif (state == "open"):
-			textStart = "Avoimella ovella"
-			textEdit = self.openDoorTextEdit
-			doorObject = self.currentObject.openImage
-		else:
-			return
-			
-		self.setObjectName(doorObject, textStart, textEdit)
-			
-	# Change door image after image dialog
-	def changeDoorImage(self, state, imagePath):
-		if (state == "locked"):
-			doorImage = self.doorImageLocked
-		elif (state == "closed"):
-			doorImage = self.doorImageClosed
-		elif (state == "open"):
-			doorImage = self.doorImageOpen
-		else:
-			return
-			
-		imgPixmap = QtGui.QPixmap(imagePath)
-		if (imgPixmap.size().height() > 200):
-			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
-		doorImage.setPixmap(imgPixmap)
+	def clearMusic(self):
+		print("Clear music clicked!")
 		
 	# Sets the index of a combobox according to given targetObject
 	def setComboboxIndex(self, targetObject, combobox):
@@ -575,16 +514,15 @@ class SettingsWidget(QtGui.QWidget):
 			roomName = room.getName()
 			if not (roomName):
 				roomName = "Huoneella ei ole nimeä"
-			imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
+			imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
 			
 			roomIcon = QtGui.QIcon(imgPixmap)
 			combobox.addItem(roomIcon, roomName, userData=room)
 			
-	# Populate use target combobox
-	def populateUseTargetCombobox(self, useType):
+	# Create use target combobox
+	def updateUseTargetCombobox(self, useType, combobox):
 		if (useType == 0):
-			self.useTargetCombo.clear()
-			return
+			objectTypes = ()
 		elif (useType == 1):
 			objectTypes = ("item", "object")
 		elif (useType == 2):
@@ -594,13 +532,13 @@ class SettingsWidget(QtGui.QWidget):
 		else:
 			objectTypes = ("obstacle",)
 			
-		self.populateCombobox(objectTypes, self.useTargetCombo, "Ei valittu")
+		self.populateCombobox(objectTypes, combobox, "Ei valittu")
 		
 	# TODO: Create a combo icon of multi-part objects such as cieni
 	#		(those with "related" attribute)
-	def populateBlockingCombobox(self):
-		self.populateCombobox(("obstacle",), self.pickupBlockCombo, "Ei estä")
-					
+	#def populateBlockingCombobox(self):
+	#	self.populateCombobox(("obstacle",), self.pickupBlockCombo, "Ei estä")
+		
 	# Populate a given combobox with given types of objects
 	# categorized by game rooms
 	def populateCombobox(self, objectTypes, combobox, firstItem=None):
@@ -619,17 +557,16 @@ class SettingsWidget(QtGui.QWidget):
 			
 			# Combobox has rooms with their obstacles under them
 			for room in objRooms:
-				print("room", room)
 				roomObject = room["room"]
 				roomName = roomObject.getName()
 				if not (roomName):
 					roomName = "Huoneella ei ole nimeä"
-				imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+roomObject.getBackground().getLocation())
+				imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+roomObject.getBackground().getLocation())
+				
 				roomIcon = QtGui.QIcon(imgPixmap)
 				
+				# Add room to the combobox and disallow choosing it
 				combobox.addItem(roomIcon, roomName)
-				
-				# Don't allow choosing rooms
 				combobox.setItemData(itemCounter, 0, QtCore.Qt.UserRole - 1);
 				itemCounter += 1
 				
@@ -643,8 +580,27 @@ class SettingsWidget(QtGui.QWidget):
 						continue
 					
 					imageObject = obj.getRepresentingImage()
-					imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+imageObject.getLocation())
+					imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+imageObject.getLocation())
 					targetIcon = QtGui.QIcon(imgPixmap)
 					combobox.addItem(targetIcon, imageObject.getName(), userData=obj)
 					itemCounter += 1
 					
+	def showMusicDialog(self):
+		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
+		'Valitse musiikkitiedosto','~', "Musiikkitiedostot (*.mp3 *.ogg)")
+		# TODO: Modified object requires filename in format "audio/filename.xxx"
+		if (len(fname) != 0):
+			self.musicTextEdit.setText(fname.split("/")[-1])
+		
+	def showImageDialog(self, callBack):
+		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
+		'Valitse taustakuva','~', "Taustakuvat (*.png)")
+		# TODO: Modified object requires filename in format "images/filename.png"
+		
+		if (len(fname) != 0):
+			callBack(fname)
+			
+	def createSeparator(self):
+		label = QtGui.QLabel("")
+		label.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
+		return label

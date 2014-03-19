@@ -1,5 +1,6 @@
 import json, View, Object
 from collections import OrderedDict
+from os.path import dirname, abspath
 
 class ScenarioData(object):
 	def __init__(self):
@@ -11,8 +12,8 @@ class ScenarioData(object):
 		self.startView = None
 		self.endViewList = []
 		
-		self.dataDir = "gamedata/latkazombit"
-
+		self.dataDir = dirname(abspath(__file__))+"/gamedata/latkazombit"
+		
 	# Load and parse game data files
 	def loadScenario(self):
 		self.parseTexts()

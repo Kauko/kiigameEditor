@@ -3,8 +3,8 @@
 # TODO: Pre-cache rooms, images, texts etc. ?
 
 from PySide import QtGui, QtCore
-import SettingsWidget
-import ScenarioData
+import SettingsWidget, ScenarioData
+from ImageCache import ImageCache
 
 class Editor(QtGui.QMainWindow):
 	def __init__(self, parent=None):
@@ -12,7 +12,9 @@ class Editor(QtGui.QMainWindow):
 		
 		self.scenarioData = ScenarioData.ScenarioData()
 		self.scenarioData.loadScenario()
-
+		
+		self.imageCache = ImageCache()
+		
 		self.setWindowTitle("Kiigame - Pelieditori")
 		
 		# TODO: Menubar
@@ -107,7 +109,8 @@ class Editor(QtGui.QMainWindow):
 		#print(ScenarioData.sc.getRoomBackLoc(0))
 		#print(ScenarioData.sc.getObjectImgLoc(0, 0))
 		
-		pixmap = QtGui.QPixmap(self.scenarioData.getRoomBackLoc(0)).scaled(790, 534, QtCore.Qt.KeepAspectRatio)
+		pixmap = self.imageCache.createPixmap(self.scenarioData.getRoomBackLoc(0))
+		pixmap.scaled(790, 534, QtCore.Qt.KeepAspectRatio)
 		scene.addPixmap(pixmap)
 		
 		left_frame_layout.addWidget(view)
