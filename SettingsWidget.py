@@ -1,4 +1,5 @@
 from PySide import QtGui, QtCore
+from ObjectImageSettings import ObjectImageSettings
 
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
@@ -36,7 +37,11 @@ class SettingsWidget(QtGui.QWidget):
 			self.setGenericOptions(gameObject)
 		elif (objectType == "Door"):
 			self.setDoorOptions(gameObject)
-		
+		elif (objectType == "Container"):
+			self.setContainerOptions(gameObject)
+		elif (objectType == "Obstacle"):
+			self.setObstacleOptions(gameObject)
+			
 	def showWidgets(self, objectType):
 		if (self.lastObjectType):
 			for item in self.itemSettings[self.lastObjectType]:
@@ -131,45 +136,16 @@ class SettingsWidget(QtGui.QWidget):
 		self.allTextsButton = QtGui.QPushButton("Nämä ja muut tekstit")
 		self.allTextsButton.clicked.connect(self.showAllTexts)
 		
-		# Widgets required by door settings
-		self.openDoorLabelLine = self.createSeparator()
-		self.openDoorLabel = QtGui.QLabel("Avoin ovi")
-		self.openDoorTextLabel = QtGui.QLabel("Avoimen oven nimi")
-		self.openDoorTextEdit = QtGui.QLineEdit()
-		self.doorImageOpen = QtGui.QLabel(self)
-		self.doorImageOpen.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("open", imagePath))
-		self.openDoorClickTextLabel = QtGui.QLabel("Teksti ovesta mentäessä")
-		self.openDoorClickTextEdit = QtGui.QTextEdit()
-		self.openDoorClickTextEdit.setMaximumHeight(50)
-		
-		self.closedDoorLabelLine = self.createSeparator()
-		self.closedDoorLabel = QtGui.QLabel("Suljettu ovi")
-		self.closedDoorTextLabel = QtGui.QLabel("Suljetun oven nimi")
-		self.closedDoorTextEdit = QtGui.QLineEdit()
-		self.doorImageClosed = QtGui.QLabel(self)
-		self.doorImageClosed.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("closed", imagePath))
-		self.closedDoorClickTextLabel = QtGui.QLabel("Teksti klikatessa")
-		self.closedDoorClickTextEdit = QtGui.QTextEdit()
-		self.closedDoorClickTextEdit.setMaximumHeight(50)
-		
-		self.lockedDoorLabelLine = self.createSeparator()
-		self.lockedDoorLabel = QtGui.QLabel("Lukittu ovi")
-		self.lockedDoorTextLabel = QtGui.QLabel("Lukitun oven nimi")
-		self.lockedDoorTextEdit = QtGui.QLineEdit()
-		self.doorImageLocked = QtGui.QLabel(self)
-		self.doorImageLocked.mousePressEvent = lambda s: self.showImageDialog(lambda imagePath: self.changeDoorImage("locked", imagePath))
-		self.lockedDoorClickTextLabel = QtGui.QLabel("Teksti klikatessa")
-		self.lockedDoorClickTextEdit = QtGui.QTextEdit()
-		self.lockedDoorClickTextEdit.setMaximumHeight(50)
-		
+		# Widgets used by doors
 		self.doorTransitionLabel = QtGui.QLabel("Mihin ovesta pääsee?")
 		self.doorTransitionCombo = QtGui.QComboBox(self)
 		self.doorTransitionCombo.setIconSize(QtCore.QSize(50,50))
 		self.populateRoomCombobox(self.doorTransitionCombo)
 		self.doorTransitionLabelLine = self.createSeparator()
 		
-		self.lockedDoorLockedCheckbox = QtGui.QCheckBox("Onko ovi lukossa?")
-		self.lockedDoorLockedCheckbox.stateChanged.connect(self.changeDoorLocked)
+		self.openDoorImage = ObjectImageSettings("Avoin ovi", "Avoimen oven nimi", parent=self)
+		self.closedDoorImage = ObjectImageSettings("Suljettu ovi", "Suljetun oven nimi", parent=self)
+		self.lockedDoorImage = ObjectImageSettings("Lukittu ovi", "Lukitun oven nimi", True, "Onko ovi lukossa?", parent=self)
 		
 		# Used by all
 		self.layout.addWidget(self.nameLabel)
@@ -210,31 +186,9 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.doorTransitionLabel)
 		self.layout.addWidget(self.doorTransitionCombo)
 		
-		self.layout.addWidget(self.openDoorLabelLine)
-		self.layout.addWidget(self.openDoorLabel)
-		self.layout.addWidget(self.openDoorTextLabel)
-		self.layout.addWidget(self.openDoorTextEdit)
-		self.layout.addWidget(self.doorImageOpen)
-		self.layout.addWidget(self.openDoorClickTextLabel)
-		self.layout.addWidget(self.openDoorClickTextEdit)
-		
-		self.layout.addWidget(self.lockedDoorLabelLine)
-		self.layout.addWidget(self.lockedDoorLabel)
-		self.layout.addWidget(self.lockedDoorLockedCheckbox)
-		self.layout.addWidget(self.lockedDoorTextLabel)
-		self.layout.addWidget(self.lockedDoorTextEdit)
-		self.layout.addWidget(self.doorImageLocked)
-		self.layout.addWidget(self.doorImageLocked)
-		self.layout.addWidget(self.lockedDoorClickTextLabel)
-		self.layout.addWidget(self.lockedDoorClickTextEdit)
-		
-		self.layout.addWidget(self.closedDoorLabelLine)
-		self.layout.addWidget(self.closedDoorLabel)
-		self.layout.addWidget(self.closedDoorTextLabel)
-		self.layout.addWidget(self.closedDoorTextEdit)
-		self.layout.addWidget(self.doorImageClosed)
-		self.layout.addWidget(self.closedDoorClickTextLabel)
-		self.layout.addWidget(self.closedDoorClickTextEdit)
+		self.layout.addWidget(self.openDoorImage)
+		self.layout.addWidget(self.closedDoorImage)
+		self.layout.addWidget(self.lockedDoorImage)
 		
 		# Which widgets are shown with each object
 		self.itemSettings = {
@@ -290,30 +244,46 @@ class SettingsWidget(QtGui.QWidget):
 				self.doorTransitionLabel,
 				self.doorTransitionCombo,
 				
-				self.openDoorLabelLine,
-				self.openDoorLabel,
-				self.openDoorTextLabel,
-				self.openDoorTextEdit,
-				self.doorImageOpen,
-				self.openDoorClickTextLabel,
-				self.openDoorClickTextEdit,
+				self.openDoorImage,
+				self.closedDoorImage,
+				self.lockedDoorImage
+				#self.openDoorLabelLine,
+				#self.openDoorLabel,
+				#self.openDoorTextLabel,
+				#self.openDoorTextEdit,
+				#self.doorImageOpen,
+				#self.openDoorClickTextLabel,
+				#self.openDoorClickTextEdit,
 				
-				self.lockedDoorLabelLine,
-				self.lockedDoorLabel,
-				self.lockedDoorLockedCheckbox,
-				self.lockedDoorTextLabel,
-				self.lockedDoorTextEdit,
-				self.doorImageLocked,
-				self.lockedDoorClickTextLabel,
-				self.lockedDoorClickTextEdit,
+				#self.lockedDoorLabelLine,
+				#self.lockedDoorLabel,
+				#self.lockedDoorLockedCheckbox,
+				#self.lockedDoorTextLabel,
+				#self.lockedDoorTextEdit,
+				#self.doorImageLocked,
+				#self.lockedDoorClickTextLabel,
+				#self.lockedDoorClickTextEdit,
 				
-				self.closedDoorLabelLine,
-				self.closedDoorLabel,
-				self.closedDoorTextLabel,
-				self.closedDoorTextEdit,
-				self.doorImageClosed,
-				self.closedDoorClickTextLabel,
-				self.closedDoorClickTextEdit
+				#self.closedDoorLabelLine,
+				#self.closedDoorLabel,
+				#self.closedDoorTextLabel,
+				#self.closedDoorTextEdit,
+				#self.doorImageClosed,
+				#self.closedDoorClickTextLabel,
+				#self.closedDoorClickTextEdit
+			],
+			"Container": [
+				self.nameLabel,
+				self.objectNameEdit,
+				self.imgTextLabel,
+				self.itemImage,
+				self.clickTextLabel,
+				self.clickTextEdit,
+				self.whereLocatedLabel,
+				self.roomCombo
+			],
+			"Obstacle": [
+			
 			]
 		}
 		
@@ -327,7 +297,7 @@ class SettingsWidget(QtGui.QWidget):
 		label.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		return label
 		
-	# Set settings for the room view
+	# Set the input field values for rooms
 	def setRoomOptions(self, room):
 		# Room name
 		self.setObjectName(room, "Huoneella")
@@ -342,7 +312,7 @@ class SettingsWidget(QtGui.QWidget):
 			roomMusic = ""
 		self.musicTextEdit.setText(roomMusic)
 		
-	# Create the input fields for object options
+	# Set the input field values for items
 	def setItemOptions(self, item):
 		imageObject = item.getRepresentingImage()
 		
@@ -393,7 +363,7 @@ class SettingsWidget(QtGui.QWidget):
 			useText = ""
 		self.useTextEdit.setText(useText)
 		
-	# Create the input fields for generic objects
+	# Set the input field values for generic objects
 	def setGenericOptions(self, gObject):
 		self.setObjectName(gObject, "Esineellä")
 		
@@ -408,6 +378,23 @@ class SettingsWidget(QtGui.QWidget):
 		if not (examineText):
 			examineText = ""
 		self.clickTextEdit.setText(examineText)
+		
+	# Set the input field values for containers
+	def setContainerOptions(self, container):
+		self.setObjectName(container, "Säilöllä")
+		
+		imageObject = container.getRepresentingImage()
+		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
+		
+		# Location
+		self.setComboboxIndex(container.location, self.roomCombo)
+		
+		
+	# Set the input field values for obstacles
+	def setObstacleOptions(self, obstacle):
+		print("Obstacle options!")
+		return
+		
 		
 	# Set any game object name
 	def setObjectName(self, image, textStart, textEdit=None):
@@ -427,31 +414,27 @@ class SettingsWidget(QtGui.QWidget):
 			self.objectNameEdit.setText(name)
 		
 	def setDoorOptions(self, doorObject):
-		# Set the locked door field state enabled or disabled
-		print("id",doorObject.id)
-		if (doorObject.isLocked()):
-			self.lockedDoorLockedCheckbox.setCheckState(QtCore.Qt.CheckState.Checked)
-		else:
-			self.lockedDoorLockedCheckbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
-		self.changeDoorLocked()
+		self.openDoorImage.setSettings(doorObject, doorObject.openImage)
+		self.closedDoorImage.setSettings(doorObject, doorObject.closedImage)
+		self.lockedDoorImage.setSettings(doorObject, doorObject.lockedImage)
 		
 		# Set images for each door found
-		self.setDoorImage(doorObject.openImage, "open")
-		self.setDoorImage(doorObject.closedImage, "closed")
-		self.setDoorImage(doorObject.lockedImage, "locked")
+		#self.setDoorImage(doorObject.openImage, "open")
+		#self.setDoorImage(doorObject.closedImage, "closed")
+		#self.setDoorImage(doorObject.lockedImage, "locked")
 		
 		# Set names for each door image
-		self.setDoorName("open")
-		self.setDoorName("closed")
-		self.setDoorName("locked")
+		#self.setDoorName("open")
+		#self.setDoorName("closed")
+		#self.setDoorName("locked")
 		
 		# Door general name is the same as open door image's name
 		#self.setObjectName(doorObject.openImage, "Ovella")
 		
 		# Examine text for each door image
-		self.setDoorExamineText(self.openDoorClickTextEdit, self.currentObject.openImage)
-		self.setDoorExamineText(self.closedDoorClickTextEdit, self.currentObject.closedImage)
-		self.setDoorExamineText(self.lockedDoorClickTextEdit, self.currentObject.lockedImage)
+		#self.setDoorExamineText(self.openDoorClickTextEdit, self.currentObject.openImage)
+		#self.setDoorExamineText(self.closedDoorClickTextEdit, self.currentObject.closedImage)
+		#self.setDoorExamineText(self.lockedDoorClickTextEdit, self.currentObject.lockedImage)
 		
 		# Location
 		self.setComboboxIndex(doorObject.location, self.roomCombo)
@@ -468,21 +451,6 @@ class SettingsWidget(QtGui.QWidget):
 			text = ""
 		#print("Txt",text)
 		textEdit.setText(text)
-	
-	# Changes door locked input fields according to the checkbox state
-	def changeDoorLocked(self):
-		if (self.lockedDoorLockedCheckbox.isChecked()):
-			isDisabled = False
-		else:
-			isDisabled = True
-			
-		self.lockedDoorTextLabel.setDisabled(isDisabled)
-		self.lockedDoorTextEdit.setDisabled(isDisabled)
-		self.doorImageLocked.setDisabled(isDisabled)
-		self.lockedDoorClickTextLabel.setDisabled(isDisabled)
-		self.lockedDoorClickTextEdit.setDisabled(isDisabled)
-		
-		# TODO: Erase locked image, name etc. when unchecked
 		
 	def showAllTexts(self):
 		print("Clicked show all texts")
