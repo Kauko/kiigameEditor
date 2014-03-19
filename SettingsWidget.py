@@ -70,6 +70,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTargetCombo = QtGui.QComboBox(self)
 		self.useTargetCombo.setIconSize(QtCore.QSize(50,50))
 		self.useTargetCombo.currentIndexChanged.connect(self.setUseTarget)
+		self.populateUseTargetCombobox(0)
 		
 		self.useTextEdit = QtGui.QTextEdit()
 		self.useTextEdit.setMaximumHeight(50)
@@ -124,22 +125,18 @@ class SettingsWidget(QtGui.QWidget):
 		# Object usage
 		self.useLabel = QtGui.QLabel("Käyttö")
 		self.useLabelLine = self.createSeparator()
-		#self.createSeparator(self.useLabelLine)
-		#self.useLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		
 		# Object type of usage
 		for i in self.useTypes:
 			self.useTypeCombo.addItem(self.useTypes[i])
 		self.useTypeCombo.currentIndexChanged.connect(self.changeUseType)
-			
-		self.populateUseTargetCombobox(0)
 		
 		self.useTextLabel = QtGui.QLabel("Teksti käytettäessä:")
 		
 		self.allTextsButton = QtGui.QPushButton("Nämä ja muut tekstit")
 		self.allTextsButton.clicked.connect(self.showAllTexts)
 		
-		# Widgets used by doors
+		# Door widgets
 		self.doorTransitionLabel = QtGui.QLabel("Mihin ovesta pääsee?")
 		self.doorTransitionCombo = QtGui.QComboBox(self)
 		self.doorTransitionCombo.setIconSize(QtCore.QSize(50,50))
@@ -150,19 +147,22 @@ class SettingsWidget(QtGui.QWidget):
 		self.closedDoorImage = ObjectImageSettings("Suljettu ovi", "Suljetun oven nimi", parent=self)
 		self.lockedDoorImage = ObjectImageSettings("Lukittu ovi", "Lukitun oven nimi", True, "Onko ovi lukossa?", parent=self)
 		
-		# Container image widgets
-		self.lockedContainerImage = ObjectImageSettings("Lukittu säilö", "Lukitun säilön nimi", True, "Onko säilö lukossa?", parent=self)
-		self.fullContainerImage = ObjectImageSettings("Täysi säilö", "Avoimen säilön nimi", parent=self)
-		self.emptyContainerImage = ObjectImageSettings("Tyhjä säilö", "Tyhjän säilön nimi", parent=self)
-
+		# Container widgets
+		self.lockedContainerImage = ObjectImageSettings("Lukittu säiliö", "Lukitun säiliön nimi", True, "Onko säiliö lukossa?", parent=self)
+		self.fullContainerImage = ObjectImageSettings("Täysi säiliö", "Avoimen säiliön nimi", parent=self)
+		self.emptyContainerImage = ObjectImageSettings("Tyhjä säiliö", "Tyhjän säiliön nimi", parent=self)
 		
-		# Used by all
+		self.whatGoesLabel = QtGui.QLabel("Mikä esine menee säiliöön?")
+		self.whatGoesCombo = self.createItemCombobox("Ei mikään")
+		
+		self.whatComesLabel = QtGui.QLabel("Minkä esineen säiliöstä saa?")
+		self.whatComesCombo = self.createItemCombobox("Ei mitään")
+		
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
 		self.layout.addWidget(self.imgTextLabel)
 		self.layout.addWidget(self.itemImage)
 		
-		# Room
 		self.layout.addWidget(self.musicLabel)
 		self.layout.addWidget(self.musicTextEdit)
 		self.layout.addWidget(self.musicBtn)
@@ -171,7 +171,6 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.roomCombo)
 		self.layout.addWidget(self.roomComboItem)
 		
-		# Items
 		self.layout.addWidget(self.clickTextLabel)
 		self.layout.addWidget(self.clickTextEdit)
 		self.layout.addWidget(self.pickupLabelLine)
@@ -188,9 +187,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.useTextEdit)
 		self.layout.addWidget(self.allTextsButton)
 		
-		# Door
 		# TODO: "Remove this image" button for door images?
-		#		Erase locked image at some point if "locked" not checked
 		self.layout.addWidget(self.doorTransitionLabelLine)
 		self.layout.addWidget(self.doorTransitionLabel)
 		self.layout.addWidget(self.doorTransitionCombo)
@@ -202,6 +199,11 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.lockedContainerImage)
 		self.layout.addWidget(self.fullContainerImage)
 		self.layout.addWidget(self.emptyContainerImage)
+		
+		self.layout.addWidget(self.whatGoesLabel)
+		self.layout.addWidget(self.whatGoesCombo)
+		self.layout.addWidget(self.whatComesLabel)
+		self.layout.addWidget(self.whatComesCombo)
 		
 		# Which widgets are shown with each object
 		self.itemSettings = {
@@ -267,7 +269,12 @@ class SettingsWidget(QtGui.QWidget):
 				
 				self.lockedContainerImage,
 				self.fullContainerImage,
-				self.emptyContainerImage
+				self.emptyContainerImage,
+				
+				self.whatGoesLabel,
+				self.whatGoesCombo,
+				self.whatComesLabel,
+				self.whatComesCombo
 			],
 			"Obstacle": [
 			
@@ -368,17 +375,22 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Set the input field values for containers
 	def setContainerOptions(self, container):
-		self.setObjectName(container, "Säilöllä")
+		self.setObjectName(container, "Säiliöllä")
 		
 		imageObject = container.getRepresentingImage()
 		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
 		
+		# Set image settings for each image
 		self.lockedContainerImage.setSettings(container, container.lockedImage)
 		self.fullContainerImage.setSettings(container, container.fullImage)
 		self.emptyContainerImage.setSettings(container, container.emptyImage)
 		
-		# Location
+		# Set location
 		self.setComboboxIndex(container.location, self.roomCombo)
+		
+		# Set what goes, what comes from the container
+		self.setComboboxIndex(container.inItem, self.whatGoesCombo)
+		self.setComboboxIndex(container.outItem, self.whatComesCombo)
 		
 	# Set the input field values for obstacles
 	def setObstacleOptions(self, obstacle):
@@ -499,7 +511,7 @@ class SettingsWidget(QtGui.QWidget):
 			doorObject = self.currentObject.openImage
 		else:
 			return
-		print("SEt",doorObject,textStart)
+			
 		self.setObjectName(doorObject, textStart, textEdit)
 			
 	# Change door image after image dialog
@@ -524,18 +536,18 @@ class SettingsWidget(QtGui.QWidget):
 		for i in range(combobox.count()):
 			if (combobox.itemData(i) == targetObject):
 				combobox.setCurrentIndex(i)
-	
-	# TODO: Door combobox
-	
+				return
+		combobox.setCurrentIndex(0)
+		
 	# Create combobox from given items with default of all item types
-	def createItemCombobox(self, objectTypes=None):
+	def createItemCombobox(self, firstItem, objectTypes=None):
 		if not (objectTypes):
 			objectTypes = ("object", "item", "door", "container", "obstacle")
 		
 		combobox = QtGui.QComboBox(self)
 		combobox.setIconSize(QtCore.QSize(50,50))
 		
-		self.populateCombobox(objectTypes, combobox)
+		self.populateCombobox(objectTypes, combobox, firstItem)
 		return combobox
 		
 	# Populate a given combobox with game rooms
@@ -564,21 +576,23 @@ class SettingsWidget(QtGui.QWidget):
 		else:
 			objectTypes = ("obstacle",)
 			
-		self.populateCombobox(objectTypes, self.useTargetCombo)
+		self.populateCombobox(objectTypes, self.useTargetCombo, "Ei valittu")
 		
 	# TODO: Create a combo icon of multi-part objects such as cieni
 	#		(those with "related" attribute)
 	def populateBlockingCombobox(self):
-		self.pickupBlockCombo.addItem("Ei estä")
-		self.populateCombobox(("obstacle",), self.pickupBlockCombo)
+		self.populateCombobox(("obstacle",), self.pickupBlockCombo, "Ei estä")
 					
 	# Populate a given combobox with given types of objects
 	# categorized by game rooms
-	def populateCombobox(self, objectTypes, combobox):
+	def populateCombobox(self, objectTypes, combobox, firstItem=None):
 		# TODO: Disconnect combobox from events when populating it
 		combobox.clear()
-		combobox.addItem("Ei valittu")
 		
+		# Add the given string as the first item
+		if (firstItem):
+			combobox.addItem(firstItem)
+			
 		for objType in objectTypes:
 			objRooms = self.parent.getObjectsByType(objType)
 			
