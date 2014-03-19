@@ -81,7 +81,13 @@ class SettingsWidget(QtGui.QWidget):
 		self.whereLocatedLabel = QtGui.QLabel("Missä sijaitsee?")
 		self.roomCombo = QtGui.QComboBox(self)
 		self.roomCombo.setIconSize(QtCore.QSize(50,50))
-		self.populateroomCombobox(self.roomCombo)
+		self.populateRoomCombobox(self.roomCombo)
+		
+		# Where located combo with "No room" option
+		self.roomComboItem = QtGui.QComboBox(self)
+		self.roomComboItem.setIconSize(QtCore.QSize(50,50))
+		self.roomComboItem.addItem("Ei sijaitse huoneessa")
+		self.populateRoomCombobox(self.roomComboItem)
 		
 		# Object image
 		self.imgTextLabel = QtGui.QLabel("Kuva")
@@ -159,7 +165,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.doorTransitionLabel = QtGui.QLabel("Mihin ovesta pääsee?")
 		self.doorTransitionCombo = QtGui.QComboBox(self)
 		self.doorTransitionCombo.setIconSize(QtCore.QSize(50,50))
-		self.populateroomCombobox(self.doorTransitionCombo)
+		self.populateRoomCombobox(self.doorTransitionCombo)
 		self.doorTransitionLabelLine = self.createSeparator()
 		
 		self.lockedDoorLockedCheckbox = QtGui.QCheckBox("Onko ovi lukossa?")
@@ -178,6 +184,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.whereFromLabel)
 		self.layout.addWidget(self.whereLocatedLabel)
 		self.layout.addWidget(self.roomCombo)
+		self.layout.addWidget(self.roomComboItem)
 		
 		# Items
 		self.layout.addWidget(self.clickTextLabel)
@@ -197,6 +204,12 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.allTextsButton)
 		
 		# Door
+		# TODO: "Remove this image" button for door images?
+		#		Erase locked image at some point if "locked" not checked
+		self.layout.addWidget(self.doorTransitionLabelLine)
+		self.layout.addWidget(self.doorTransitionLabel)
+		self.layout.addWidget(self.doorTransitionCombo)
+		
 		self.layout.addWidget(self.openDoorLabelLine)
 		self.layout.addWidget(self.openDoorLabel)
 		self.layout.addWidget(self.openDoorTextLabel)
@@ -222,10 +235,6 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.doorImageClosed)
 		self.layout.addWidget(self.closedDoorClickTextLabel)
 		self.layout.addWidget(self.closedDoorClickTextEdit)
-		
-		self.layout.addWidget(self.doorTransitionLabelLine)
-		self.layout.addWidget(self.doorTransitionLabel)
-		self.layout.addWidget(self.doorTransitionCombo)
 		
 		# Which widgets are shown with each object
 		self.itemSettings = {
@@ -261,7 +270,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.useTextEdit,
 				self.allTextsButton,
 				self.whereLocatedLabel,
-				self.roomCombo
+				self.roomComboItem
 			],
 			"Object": [
 				self.nameLabel,
@@ -274,11 +283,12 @@ class SettingsWidget(QtGui.QWidget):
 				self.roomCombo
 			],
 			"Door": [
-				self.nameLabel,
-				self.objectNameEdit,
-				
 				self.whereLocatedLabel,
 				self.roomCombo,
+				
+				self.doorTransitionLabelLine,
+				self.doorTransitionLabel,
+				self.doorTransitionCombo,
 				
 				self.openDoorLabelLine,
 				self.openDoorLabel,
@@ -303,11 +313,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.closedDoorTextEdit,
 				self.doorImageClosed,
 				self.closedDoorClickTextLabel,
-				self.closedDoorClickTextEdit,
-				
-				self.doorTransitionLabelLine,
-				self.doorTransitionLabel,
-				self.doorTransitionCombo
+				self.closedDoorClickTextEdit
 			]
 		}
 		
@@ -347,7 +353,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
 		
 		# Location
-		self.setItemLocation(item)
+		self.setComboboxIndex(item.location, self.roomComboItem)
 		
 		# Examine text
 		examineText = item.getExamineText()
@@ -395,7 +401,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setItemImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
 		
 		# Location
-		self.setItemLocation(gObject)
+		self.setComboboxIndex(gObject.location, self.roomCombo)
 		
 		# Examine text
 		examineText = gObject.getExamineText()
@@ -422,7 +428,8 @@ class SettingsWidget(QtGui.QWidget):
 		
 	def setDoorOptions(self, doorObject):
 		# Set the locked door field state enabled or disabled
-		if (doorObject.closedImage):
+		print("id",doorObject.id)
+		if (doorObject.isLocked()):
 			self.lockedDoorLockedCheckbox.setCheckState(QtCore.Qt.CheckState.Checked)
 		else:
 			self.lockedDoorLockedCheckbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
@@ -438,21 +445,20 @@ class SettingsWidget(QtGui.QWidget):
 		self.setDoorName("closed")
 		self.setDoorName("locked")
 		
+		# Door general name is the same as open door image's name
+		#self.setObjectName(doorObject.openImage, "Ovella")
+		
 		# Examine text for each door image
 		self.setDoorExamineText(self.openDoorClickTextEdit, self.currentObject.openImage)
 		self.setDoorExamineText(self.closedDoorClickTextEdit, self.currentObject.closedImage)
 		self.setDoorExamineText(self.lockedDoorClickTextEdit, self.currentObject.lockedImage)
 		
-		
 		# Location
-		self.setItemLocation(doorObject)
+		self.setComboboxIndex(doorObject.location, self.roomCombo)
 		
-		# Examine text
-		examineText = doorObject.getExamineText()
-		if not (examineText):
-			examineText = ""
-		self.clickTextEdit.setText(examineText)	
-	
+		# Door transition room
+		self.setComboboxIndex(doorObject.transition, self.doorTransitionCombo)
+		
 	# Sets door examine text
 	# TODO: This could be generalized for every examine text
 	def setDoorExamineText(self, textEdit, image):
@@ -582,16 +588,17 @@ class SettingsWidget(QtGui.QWidget):
 			imgPixmap = imgPixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio)
 		doorImage.setPixmap(imgPixmap)
 		
-	def setItemLocation(self, item):
+	# Sets the index of a combobox according to given targetObject
+	def setComboboxIndex(self, targetObject, combobox):
 		# Find the combobox item with the given item
 		for i in range(self.roomCombo.count()):
-			if (self.roomCombo.itemData(i) == item.location):
-				self.roomCombo.setCurrentIndex(i)
+			if (combobox.itemData(i) == targetObject):
+				combobox.setCurrentIndex(i)
 	
 	# TODO: Door combobox
 	
 	# Populate a given combobox with game rooms
-	def populateroomCombobox(self, combobox):
+	def populateRoomCombobox(self, combobox):
 		for room in self.parent.getRoomObjects():
 			# TODO: Some model to eliminate redundancy from getName/roomName patterns
 			roomName = room.getName()

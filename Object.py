@@ -215,6 +215,15 @@ class Container(Object):
 		elif (self.outItem == useItem):
 			return self.fullImage
 
+	# Returns True if container is locked, otherwise False
+	def isLocked(self):
+		try:
+			if (self.objectAttributes["object"]["locked"] == True):
+				return True
+		except KeyError:
+			print("Warning: Attribute 'locked' not defined for door object '%s'" %(self.id))
+		return False
+
 class Door(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Door, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -260,6 +269,15 @@ class Door(Object):
 	def getUseImage(self, useItem):
 		if (self.key == useItem):
 			return self.lockedImage
+
+	# Returns True if door is locked, otherwise False
+	def isLocked(self):
+		try:
+			if (self.objectAttributes["object"]["locked"] == True):
+				return True
+		except KeyError:
+			print("Warning: Attribute 'locked' not defined for door object '%s'" %(self.id))
+		return False
 
 class Obstacle(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
