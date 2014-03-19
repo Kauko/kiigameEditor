@@ -245,6 +245,14 @@ class ScenarioData(object):
 			return self.getObject(entityId)
 			
 		return None
+		
+	def getAllObjects(self):
+		retObjects = []
+		for room in self.roomList:
+			for object in room.getItems():
+				print(object.id)
+				retObjects.append(object)
+		return retObjects
 
 	def deleteObject(self, objectId):
 		for obj in self.objectList:

@@ -23,9 +23,11 @@ class Editor(QtGui.QMainWindow):
 		
 		self.createMainTab()
 		self.createSpaceTab()
+		self.createTextsTab()
 		
 		tabWidget.addTab(self.mainTab, "Päänäkymä")
 		tabWidget.addTab(self.spaceTab, "Tila")
+		tabWidget.addTab(self.textsTab, "Tekstit")
 		
 	def createMainTab(self):
 		self.mainTab = QtGui.QWidget()
@@ -79,7 +81,6 @@ class Editor(QtGui.QMainWindow):
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
 		
-		
 		self.settingsWidget = SettingsWidget.SettingsWidget(self)
 		self.settingsWidget.displayOptions(selectedRoom.room)
 		
@@ -120,6 +121,74 @@ class Editor(QtGui.QMainWindow):
 		
 		#right_frame_layout.addWidget(self.settingsWidget)
 		
+	def createTextsTab(self):
+		self.textsTab = QtGui.QWidget()
+
+		layout = QtGui.QHBoxLayout()
+		self.textsTab.setLayout(layout)
+
+		# Objects
+		left_frame = QtGui.QGroupBox("Esineet")
+		left_frame_layout = QtGui.QVBoxLayout()
+		left_frame.setLayout(left_frame_layout)
+		layout.addWidget(left_frame)
+		
+		# Set-up widget for showing room items
+		self.text_scene = QtGui.QTableWidget(self)
+		#text_scene.setMovement(QtGui.QListView.Static)
+		self.text_scene.itemClicked.connect(self.textItemClicked)
+		
+		left_frame_layout.addWidget(self.text_scene)
+		
+		# Draw all items and their progress bar
+		objects = self.scenarioData.getAllObjects()
+		self.drawTextItems(objects)
+		
+		# Select the first item
+		selectedItem = self.text_scene.itemAt(0, 0)
+		self.text_scene.setCurrentItem(selectedItem)
+		
+		# Texts
+		right_frame = QtGui.QGroupBox("Tekstit")
+		right_frame_layout = QtGui.QVBoxLayout()
+		right_frame.setLayout(right_frame_layout)
+		layout.addWidget(right_frame)
+		
+		self.textsWidget = TextsWidget(self)
+		self.textsWidget.displayTexts(selectedItem)
+		
+	# Click on an object in the texts tab object list
+	def textItemClicked(self, item):
+		self.textsWidget.displayOptions(item)
+		
+	def drawTextItems(self, textItems):
+		row = 0
+		
+		self.text_scene.setRowCount(0)
+		self.text_scene.setColumnCount(2)
+		
+		#Disable sorting for row count, enable it after adding items
+		self.text_scene.setSortingEnabled(False)
+		
+		for item in textItems:
+			# TODO: Resolve handling text objects (issue #8)
+			if (item.getClassname() == "Text"):
+				continue
+				
+			# Add a row
+			self.text_scene.insertRow(self.text_scene.rowCount())
+			row += 1
+			
+			# Add a text item to the first column
+			widgetItem = TextItemWidget(item, self.scenarioData.dataDir)
+			self.text_scene.setItem(row, 0, widgetItem)
+			
+			# Add a progressbar to the second column
+			progressBarItem = ProgressBarItemWidget(item)
+			self.text_scene.setItem(row, 1, progressBarItem)
+			
+		self.text_scene.setSortingEnabled(True)
+	
 	# Click on a room in the main tab
 	def roomClicked(self, widgetItem):
 		roomItems = widgetItem.room.getItems()
@@ -200,6 +269,46 @@ class ItemWidget(QtGui.QListWidgetItem):
 		imagePath = imageDir+"/"+imageObject.getLocation()
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
+
+# Text item widget that represents items in texts tab
+class TextItemWidget(QtGui.QTableWidgetItem):
+	def __init__(self, textItem, imageDir, parent=None):
+		super(TextItemWidget, self).__init__(parent)
+		
+		# Row size, especially height
+		self.setSizeHint(QtCore.QSize(25,25))
+		
+		self.textItem = textItem
+		imageObject = textItem.getRepresentingImage()
+		
+		textItemName = self.textItem.getName()
+		if not (textItemName):
+			textItemName = "Esineellä ei ole nimeä"
+		self.setText(textItemName)
+		
+		imagePath = imageDir+"/"+imageObject.getLocation()
+		icon = QtGui.QIcon(imagePath)
+		self.setIcon(icon)
+
+# ProgressBar item that shows how much item has texts completed
+class ProgressBarItemWidget(QtGui.QListWidgetItem):
+	def __init__(self, textItem, parent=None):
+		super(ProgressBarItemWidget, self).__init__(parent)
+
+		# Row size, especially height
+		self.setSizeHint(QtCore.QSize(25,25))
+		
+		self.textItem = textItem
+
+	def calculateProgress()
+
+# Texts widget that shows texts of specific item in the texts tab
+class TextsWidget(QtGui.QWidget):
+	def __init__(self, parent=None):
+		super(TextsWidget, self).__init__(parent)
+
+	def displayTexts(self, item):
+		print(item)
 							
 if __name__ == '__main__':
 	from sys import argv, exit
