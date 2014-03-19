@@ -245,14 +245,22 @@ class ScenarioData(object):
 			return self.getObject(entityId)
 			
 		return None
-		
+	
+	# Get all right type of objects and amount images they have
 	def getAllObjects(self):
 		retObjects = []
+		imgCount = 0
+		rightTypes = ["Object", "Item", "Container", "Door", "Obstacle"]
+		
 		for room in self.roomList:
 			for object in room.getItems():
-				print(object.id)
-				retObjects.append(object)
-		return retObjects
+				if (object.__class__.__name__ in rightTypes):
+					retObjects.append(object)
+					
+					if (len(object.getImages()) != 0):
+						imgCount += len(object.getImages())
+					
+		return [retObjects, imgCount]
 
 	def deleteObject(self, objectId):
 		for obj in self.objectList:

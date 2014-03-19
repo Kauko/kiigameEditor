@@ -163,18 +163,17 @@ class Editor(QtGui.QMainWindow):
 		
 	def drawTextItems(self, textItems):
 		row = 0
+		imgCount = textItems.pop()
+		textItems = textItems.pop()
 		
 		self.text_scene.setRowCount(0)
 		self.text_scene.setColumnCount(2)
 		
 		#Disable sorting for row count, enable it after adding items
 		self.text_scene.setSortingEnabled(False)
+		print("HUI",textItems)
 		
 		for item in textItems:
-			# TODO: Resolve handling text objects (issue #8)
-			if (item.getClassname() == "Text"):
-				continue
-				
 			# Add a row
 			self.text_scene.insertRow(self.text_scene.rowCount())
 			row += 1
@@ -183,8 +182,18 @@ class Editor(QtGui.QMainWindow):
 			widgetItem = TextItemWidget(item, self.scenarioData.dataDir)
 			self.text_scene.setItem(row, 0, widgetItem)
 			
+			# Maximum amount of texts for item, 1 for examine
+			maxAmount = 1
+			
+			if (item.__class__.__name__ == "Item"):
+				print("Item", item.__class__.__name__)
+				maxAmount = imgCount
+			elif not (item.__class__.__name__ == "Object"):
+				print("Not Object", item.__class__.__name__)
+				maxAmount = len(item.getImages())
+				
 			# Add a progressbar to the second column
-			progressBarItem = ProgressBarItemWidget(item)
+			progressBarItem = ProgressBarItemWidget(item, maxAmount)
 			self.text_scene.setItem(row, 1, progressBarItem)
 			
 		self.text_scene.setSortingEnabled(True)
@@ -291,16 +300,20 @@ class TextItemWidget(QtGui.QTableWidgetItem):
 		self.setIcon(icon)
 
 # ProgressBar item that shows how much item has texts completed
-class ProgressBarItemWidget(QtGui.QListWidgetItem):
-	def __init__(self, textItem, parent=None):
+class ProgressBarItemWidget(QtGui.QTableWidgetItem):
+	def __init__(self, textItem, maxAmount, parent=None):
 		super(ProgressBarItemWidget, self).__init__(parent)
 
 		# Row size, especially height
 		self.setSizeHint(QtCore.QSize(25,25))
 		
 		self.textItem = textItem
+		self.maxAmount = maxAmount
+		
+		self.calculateProgress()
 
-	def calculateProgress()
+	def calculateProgress(self): # If there's many images, .texts doesn't work!
+		print ("LOL", self.textItem.id, self.maxAmount, len(self.textItem.texts))
 
 # Texts widget that shows texts of specific item in the texts tab
 class TextsWidget(QtGui.QWidget):
@@ -308,7 +321,7 @@ class TextsWidget(QtGui.QWidget):
 		super(TextsWidget, self).__init__(parent)
 
 	def displayTexts(self, item):
-		print(item)
+		print("LOOOOO")
 							
 if __name__ == '__main__':
 	from sys import argv, exit
