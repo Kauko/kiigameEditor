@@ -607,10 +607,13 @@ class SettingsWidget(QtGui.QWidget):
 		# TODO: Disconnect combobox from events when populating it
 		combobox.clear()
 		
+		itemCounter = 0
+		
 		# Add the given string as the first item
 		if (firstItem):
 			combobox.addItem(firstItem)
-			
+			itemCounter = 1
+		
 		for objType in objectTypes:
 			objRooms = self.parent.getObjectsByType(objType)
 			
@@ -624,8 +627,11 @@ class SettingsWidget(QtGui.QWidget):
 				imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+roomObject.getBackground().getLocation())
 				roomIcon = QtGui.QIcon(imgPixmap)
 				
-				# TODO: Disable ability to choose rooms
 				combobox.addItem(roomIcon, roomName)
+				
+				# Don't allow choosing rooms
+				combobox.setItemData(itemCounter, 0, QtCore.Qt.UserRole - 1);
+				itemCounter += 1
 				
 				# TODO: Indendation of objects in the combobox
 				# Add objects under the room
@@ -640,3 +646,5 @@ class SettingsWidget(QtGui.QWidget):
 					imgPixmap = QtGui.QPixmap(self.parent.getImageDir()+"/"+imageObject.getLocation())
 					targetIcon = QtGui.QIcon(imgPixmap)
 					combobox.addItem(targetIcon, imageObject.getName(), userData=obj)
+					itemCounter += 1
+					
