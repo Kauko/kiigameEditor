@@ -334,10 +334,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setComboboxIndex(item.location, self.roomComboItem)
 		
 		# Examine text
-		examineText = item.getExamineText()
-		if not (examineText):
-			examineText = ""
-		self.clickTextEdit.setText(examineText)
+		self.setExamineText(item)
 		
 		# Pickup text
 		pickupText = item.getPickupText()
@@ -382,10 +379,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setComboboxIndex(gObject.location, self.roomCombo)
 		
 		# Examine text
-		examineText = gObject.getExamineText()
-		if not (examineText):
-			examineText = ""
-		self.clickTextEdit.setText(examineText)
+		self.setExamineText(gObject)
 		
 	# Set the input field values for containers
 	def setContainerOptions(self, container):
@@ -410,6 +404,18 @@ class SettingsWidget(QtGui.QWidget):
 		# Set location
 		self.setComboboxIndex(obstacle.location, self.roomCombo)
 		
+	# Set examine text for the given object
+	def setExamineText(self, gameObject, textEdit=None):
+		try:
+			text = gameObject.getExamineText()
+		except AttributeError:
+			text = ""
+		
+		if (textEdit):
+			textEdit.setText(text)
+		else:
+			self.clickTextEdit.setText(text)
+			
 	# Set any game object name
 	def setObjectName(self, image, textStart, textEdit=None):
 		# Given image may be None

@@ -344,8 +344,3 @@ class JSONImage(Object):
 	def getLocation(self):
 		return self.imageAttributes["src"]
 		
-	#def getUseText(self):
-	#	try:
-	#		return self.texts[self.target.id]
-	#	except:
-	#		return
