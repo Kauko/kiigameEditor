@@ -49,6 +49,9 @@ class View(object):
 		except:
 			return None
 			
+	def setName(self, name):
+		self.texts["name"] = name
+			
 	def getMusic(self):
 		try:
 			return self.object["music"]
@@ -80,6 +83,9 @@ class Sequence(View):
 	def getChildren(self):
 		return self.sequenceImages
 		
+	def getRepresentingImage(self):
+		return self.sequenceImages[0]
+		
 # Start menu
 class Start(View):
 	def __init__(self, texts, startAttributes, startImages):
@@ -104,6 +110,9 @@ class Start(View):
 				
 	def getChildren(self):
 		return [self.background, self.startButton, self.creditsButton, self.emptyButton, self.beginingImage]
+
+	def getRepresentingImage(self):
+		return self.background
 		
 # End menu
 class End(View):
@@ -168,8 +177,8 @@ class Room(View):
 	
 	def getItems(self):
 		return self.objectList
-	
-	def getBackground(self):
+		
+	def getRepresentingImage(self):
 		return self.background
 		
 	def postInit(self, getGameObject):
@@ -202,7 +211,6 @@ class Custom(View):
 	def __init__(self, texts, viewId, viewAttributes, viewImages):
 		super(Custom, self).__init__(texts, viewAttributes, viewId)
 		
-		# Create objects inside the room including the background
 		self.objectList = []
 		for imageId in viewImages:
 			images = viewImages[imageId].pop("image")
@@ -217,4 +225,7 @@ class Custom(View):
 	
 	def getChildren(self):
 		return self.objectList
+		
+	def getRepresentingImage(self):
+		return self.objectList[0].getRepresentingImage()
 		

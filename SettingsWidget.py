@@ -63,7 +63,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# General image
 		self.objectImage = QtGui.QLabel(self)
-		self.objectImage.mousePressEvent = lambda s: self.showImageDialog(self.setobjectImage)
+		self.objectImage.mousePressEvent = lambda s: self.showImageDialog(self.changeObjectImage)
 		
 		self.useTargetCombo = self.createItemCombobox("Ei mikään")
 		self.useTargetCombo.currentIndexChanged.connect(self.changeUseTarget)
@@ -311,7 +311,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(room, "Huoneella")
 		
 		# Room background
-		self.setobjectImage(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
+		self.setobjectImage(self.parent.getImageDir()+"/"+room.getRepresentingImage().getSource())
 		
 		# Room music may return None which doesn't have split
 		try:
@@ -328,7 +328,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(imageObject, "Esineellä")
 		
 		# Item image
-		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
+		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
 		
 		# Location
 		self.setComboboxIndex(item.location, self.roomComboItem)
@@ -374,7 +374,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(gObject, "Esineellä")
 		
 		imageObject = gObject.getRepresentingImage()
-		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getLocation())
+		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
 		
 		# Location
 		self.setComboboxIndex(gObject.location, self.roomCombo)
@@ -470,10 +470,10 @@ class SettingsWidget(QtGui.QWidget):
 			self.clickTextEdit.setText(text)
 			
 	# Set any game object name
-	def setObjectName(self, image, textStart, textEdit=None):
+	def setObjectName(self, gameObject, textStart, textEdit=None):
 		# Given image may be None
 		try:
-			name = image.getName()
+			name = gameObject.getName()
 		except AttributeError:
 			name = ""
 			
@@ -485,9 +485,19 @@ class SettingsWidget(QtGui.QWidget):
 			textEdit.setText(name)
 		else:
 			self.objectNameEdit.setText(name)
-				
+			
+	# Change the image of a gameobject
+	def changeObjectImage(self, imagePath, image=None):
+		# If no image, a default image var will be used
+		self.setobjectImage(imagePath, image)
+		
+		self.currentObject.getRepresentingImage().setImagePath(imagePath)
+		
 	def changeName(self):
 		print("Name changed!")
+		# TODO: What if blank name?
+		# TODO: Update whatever item listings displaying item's name (main tab, ...)
+		self.currentObject.setName(self.objectNameEdit.text())
 		
 	# Change object use type
 	def changeUseType(self, index):
@@ -541,7 +551,7 @@ class SettingsWidget(QtGui.QWidget):
 			roomName = room.getName()
 			if not (roomName):
 				roomName = "Huoneella ei ole nimeä"
-			imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+room.getBackground().getLocation())
+			imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+room.getRepresentingImage().getSource())
 			
 			roomIcon = QtGui.QIcon(imgPixmap)
 			combobox.addItem(roomIcon, roomName, userData=room)
@@ -588,7 +598,7 @@ class SettingsWidget(QtGui.QWidget):
 				roomName = roomObject.getName()
 				if not (roomName):
 					roomName = "Huoneella ei ole nimeä"
-				imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+roomObject.getBackground().getLocation())
+				imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+roomObject.getRepresentingImage().getSource())
 				
 				roomIcon = QtGui.QIcon(imgPixmap)
 				
@@ -607,7 +617,7 @@ class SettingsWidget(QtGui.QWidget):
 						continue
 					
 					imageObject = obj.getRepresentingImage()
-					imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+imageObject.getLocation())
+					imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+imageObject.getSource())
 					targetIcon = QtGui.QIcon(imgPixmap)
 					combobox.addItem(targetIcon, imageObject.getName(), userData=obj)
 					itemCounter += 1

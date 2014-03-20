@@ -78,6 +78,9 @@ class Object(object):
 			return self.texts["name"]
 		except:
 			return None
+			
+	def setName(self, name):
+		self.texts["name"] = name
 		
 	# Returns of the most "representing" image for an item such as open door
 	# instead closed door image
@@ -361,6 +364,9 @@ class JSONImage(Object):
 		super(JSONImage, self).__init__(texts, location, imageAttributes["id"], None, objectAttributes)
 		self.imageAttributes = imageAttributes
 		
-	def getLocation(self):
+	def getSource(self):
 		return self.imageAttributes["src"]
 		
+	def setImagePath(self, imagePath):
+		# Cut the plain filename out of the name
+		self.imageAttributes["src"] = "images/"+imagePath.split("/")[-1]

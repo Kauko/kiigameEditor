@@ -180,7 +180,7 @@ class RoomWidget(QtGui.QListWidgetItem):
 			roomName = "Huoneella ei ole nimeä"
 		self.setText(roomName)
 		
-		imagePath = imageDir+"/"+room.getBackground().getLocation()
+		imagePath = imageDir+"/"+room.getRepresentingImage().getSource()
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
 		
@@ -200,7 +200,7 @@ class ItemWidget(QtGui.QListWidgetItem):
 			itemName = "Esineellä ei ole nimeä"
 		self.setText(itemName)
 		
-		imagePath = imageDir+"/"+imageObject.getLocation()
+		imagePath = imageDir+"/"+imageObject.getSource()
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
 							
