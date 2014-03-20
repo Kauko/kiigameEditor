@@ -78,7 +78,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.musicBtn = QtGui.QPushButton('Selaa...', self)
 		self.musicBtn.setToolTip('Valitse musiikkitiedosto')
 		self.musicBtn.resize(self.musicBtn.sizeHint())
-		self.musicBtn.clicked.connect(self.showMusicDialog)
+		self.musicBtn.clicked.connect(lambda: self.showMusicDialog(self.changeMusic))
 		
 		self.musicTextEdit = QtGui.QLineEdit()
 		self.musicTextEdit.setReadOnly(True)
@@ -493,6 +493,10 @@ class SettingsWidget(QtGui.QWidget):
 		
 		self.currentObject.getRepresentingImage().setImagePath(imagePath)
 		
+	# Change music
+	def changeMusic(self, imagePath):
+		self.currentObject.setMusic(imagePath)
+		
 	def changeName(self):
 		print("Name changed!")
 		# TODO: What if blank name?
@@ -622,13 +626,14 @@ class SettingsWidget(QtGui.QWidget):
 					combobox.addItem(targetIcon, imageObject.getName(), userData=obj)
 					itemCounter += 1
 					
-	def showMusicDialog(self):
+	def showMusicDialog(self, callBack):
 		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
 		'Valitse musiikkitiedosto','~', "Musiikkitiedostot (*.mp3 *.ogg)")
 		# TODO: Modified object requires filename in format "audio/filename.xxx"
 		if (len(fname) != 0):
 			self.musicTextEdit.setText(fname.split("/")[-1])
-		
+			callBack(fname)
+			
 	def showImageDialog(self, callBack):
 		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
 		'Valitse taustakuva','~', "Taustakuvat (*.png)")

@@ -58,6 +58,9 @@ class View(object):
 		except KeyError:
 			return
 
+	def setMusic(self, filePath):
+		self.object["music"] = "audio/"+filePath.split("/")[-1]
+
 	# Post-init should be overriden by views
 	def postInit(self, getGameObject):
 		return
