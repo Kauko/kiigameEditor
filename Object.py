@@ -146,7 +146,6 @@ class Item(Object):
 		
 	def setComesFrom(self, target):
 		self.comesFrom = target
-		#self.target = target
 		
 	# Get the text displayed when this item is used on its target
 	def getUseText(self):
@@ -156,7 +155,18 @@ class Item(Object):
 	# Get the image activated by the given item
 	def getUseImage(self, useItem):
 		return self.images[0]
-
+		
+	# Set the object triggered by this item
+	def setTargetObject(self, targetObject):
+		triggerType = targetObject.__class__.__name__
+		if (triggerType == "Object"):
+			self.trigger = targetObject
+			self.target = targetObject
+		elif (triggerType in ("Door", "Container")):
+			targetObject.setKey(self)
+		elif (triggerType == "Obstacle"):
+			targetObject.setTrigger(self)
+			
 class Container(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Container, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -182,8 +192,8 @@ class Container(Object):
 		
 	def postInit(self, getGameObject):
 		try:
-			self.key = getGameObject("object", self.objectAttributes["object"]["key"])
-			self.key.setTarget(self)
+			self.setKey(getGameObject("object", self.objectAttributes["object"]["key"]))
+
 		except KeyError:
 			pass
 
@@ -227,7 +237,11 @@ class Container(Object):
 	# Returns what unblocks the container
 	def getKey(self):
 		return self.key
-
+		
+	def setKey(self, keyObject):
+		self.key = keyObject
+		self.key.setTarget(self)
+		
 class Door(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Door, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -252,8 +266,7 @@ class Door(Object):
 		
 	def postInit(self, getGameObject):
 		try:
-			self.key = getGameObject("object", self.objectAttributes["object"]["key"])
-			self.key.setTarget(self)
+			self.setKey(getGameObject("object", self.objectAttributes["object"]["key"]))
 		except KeyError:
 			pass
 			
@@ -273,7 +286,7 @@ class Door(Object):
 	def getUseImage(self, useItem):
 		if (self.key == useItem):
 			return self.lockedImage
-
+			
 	# Returns True if door is locked, otherwise False
 	def isLocked(self):
 		try:
@@ -286,6 +299,10 @@ class Door(Object):
 	# Returns what unlocks the door
 	def getKey(self):
 		return self.key
+		
+	def setKey(self, keyObject):
+		self.key = keyObject
+		self.key.setTarget(self)
 
 class Obstacle(Object):
 	def __init__(self, texts, location, itemId, images, objectAttributes):
@@ -312,8 +329,7 @@ class Obstacle(Object):
 			pass
 			
 		try:
-			self.trigger = getGameObject("object", self.objectAttributes["object"]["trigger"])
-			self.trigger.setTarget(self)
+			self.setTrigger(getGameObject("object", self.objectAttributes["object"]["trigger"]))
 		except KeyError:
 			pass
 			
@@ -332,6 +348,10 @@ class Obstacle(Object):
 	# Returns what unblocks the obstacle
 	def getKey(self):
 		return self.trigger
+		
+	def setTrigger(self, triggerObject):
+		self.trigger = triggerObject
+		self.trigger.setTarget(self)
 		
 # Image object representing what is in the JSON texts
 class JSONImage(Object):

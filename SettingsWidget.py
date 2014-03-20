@@ -251,6 +251,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.allTextsButton,
 				self.whereLocatedLabel,
 				self.roomComboItem
+				# TODO: outcomeCombo for choosing trigger outcome
 			],
 			"Object": [
 				self.nameLabel,
@@ -261,6 +262,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.clickTextEdit,
 				self.whereLocatedLabel,
 				self.roomCombo
+				# TODO: whoTriggers for displaying what object triggers
 			],
 			"Door": [
 				self.whereLocatedLabel,
@@ -332,7 +334,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setComboboxIndex(item.location, self.roomComboItem)
 		
 		# Examine text
-		self.setExamineText(item)
+		self.setExamineText()
 		
 		# Pickup text
 		pickupText = item.getPickupText()
@@ -345,6 +347,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Use type of the item
 		itemTarget = self.parent.getItemUse(item)
+		
 		itemTargetType = itemTarget.__class__.__name__
 		useType = 0
 		if (itemTargetType in ("Object", "Item")):
@@ -364,10 +367,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setItemUse(useType, itemTarget)
 		
 		# Use text
-		useText = item.getUseText()
-		if not (useText):
-			useText = ""
-		self.useTextEdit.setText(useText)
+		self.setUseText()
 		
 	# Set the input field values for generic objects
 	def setGenericOptions(self, gObject):
@@ -380,8 +380,8 @@ class SettingsWidget(QtGui.QWidget):
 		self.setComboboxIndex(gObject.location, self.roomCombo)
 		
 		# Examine text
-		self.setExamineText(gObject)
-		
+		self.setExamineText()
+			
 	# Set the input field values for containers
 	def setContainerOptions(self, container):
 	
@@ -440,8 +440,25 @@ class SettingsWidget(QtGui.QWidget):
 		# Door transition room
 		self.setComboboxIndex(doorObject.transition, self.doorTransitionCombo)
 		
+	# Set use item for items
+	def setUseText(self, textEdit=None, item=None):
+		if not (item):
+			item = self.currentObject
+
+		useText = item.getUseText()
+		if not (useText):
+			useText = ""
+			
+		if (textEdit):
+			textEdit.setText(useText)
+		else:
+			self.useTextEdit.setText(useText)
+			
 	# Set examine text for the given object
-	def setExamineText(self, gameObject, textEdit=None):
+	def setExamineText(self, gameObject=None, textEdit=None):
+		if not (gameObject):
+			gameObject = self.currentObject
+			
 		try:
 			text = gameObject.getExamineText()
 		except AttributeError:
@@ -474,12 +491,22 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Change object use type
 	def changeUseType(self, index):
-		print("Use type set!")
 		self.updateUseTargetCombobox(index, self.useTargetCombo)
 		
-	# Set object use target
+	def changeCombobox(self, sourceValue, changeValue):
+		print("change combo!", sourceValue, changeValue)
+		
+	# Set item use target
 	def changeUseTarget(self, index):
-		print("Use target set", self.useTargetCombo.itemData(index))
+		targetType = self.useTargetCombo.itemData(index).__class__.__name__
+		if (targetType in ("Door", "Container")):
+			if not (self.useTargetCombo.itemData(index).lockedImage):
+				print("Target doesn't have locked image!")
+				# TODO: What to do if target doesn't have locked image?
+				return
+				
+		self.currentObject.setTargetObject(self.useTargetCombo.itemData(index))
+		self.setUseText()
 		
 	def showAllTexts(self):
 		print("Clicked show all texts")
