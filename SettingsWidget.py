@@ -62,6 +62,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.objectNameEdit.editingFinished.connect(self.changeName)
 		
 		# General image
+		self.imgTextLabel = QtGui.QLabel("Kuva")
 		self.objectImage = QtGui.QLabel(self)
 		self.objectImage.mousePressEvent = lambda s: self.showImageDialog(self.changeObjectImage)
 		
@@ -70,6 +71,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 		self.useTextEdit = QtGui.QTextEdit()
 		self.useTextEdit.setMaximumHeight(50)
+		self.useTextEdit.focusOutEvent = lambda s: self.changeUseText()
 		
 		# Music
 		# TODO: How to clear music?
@@ -94,15 +96,14 @@ class SettingsWidget(QtGui.QWidget):
 		self.roomCombo = QtGui.QComboBox(self)
 		self.roomCombo.setIconSize(QtCore.QSize(50,50))
 		self.populateRoomCombobox(self.roomCombo)
+		self.roomCombo.currentIndexChanged.connect(lambda: self.changeWhereLocated(self.roomCombo))
 		
 		# Where located combo with "No room" option
 		self.roomComboItem = QtGui.QComboBox(self)
 		self.roomComboItem.setIconSize(QtCore.QSize(50,50))
 		self.roomComboItem.addItem("Ei sijaitse huoneessa")
 		self.populateRoomCombobox(self.roomComboItem)
-		
-		# Object image
-		self.imgTextLabel = QtGui.QLabel("Kuva")
+		self.roomComboItem.currentIndexChanged.connect(lambda: self.changeWhereLocated(self.roomComboItem))
 		
 		self.clickTextLabel = QtGui.QLabel("Teksti klikatessa:")
 		
@@ -250,7 +251,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.useTextEdit,
 				self.allTextsButton,
 				self.whereLocatedLabel,
-				self.roomComboItem
+				self.roomComboItem # TODO: Some better system to move items around
 				# TODO: outcomeCombo for choosing trigger outcome
 			],
 			"Object": [
@@ -485,7 +486,15 @@ class SettingsWidget(QtGui.QWidget):
 			textEdit.setText(name)
 		else:
 			self.objectNameEdit.setText(name)
-			
+		
+	def changeWhereLocated(self, combobox):
+		print("Where",combobox.itemData(combobox.currentIndex()))
+		
+	# Text that comes after using an item
+	def changeUseText(self):
+		# TODO: Disable text field if no target is selected
+		self.currentObject.setUseText(self.useTextEdit.toPlainText())
+		
 	# Change the image of a gameobject
 	def changeObjectImage(self, imagePath, image=None):
 		# If no image, a default image var will be used

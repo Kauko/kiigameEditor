@@ -150,6 +150,11 @@ class Item(Object):
 	def setComesFrom(self, target):
 		self.comesFrom = target
 		
+	# Set the item use text if target is defined
+	def setUseText(self, useText):
+		if (self.target):
+			self.texts[self.target.id] = useText
+		
 	# Get the text displayed when this item is used on its target
 	def getUseText(self):
 		useImage = self.target.getUseImage(self)
