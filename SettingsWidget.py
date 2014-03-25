@@ -166,6 +166,13 @@ class SettingsWidget(QtGui.QWidget):
 		self.whatComesLabel = QtGui.QLabel("Mitä tulee säiliöstä?")
 		self.whatComesCombo = self.createItemCombobox("Ei mitään")
 		
+		self.useDisappearCheckbox = QtGui.QCheckBox() # Set text afterwards
+		self.useDisappearCheckbox.stateChanged.connect(self.changeUseDisappear)
+		
+		self.outcomeLabel = QtGui.QLabel("Lopputulos")
+		self.outcomeCombobox = self.createItemCombobox("Ei valittu", ("object",))
+		self.outcomeCombobox.currentIndexChanged.connect(self.changeOutcome)
+		
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
 		self.layout.addWidget(self.imgTextLabel)
@@ -192,6 +199,11 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.useLabel)
 		self.layout.addWidget(self.useTypeCombo)
 		self.layout.addWidget(self.useTargetCombo)
+		
+		self.layout.addWidget(self.useDisappearCheckbox)
+		self.layout.addWidget(self.outcomeLabel)
+		self.layout.addWidget(self.outcomeCombobox)
+		
 		self.layout.addWidget(self.useTextLabel)
 		self.layout.addWidget(self.useTextEdit)
 		self.layout.addWidget(self.allTextsButton)
@@ -512,6 +524,12 @@ class SettingsWidget(QtGui.QWidget):
 	def changeMusic(self, imagePath):
 		self.currentObject.setMusic(imagePath)
 		
+	def changeUseDisappear(self):
+		print("Use disappear", self.useDisappearCheckbox.isChecked())
+		
+	def changeOutcome(self):
+		print("Change outcome", self.outcomeCombobox.itemData(self.outcomeCombobox.currentIndex()))
+		
 	def changeName(self):
 		# TODO: What if blank name?
 		# TODO: Update whatever item listings displaying item's name (main tab, ...)
@@ -521,6 +539,16 @@ class SettingsWidget(QtGui.QWidget):
 	def changeUseType(self, index):
 		# TODO: Clear and disable useText field
 		self.updateUseTargetCombobox(index, self.useTargetCombo)
+		
+		if (index == 1):
+			self.useDisappearCheckbox.setText("Katoaako %s käytettäessä?" %(self.currentObject.getName()))
+			self.useDisappearCheckbox.show()
+			self.outcomeLabel.show()
+			self.outcomeCombobox.show()
+		else:
+			self.useDisappearCheckbox.hide()
+			self.outcomeLabel.hide()
+			self.outcomeCombobox.hide()
 		
 	def changeCombobox(self, sourceValue, changeValue):
 		print("change combo!", sourceValue, changeValue)
@@ -597,7 +625,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Populate a given combobox with given types of objects
 	# categorized by game rooms
-	def populateCombobox(self, objectTypes, combobox, firstItem=None):
+	def populateCombobox(self, objectTypes, combobox, firstItem=None, addChoices=None):
 		# TODO: Disconnect combobox from events when populating it
 		combobox.clear()
 		
