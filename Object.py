@@ -175,6 +175,20 @@ class Container(Object):
 		except KeyError:
 			self.fullImage = None
 			
+		self.texts = {}
+		
+		try:
+			if (self.emptyImage):
+				self.texts.update(texts[self.emptyImage.id])
+			
+			if (self.lockedImage):
+				self.texts.update(texts[self.lockedImage.id])
+				
+			if (self.fullImage):
+				self.texts.update(texts[self.fullImage.id])
+		except KeyError:
+			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
+			
 		# Handle these in postInit
 		self.key = None
 		self.inItem = None
@@ -232,6 +246,20 @@ class Door(Object):
 			self.openImage = self.getImage(objectAttributes["object"]["open_image"])
 		except KeyError:
 			self.openImage = None
+		
+		self.texts = {}
+		
+		try:
+			if (self.closedImage):
+				self.texts.update(texts[self.closedImage.id])
+			
+			if (self.lockedImage):
+				self.texts.update(texts[self.lockedImage.id])
+				
+			if (self.openImage):
+				self.texts.update(texts[self.openImage.id])
+		except KeyError:
+			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
 			
 		# Handle these in postInit
 		self.key = None
@@ -274,6 +302,17 @@ class Obstacle(Object):
 			self.unblockingImage = self.getImage(objectAttributes["object"]["unblocking_image"])
 		except KeyError:
 			self.unblockingImage = None
+		
+		self.texts = {}
+
+		try:
+			if (self.blockingImage):
+				self.texts.update(texts[self.blockingImage.id])
+			
+			if (self.unblockingImage):
+				self.texts.update(texts[self.unblockingText.id])
+		except KeyError:
+			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
 			
 		# Handle these in postInit
 		self.blockTarget = None

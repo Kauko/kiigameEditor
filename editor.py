@@ -171,12 +171,10 @@ class Editor(QtGui.QMainWindow):
 		
 		#Disable sorting for row count, enable it after adding items
 		self.text_scene.setSortingEnabled(False)
-		print("HUI",textItems)
 		
 		for item in textItems:
 			# Add a row
 			self.text_scene.insertRow(self.text_scene.rowCount())
-			row += 1
 			
 			# Add a text item to the first column
 			widgetItem = TextItemWidget(item, self.scenarioData.dataDir)
@@ -184,18 +182,32 @@ class Editor(QtGui.QMainWindow):
 			
 			# Maximum amount of texts for item, 1 for examine
 			maxAmount = 1
-			
+			#TODO: Rewards are not items? Their maxAmount is just 1
+
 			if (item.__class__.__name__ == "Item"):
 				print("Item", item.__class__.__name__)
-				maxAmount = imgCount
+				maxAmount = imgCount+1
+				
+				if ("src2" in item.getRepresentingImage().imageAttributes):
+					maxAmount = 1
+				
 			elif not (item.__class__.__name__ == "Object"):
 				print("Not Object", item.__class__.__name__)
 				maxAmount = len(item.getImages())
 				
 			# Add a progressbar to the second column
-			progressBarItem = ProgressBarItemWidget(item, maxAmount)
-			self.text_scene.setItem(row, 1, progressBarItem)
+			#progressBarItem = ProgressBarItemWidget(item, maxAmount)
+			progressBar = QtGui.QProgressBar()
+		
+			print ("LOL", item.id, maxAmount, len(item.texts)-1)
+			progressBar.setMinimum(0)
+			progressBar.setMaximum(maxAmount)
+			progressBar.setValue(len(item.texts)-1)
 			
+			# TODO: Sorting doesn't work, fix possibly by setItem here and setCellWidget inside item
+			self.text_scene.setCellWidget(row, 1, progressBar)
+			
+			row += 1
 		self.text_scene.setSortingEnabled(True)
 	
 	# Click on a room in the main tab
@@ -303,17 +315,22 @@ class TextItemWidget(QtGui.QTableWidgetItem):
 class ProgressBarItemWidget(QtGui.QTableWidgetItem):
 	def __init__(self, textItem, maxAmount, parent=None):
 		super(ProgressBarItemWidget, self).__init__(parent)
-
-		# Row size, especially height
-		self.setSizeHint(QtCore.QSize(25,25))
 		
+		self.progressBar = QtGui.QProgressBar()
 		self.textItem = textItem
 		self.maxAmount = maxAmount
 		
 		self.calculateProgress()
 
 	def calculateProgress(self): # If there's many images, .texts doesn't work!
-		print ("LOL", self.textItem.id, self.maxAmount, len(self.textItem.texts))
+		
+		if (self.textItem.__class__.__name__ == "Item"):
+			self.maxAmount += 1
+		
+		print ("LOL", self.textItem.id, self.maxAmount, len(self.textItem.texts)-1)
+		self.progressBar.setMinimum(0)
+		self.progressBar.setMaximum(self.maxAmount)
+		self.progressBar.setValue(len(self.textItem.texts)-1)
 
 # Texts widget that shows texts of specific item in the texts tab
 class TextsWidget(QtGui.QWidget):

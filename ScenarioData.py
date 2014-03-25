@@ -254,10 +254,8 @@ class ScenarioData(object):
 		
 		for room in self.roomList:
 			for object in room.getItems():
-				if (object.__class__.__name__ in rightTypes):
-					retObjects.append(object)
-					
-					if (len(object.getImages()) != 0):
+				if (object.__class__.__name__ in rightTypes and object.getClassname() != "Text"):
+						retObjects.append(object)
 						imgCount += len(object.getImages())
 					
 		return [retObjects, imgCount]
