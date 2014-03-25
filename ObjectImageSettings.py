@@ -49,7 +49,6 @@ class ObjectImageSettings(QtGui.QWidget):
 			isDisabled = False
 		else:
 			isDisabled = True
-			
 		self.nameLabel.setDisabled(isDisabled)
 		self.nameEdit.setDisabled(isDisabled)
 		self.keyLabel.setDisabled(isDisabled)
@@ -72,9 +71,10 @@ class ObjectImageSettings(QtGui.QWidget):
 		# Set image
 		if (self.gameImageObject):
 			imagePath = self.parent.parent.getImageDir()+"/"+self.gameImageObject.getSource()
-		else:
+		elif self.objectType == "Door":
 			imagePath = "images/door_placeholder.png"
-			
+		elif self.objectType == "Container":
+			imagePath = "images/container_placeholder.png"
 		self.parent.setobjectImage(imagePath, self.image)
 		
 		# Change locked state
