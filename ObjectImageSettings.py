@@ -1,6 +1,5 @@
 from PySide import QtGui, QtCore
-# TODO: Give texts in
-# TODO: 
+
 # A widget that may have an object's closed, locked and open state settings
 class ObjectImageSettings(QtGui.QWidget):
 	def __init__(self, titleLabelText, nameLabelText, canBeLocked=False, lockedText=None, parent=None):
@@ -32,7 +31,7 @@ class ObjectImageSettings(QtGui.QWidget):
 			self.lockedCheckbox = QtGui.QCheckBox(lockedText)
 			self.lockedCheckbox.stateChanged.connect(self.changeLocked)
 			self.keyLabel = QtGui.QLabel("Mikä avaa?")
-			self.keyCombo = self.parent.createItemCombobox("Avainta ei valittu!", ("item",)) 
+			self.keyCombo = self.parent.createItemCombobox("Avainta ei valittu!", ("item",), ("item",), self.clearKey, self.changeKey)
 			
 			self.layout.addWidget(self.lockedCheckbox)
 			self.layout.addWidget(self.keyLabel)
@@ -43,6 +42,12 @@ class ObjectImageSettings(QtGui.QWidget):
 		self.layout.addWidget(self.image)
 		self.layout.addWidget(self.clickLabel)
 		self.layout.addWidget(self.clickEdit)
+		
+	def clearKey(self):
+		print("Clearing key!")
+		
+	def changeKey(self):
+		print("Changing key!")
 		
 	def changeLocked(self):
 		if (self.lockedCheckbox.isChecked()):

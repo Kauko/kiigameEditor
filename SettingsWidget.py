@@ -2,9 +2,6 @@ from PySide import QtGui, QtCore
 from ObjectImageSettings import ObjectImageSettings
 from ImageCache import ImageCache
 
-# TODO: On all comboboxes: What to do when item is in use? For example,
-#		if an item is already a key to an object, how to display it?
-
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
@@ -117,9 +114,6 @@ class SettingsWidget(QtGui.QWidget):
 		self.pickupTextEdit.setMaximumHeight(50)
 		self.pickupTextEdit.focusOutEvent = lambda s: self.changePickupText()
 		
-		#self.pickupBlockLabel = QtGui.QLabel("Estääkö jokin poiminnan?")
-		#self.pickupBlockCombo = self.createItemCombobox(None, ("obstacle",))
-		
 		# Object usage
 		self.useLabel = QtGui.QLabel("Käyttö")
 		self.useLabelLine = self.createSeparator()
@@ -133,24 +127,24 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTextLabel = QtGui.QLabel("Teksti käytettäessä:")
 		
 		# Use target
-		self.useTargetCombo = self.createItemCombobox("Ei mikään")
-		self.useTargetCombo.currentIndexChanged.connect(self.changeUseTarget)
+		self.useTargetCombo = self.createItemCombobox("Ei mikään", connectTo=self.changePickupText)
 		
 		self.allTextsButton = QtGui.QPushButton("Nämä ja muut tekstit")
 		self.allTextsButton.clicked.connect(self.showAllTexts)
 		
 		# Door widgets
 		self.doorTransitionLabel = QtGui.QLabel("Mihin pääsee?")
-		self.doorTransitionCombo = QtGui.QComboBox(self)
-		self.doorTransitionCombo.setIconSize(QtCore.QSize(50,50))
-		self.populateRoomCombobox(self.doorTransitionCombo)
+		#self.doorTransitionCombo = QtGui.QComboBox(self)
+		self.doorTransitionCombo = self.createItemCombobox("Ei mihinkään", "room", connectTo=self.changeRoom)
+		#self.doorTransitionCombo.setIconSize(QtCore.QSize(50,50))
+		#self.populateRoomCombobox(self.doorTransitionCombo)
 		self.doorTransitionLabelLine = self.createSeparator()
 		
 		self.doorInitialStateLabel = QtGui.QLabel("Tila alussa")
 		self.doorInitialStateCombo = QtGui.QComboBox(self)
 		self.doorInitialStateCombo.addItem("Kiinni")
 		self.doorInitialStateCombo.addItem("Auki")
-		self.doorInitialStateCombo.currentIndexChanged.connect(self.changeDoorInitialState)
+		self.doorInitialStateCombo.currentIndexChanged.connect(lambda s: self.objectComboboxHandler(self.doorInitialStateCombo, self.changeDoorInitialState))
 		
 		self.openDoorImage = ObjectImageSettings("Avoin kulkureitti", "Avoimen kulkureitin nimi", parent=self)
 		self.closedDoorImage = ObjectImageSettings("Suljettu kulkureitti", "Suljetun kulkureitin nimi", parent=self)
@@ -164,20 +158,19 @@ class SettingsWidget(QtGui.QWidget):
 		# Obstacle widgets
 		self.obstacleImage = ObjectImageSettings(None, "Esteen nimi", True, "Onko säiliö lukossa?", parent=self)
 		self.obstacleBlocksLabel = QtGui.QLabel("Mitä estää?")
-		self.obstacleBlocksCombo = self.createItemCombobox("Ei mitään", ("door",))
+		self.obstacleBlocksCombo = self.createItemCombobox("Ei mitään", ("door",), ("door",), connectTo=self.changeObstacleBlock)
 		
 		self.whatGoesLabel = QtGui.QLabel("Mikä menee säiliöön?")
-		self.whatGoesCombo = self.createItemCombobox("Ei mikään", ("item",))
+		self.whatGoesCombo = self.createItemCombobox("Ei mikään", ("item",), ("item",), connectTo=self.changeWhatGoes)
 		
 		self.whatComesLabel = QtGui.QLabel("Mitä tulee säiliöstä?")
-		self.whatComesCombo = self.createItemCombobox("Ei mitään", ("item",))
+		self.whatComesCombo = self.createItemCombobox("Ei mitään", ("item",), ("item",), connectTo=self.changeWhatComes)
 		
 		self.useDisappearCheckbox = QtGui.QCheckBox() # Set text afterwards
 		self.useDisappearCheckbox.stateChanged.connect(self.changeUseDisappear)
 		
 		self.outcomeLabel = QtGui.QLabel("Lopputulos")
-		self.outcomeCombobox = self.createItemCombobox("Ei valittu", ("object",))
-		self.outcomeCombobox.currentIndexChanged.connect(self.changeOutcome)
+		self.outcomeCombobox = self.createItemCombobox("Ei valittu", ("object",), ("object",), noChoiceMethod=self.clearOutcome, connectTo=self.changeOutcome)
 		
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
@@ -557,6 +550,18 @@ class SettingsWidget(QtGui.QWidget):
 	def changeOutcome(self):
 		print("Change outcome", self.outcomeCombobox.itemData(self.outcomeCombobox.currentIndex()))
 		
+	def changeObstacleBlock(self):
+		print("Change obstacle block target!")
+		
+	def changeWhatGoes(self):
+		print("Change what goes!")
+		
+	def changeWhatComes(self):
+		print("Change what comes!")
+		
+	def changeRoom(self):
+		print("Change room!")
+		
 	def changeName(self):
 		# TODO: What if blank name?
 		# TODO: Update whatever item listings displaying item's name (main tab, ...)
@@ -592,12 +597,10 @@ class SettingsWidget(QtGui.QWidget):
 			self.useTextEdit.show()
 			self.allTextsButton.show()
 			
-	def changeCombobox(self, sourceValue, changeValue):
-		print("change combo!", sourceValue, changeValue)
-		
 	# Set item use target
 	def changeUseTarget(self, index):
-		targetType = self.useTargetCombo.itemData(index).__class__.__name__
+		targetType = self.useTargetCombo.itemData(index).__class__.__name__ 
+		
 		if (targetType in ("Door", "Container")):
 			if not (self.useTargetCombo.itemData(index).lockedImage):
 				print("Target doesn't have locked image!")
@@ -607,6 +610,10 @@ class SettingsWidget(QtGui.QWidget):
 		self.currentObject.setTargetObject(self.useTargetCombo.itemData(index))
 		self.setUseText()
 		
+	# Create new game object
+	def createObject(self, objectType):
+		print("Create new object of type", objectType)
+	
 	def showAllTexts(self):
 		print("Clicked show all texts")
 		
@@ -623,18 +630,28 @@ class SettingsWidget(QtGui.QWidget):
 		combobox.setCurrentIndex(0)
 		
 	# Create combobox from given items with default of all item types
-	def createItemCombobox(self, firstItem, objectTypes=None):
+	def createItemCombobox(self, noChoiceText, objectTypes=None, addChoices=None, noChoiceMethod=None, connectTo=None):
 		if not (objectTypes):
 			objectTypes = ("object", "item", "door", "container", "obstacle")
-		
+			
 		combobox = QtGui.QComboBox(self)
 		combobox.setIconSize(QtCore.QSize(50,50))
 		
-		self.populateCombobox(objectTypes, combobox, firstItem)
+		combobox.currentIndexChanged.connect(lambda s: self.objectComboboxHandler(combobox, connectTo))
+		
+		if (objectTypes == "room"):
+			self.populateRoomCombobox(combobox, addChoices)
+		else:
+			self.populateCombobox(objectTypes, combobox, noChoiceText, addChoices, noChoiceMethod)
+			
 		return combobox
 		
 	# Populate a given combobox with game rooms
-	def populateRoomCombobox(self, combobox):
+	def populateRoomCombobox(self, combobox, addChoice=True):
+		if (addChoice):
+			imgPixmap = self.imageCache.createPixmap("images/add_new_icon.png")
+			combobox.addItem(imgPixmap, "Lisää uusi huone")
+			
 		for room in self.parent.getRoomObjects():
 			# TODO: Some model to eliminate redundancy from getName/roomName patterns
 			roomName = room.getName()
@@ -658,8 +675,30 @@ class SettingsWidget(QtGui.QWidget):
 		else:
 			objectTypes = ("obstacle",)
 			
-		self.populateCombobox(objectTypes, combobox, "Ei valittu")
+		self.populateCombobox(objectTypes, combobox, "Ei valittu", objectTypes, self.clearUseTarget)
+	
+	def clearUseTarget(self):
+		print("Clear useTarget!")
 		
+	def clearOutcome(self):
+		print("Clear outcome!")
+	
+	# Handle item combobox
+	def objectComboboxHandler(self, combobox, callback):
+		
+		print("Choice handler", combobox, callback, combobox.itemData(combobox.currentIndex()))
+		target = combobox.itemData(combobox.currentIndex())
+		targetType = target.__class__.__name__
+		
+		# If chosen item is something else than a game object don't do callback
+		if (targetType == "method"):
+			target()
+		elif (targetType == "str"):
+			self.createObject(target)
+		else:
+			callback()
+		#(lambda s: self.objectComboboxHandler(self.changeOutcome))
+	
 	# TODO: Create a combo icon of multi-part objects such as cieni
 	#		(those with "related" attribute)
 	#def populateBlockingCombobox(self):
@@ -667,7 +706,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Populate a given combobox with given types of objects
 	# categorized by game rooms
-	def populateCombobox(self, objectTypes, combobox, noChoiceText=None, addChoices=None):
+	def populateCombobox(self, objectTypes, combobox, noChoiceText=None, addChoices=None, noChoiceMethod=None):
 		# TODO: Disconnect combobox from events when populating it
 		combobox.clear()
 		
@@ -676,9 +715,17 @@ class SettingsWidget(QtGui.QWidget):
 		# Add the given string as the first item
 		if (noChoiceText):
 			imgPixmap = self.imageCache.createPixmap("images/no_choice_icon.png")
-			combobox.addItem(imgPixmap, noChoiceText)
+			combobox.addItem(imgPixmap, noChoiceText, userData=noChoiceMethod)
 			itemCounter = 1
-		
+			
+		# Add items to add given types of objects
+		if (addChoices):
+			imgPixmap = self.imageCache.createPixmap("images/add_new_icon.png")
+			for choice in addChoices:
+				print("ASKDJASJ",choice)
+				combobox.addItem(imgPixmap, "Lisää uusi %s" %(self.parent.getGeneralName(choice).lower()), userData=choice)
+				itemCounter += 1
+			
 		for objType in objectTypes:
 			objRooms = self.parent.getObjectsByType(objType)
 			

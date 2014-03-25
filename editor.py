@@ -170,6 +170,10 @@ class Editor(QtGui.QMainWindow):
 	def getItemUse(self, item):
 		return item.getUse()
 		
+	# Get the general object name for an object type
+	def getGeneralName(self, objectType):
+		return self.scenarioData.getGeneralName(objectType)
+		
 # Room image with caption used in the main view
 class RoomWidget(QtGui.QListWidgetItem):
 	def __init__(self, room, imageDir, parent=None):

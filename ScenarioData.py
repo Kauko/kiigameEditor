@@ -230,6 +230,19 @@ class ScenarioData(object):
 				retObjects.append(roomObjects)
 		return retObjects		
 		
+	def getGeneralName(self, objectType):
+		objectType = objectType.lower()
+		if (objectType == "object"):
+			return Object.Object.generalName
+		elif (objectType == "item"):
+			return Object.Item.generalName
+		elif (objectType == "door"):
+			return Object.Door.generalName
+		elif (objectType == "container"):
+			return Object.Container.generalName
+		elif (objectType == "obstacle"):
+			return Object.Obstacle.generalName
+			
 	#def getObjectImgLoc(self, room, i):
 	#	r = self.roomList[room]
 	#	#o = r.objectList[

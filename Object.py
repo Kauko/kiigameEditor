@@ -2,7 +2,8 @@ from random import randint
 
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
-
+	generalName = "Kiinteä esine"
+	
 	# Static method to create unique object ID
 	usedIds = []
 	def createUniqueId(newId=None):
@@ -101,6 +102,8 @@ class Object(object):
 
 # Pickable item
 class Item(Object):
+	generalName = "Käyttöesine"
+	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Item, self).__init__(texts, location, itemId, images, objectAttributes)
 		#self.interaction = interaction
@@ -184,6 +187,8 @@ class Item(Object):
 			targetObject.setTrigger(self)
 			
 class Container(Object):
+	generalName = "Säiliö"
+	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Container, self).__init__(texts, location, itemId, images, objectAttributes)
 		
@@ -259,6 +264,8 @@ class Container(Object):
 		self.key.setTarget(self)
 		
 class Door(Object):
+	generalName = "Kulkureitti"
+	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Door, self).__init__(texts, location, itemId, images, objectAttributes)
 		
@@ -321,6 +328,8 @@ class Door(Object):
 		self.key.setTarget(self)
 
 class Obstacle(Object):
+	generalName = "Este"
+	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Obstacle, self).__init__(texts, location, itemId, images, objectAttributes)
 		# Create the available image objects
