@@ -24,8 +24,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.parent = parent
 		self.imageCache = ImageCache()
 			
-		self.createItemOptions()
-		#self.createRoomOptions()
+		self.createOtionFields()
 		
 	def displayOptions(self, gameObject):
 		objectType = gameObject.__class__.__name__
@@ -55,7 +54,7 @@ class SettingsWidget(QtGui.QWidget):
 			item.show()
 			
 	# Settings for the object view
-	def createItemOptions(self):
+	def createOtionFields(self):
 		# Name
 		self.nameLabel = QtGui.QLabel("Nimi")
 		self.objectNameEdit =  QtGui.QLineEdit()
@@ -65,9 +64,6 @@ class SettingsWidget(QtGui.QWidget):
 		self.imgTextLabel = QtGui.QLabel("Kuva")
 		self.objectImage = QtGui.QLabel(self)
 		self.objectImage.mousePressEvent = lambda s: self.showImageDialog(self.changeObjectImage)
-		
-		self.useTargetCombo = self.createItemCombobox("Ei mikään")
-		self.useTargetCombo.currentIndexChanged.connect(self.changeUseTarget)
 		
 		self.useTextEdit = QtGui.QTextEdit()
 		self.useTextEdit.setMaximumHeight(50)
@@ -105,23 +101,22 @@ class SettingsWidget(QtGui.QWidget):
 		self.populateRoomCombobox(self.roomComboItem)
 		self.roomComboItem.currentIndexChanged.connect(lambda: self.changeWhereLocated(self.roomComboItem))
 		
-		self.clickTextLabel = QtGui.QLabel("Teksti klikatessa:")
-		
-		self.clickTextEdit = QtGui.QTextEdit()
-		self.clickTextEdit.setMaximumHeight(50)
+		self.examineTextLabel = QtGui.QLabel("Teksti klikatessa:")
+		self.examineTextEdit = QtGui.QTextEdit()
+		self.examineTextEdit.setMaximumHeight(50)
+		self.examineTextEdit.focusOutEvent = lambda s: self.changeExamineText()
 		
 		# Pickup text section
 		self.pickupLabel = QtGui.QLabel("Poiminta")
 		self.pickupLabelLine = self.createSeparator()
 		self.pickupLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
-		
 		self.pickupTextLabel = QtGui.QLabel("Teksti poimittaessa:")
 		
 		self.pickupTextEdit = QtGui.QTextEdit()
 		self.pickupTextEdit.setMaximumHeight(50)
+		self.pickupTextEdit.focusOutEvent = lambda s: self.changePickupText()
 		
 		self.pickupBlockLabel = QtGui.QLabel("Estääkö jokin poiminnan?")
-		
 		self.pickupBlockCombo = self.createItemCombobox(None, ("obstacle",))
 		
 		# Object usage
@@ -135,6 +130,10 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTypeCombo.currentIndexChanged.connect(self.changeUseType)
 		
 		self.useTextLabel = QtGui.QLabel("Teksti käytettäessä:")
+		
+		# Use target
+		self.useTargetCombo = self.createItemCombobox("Ei mikään")
+		self.useTargetCombo.currentIndexChanged.connect(self.changeUseTarget)
 		
 		self.allTextsButton = QtGui.QPushButton("Nämä ja muut tekstit")
 		self.allTextsButton.clicked.connect(self.showAllTexts)
@@ -180,8 +179,8 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.roomCombo)
 		self.layout.addWidget(self.roomComboItem)
 		
-		self.layout.addWidget(self.clickTextLabel)
-		self.layout.addWidget(self.clickTextEdit)
+		self.layout.addWidget(self.examineTextLabel)
+		self.layout.addWidget(self.examineTextEdit)
 		self.layout.addWidget(self.pickupLabelLine)
 		self.layout.addWidget(self.pickupLabel)
 		self.layout.addWidget(self.pickupTextLabel)
@@ -237,8 +236,8 @@ class SettingsWidget(QtGui.QWidget):
 				self.objectNameEdit,
 				self.imgTextLabel,
 				self.objectImage,
-				self.clickTextLabel,
-				self.clickTextEdit,
+				self.examineTextLabel,
+				self.examineTextEdit,
 				self.pickupLabelLine,
 				self.pickupLabel,
 				self.pickupTextLabel,
@@ -259,8 +258,8 @@ class SettingsWidget(QtGui.QWidget):
 				self.objectNameEdit,
 				self.imgTextLabel,
 				self.objectImage,
-				self.clickTextLabel,
-				self.clickTextEdit,
+				self.examineTextLabel,
+				self.examineTextEdit,
 				self.whereLocatedLabel,
 				self.roomCombo
 				# TODO: whoTriggers for displaying what object triggers
@@ -468,7 +467,7 @@ class SettingsWidget(QtGui.QWidget):
 		if (textEdit):
 			textEdit.setText(text)
 		else:
-			self.clickTextEdit.setText(text)
+			self.examineTextEdit.setText(text)
 			
 	# Set any game object name
 	def setObjectName(self, gameObject, textStart, textEdit=None):
@@ -488,12 +487,18 @@ class SettingsWidget(QtGui.QWidget):
 			self.objectNameEdit.setText(name)
 		
 	def changeWhereLocated(self, combobox):
-		print("Where",combobox.itemData(combobox.currentIndex()))
+		print("Change where located to",combobox.itemData(combobox.currentIndex()))
 		
 	# Text that comes after using an item
 	def changeUseText(self):
 		# TODO: Disable text field if no target is selected
 		self.currentObject.setUseText(self.useTextEdit.toPlainText())
+		
+	def changePickupText(self):
+		self.currentObject.setPickupText(self.pickupTextEdit.toPlainText())
+		
+	def changeExamineText(self):
+		self.currentObject.setExamineText(self.examineTextEdit.toPlainText())
 		
 	# Change the image of a gameobject
 	def changeObjectImage(self, imagePath, image=None):
@@ -507,13 +512,13 @@ class SettingsWidget(QtGui.QWidget):
 		self.currentObject.setMusic(imagePath)
 		
 	def changeName(self):
-		print("Name changed!")
 		# TODO: What if blank name?
 		# TODO: Update whatever item listings displaying item's name (main tab, ...)
 		self.currentObject.setName(self.objectNameEdit.text())
 		
 	# Change object use type
 	def changeUseType(self, index):
+		# TODO: Clear and disable useText field
 		self.updateUseTargetCombobox(index, self.useTargetCombo)
 		
 	def changeCombobox(self, sourceValue, changeValue):

@@ -47,7 +47,7 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setViewMode(QtGui.QListView.IconMode)
 		self.left_scene.setFlow(QtGui.QListView.LeftToRight)
 		self.left_scene.setMovement(QtGui.QListView.Static)
-		self.left_scene.itemClicked.connect(self.roomClicked)
+		self.left_scene.itemSelectionChanged.connect(self.roomClicked)
 		# TODO: Double click room, display the room view
 		
 		left_frame_layout.addWidget(self.left_scene)
@@ -67,7 +67,7 @@ class Editor(QtGui.QMainWindow):
 		self.middle_scene = QtGui.QListWidget(self)
 		self.middle_scene.setIconSize(QtCore.QSize(100, 100))
 		self.middle_scene.setMovement(QtGui.QListView.Static)
-		self.middle_scene.itemClicked.connect(self.roomItemClicked)
+		self.middle_scene.itemSelectionChanged.connect(self.roomItemClicked)
 		
 		middle_frame_layout.addWidget(self.middle_scene)
 		
@@ -124,13 +124,15 @@ class Editor(QtGui.QMainWindow):
 		#right_frame_layout.addWidget(self.settingsWidget)
 		
 	# Click on a room in the main tab
-	def roomClicked(self, widgetItem):
+	def roomClicked(self):
+		widgetItem = self.left_scene.selectedItems()[0]
 		roomItems = widgetItem.room.getItems()
 		self.drawRoomItems(roomItems)
 		self.settingsWidget.displayOptions(widgetItem.room)
 		
 	# Click on an item in thre main tab room preview
-	def roomItemClicked(self, widgetItem):
+	def roomItemClicked(self):
+		widgetItem = self.middle_scene.selectedItems()[0]
 		self.settingsWidget.displayOptions(widgetItem.item)
 		
 	# Draw the leftmost frame rooms

@@ -155,6 +155,14 @@ class Item(Object):
 		if (self.target):
 			self.texts[self.target.id] = useText
 		
+	# Set item's pickup text
+	def setPickupText(self, pickupText):
+		self.texts["pickup"] = pickupText
+		
+	# Set item's examine (click) text
+	def setExamineText(self, examineText):
+		self.texts["examine"] = examineText
+		
 	# Get the text displayed when this item is used on its target
 	def getUseText(self):
 		useImage = self.target.getUseImage(self)
