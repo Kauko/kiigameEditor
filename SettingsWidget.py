@@ -86,20 +86,21 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Where from dropdown box
 		self.whereFromLabel = QtGui.QLabel("Mistä sinne pääsee?")
+		# TODO: whereFromCombo
 		
 		# Where located
-		self.whereLocatedLabel = QtGui.QLabel("Missä sijaitsee?")
-		self.roomCombo = QtGui.QComboBox(self)
-		self.roomCombo.setIconSize(QtCore.QSize(50,50))
-		self.populateRoomCombobox(self.roomCombo)
-		self.roomCombo.currentIndexChanged.connect(lambda: self.changeWhereLocated(self.roomCombo))
+		#self.whereLocatedLabel = QtGui.QLabel("Missä sijaitsee?")
+		#self.roomCombo = QtGui.QComboBox(self)
+		#self.roomCombo.setIconSize(QtCore.QSize(50,50))
+		#self.populateRoomCombobox(self.roomCombo)
+		#self.roomCombo.currentIndexChanged.connect(lambda: self.changeWhereLocated(self.roomCombo))
 		
 		# Where located combo with "No room" option
-		self.roomComboItem = QtGui.QComboBox(self)
-		self.roomComboItem.setIconSize(QtCore.QSize(50,50))
-		self.roomComboItem.addItem("Ei sijaitse huoneessa")
-		self.populateRoomCombobox(self.roomComboItem)
-		self.roomComboItem.currentIndexChanged.connect(lambda: self.changeWhereLocated(self.roomComboItem))
+		#self.roomComboItem = QtGui.QComboBox(self)
+		#self.roomComboItem.setIconSize(QtCore.QSize(50,50))
+		#self.roomComboItem.addItem("Ei sijaitse huoneessa")
+		#self.populateRoomCombobox(self.roomComboItem)
+		#self.roomComboItem.currentIndexChanged.connect(lambda: self.changeWhereLocated(self.roomComboItem))
 		
 		self.examineTextLabel = QtGui.QLabel("Teksti klikatessa:")
 		self.examineTextEdit = QtGui.QTextEdit()
@@ -110,14 +111,14 @@ class SettingsWidget(QtGui.QWidget):
 		self.pickupLabel = QtGui.QLabel("Poiminta")
 		self.pickupLabelLine = self.createSeparator()
 		self.pickupLabelLine.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
-		self.pickupTextLabel = QtGui.QLabel("Teksti poimittaessa:")
+		self.pickupTextLabel = QtGui.QLabel("Teksti poimiessa:")
 		
 		self.pickupTextEdit = QtGui.QTextEdit()
 		self.pickupTextEdit.setMaximumHeight(50)
 		self.pickupTextEdit.focusOutEvent = lambda s: self.changePickupText()
 		
-		self.pickupBlockLabel = QtGui.QLabel("Estääkö jokin poiminnan?")
-		self.pickupBlockCombo = self.createItemCombobox(None, ("obstacle",))
+		#self.pickupBlockLabel = QtGui.QLabel("Estääkö jokin poiminnan?")
+		#self.pickupBlockCombo = self.createItemCombobox(None, ("obstacle",))
 		
 		# Object usage
 		self.useLabel = QtGui.QLabel("Käyttö")
@@ -139,18 +140,18 @@ class SettingsWidget(QtGui.QWidget):
 		self.allTextsButton.clicked.connect(self.showAllTexts)
 		
 		# Door widgets
-		self.doorTransitionLabel = QtGui.QLabel("Mihin ovesta pääsee?")
+		self.doorTransitionLabel = QtGui.QLabel("Mihin pääsee?")
 		self.doorTransitionCombo = QtGui.QComboBox(self)
 		self.doorTransitionCombo.setIconSize(QtCore.QSize(50,50))
 		self.populateRoomCombobox(self.doorTransitionCombo)
 		self.doorTransitionLabelLine = self.createSeparator()
 		
-		self.openDoorImage = ObjectImageSettings("Avoin ovi", "Avoimen oven nimi", parent=self)
-		self.closedDoorImage = ObjectImageSettings("Suljettu ovi", "Suljetun oven nimi", parent=self)
-		self.lockedDoorImage = ObjectImageSettings("Lukittu ovi", "Lukitun oven nimi", True, "Onko ovi lukossa?", parent=self)
+		self.openDoorImage = ObjectImageSettings("Avoin kulkureitti", "Avoimen kulkureitin nimi", parent=self)
+		self.closedDoorImage = ObjectImageSettings("Suljettu kulkureitti", "Suljetun kulkureitin nimi", parent=self)
+		self.lockedDoorImage = ObjectImageSettings("Lukittu kulkureitti", "Kuva kokeilun jälkeen", True, "Lukossa", parent=self)
 		
 		# Container widgets
-		self.lockedContainerImage = ObjectImageSettings("Lukittu säiliö", "Lukitun säiliön nimi", True, "Onko säiliö lukossa?", parent=self)
+		self.lockedContainerImage = ObjectImageSettings("Lukittu säiliö", "Lukitun säiliön nimi", True, "Lukossa", parent=self)
 		self.fullContainerImage = ObjectImageSettings("Täysi säiliö", "Avoimen säiliön nimi", parent=self)
 		self.emptyContainerImage = ObjectImageSettings("Tyhjä säiliö", "Tyhjän säiliön nimi", parent=self)
 		
@@ -159,10 +160,10 @@ class SettingsWidget(QtGui.QWidget):
 		self.obstacleBlocksLabel = QtGui.QLabel("Mitä estää?")
 		self.obstacleBlocksCombo = self.createItemCombobox("Ei mitään", ("door",))
 		
-		self.whatGoesLabel = QtGui.QLabel("Mikä esine menee säiliöön?")
+		self.whatGoesLabel = QtGui.QLabel("Mikä menee säiliöön?")
 		self.whatGoesCombo = self.createItemCombobox("Ei mikään")
 		
-		self.whatComesLabel = QtGui.QLabel("Minkä esineen säiliöstä saa?")
+		self.whatComesLabel = QtGui.QLabel("Mitä tulee säiliöstä?")
 		self.whatComesCombo = self.createItemCombobox("Ei mitään")
 		
 		self.layout.addWidget(self.nameLabel)
@@ -175,9 +176,9 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.musicBtn)
 		self.layout.addWidget(self.musicClear)
 		self.layout.addWidget(self.whereFromLabel)
-		self.layout.addWidget(self.whereLocatedLabel)
-		self.layout.addWidget(self.roomCombo)
-		self.layout.addWidget(self.roomComboItem)
+		#self.layout.addWidget(self.whereLocatedLabel)
+		#self.layout.addWidget(self.roomCombo)
+		#self.layout.addWidget(self.roomComboItem)
 		
 		self.layout.addWidget(self.examineTextLabel)
 		self.layout.addWidget(self.examineTextEdit)
@@ -185,8 +186,8 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.pickupLabel)
 		self.layout.addWidget(self.pickupTextLabel)
 		self.layout.addWidget(self.pickupTextEdit)
-		self.layout.addWidget(self.pickupBlockLabel)
-		self.layout.addWidget(self.pickupBlockCombo)
+		#self.layout.addWidget(self.pickupBlockLabel)
+		#self.layout.addWidget(self.pickupBlockCombo)
 		self.layout.addWidget(self.useLabelLine)
 		self.layout.addWidget(self.useLabel)
 		self.layout.addWidget(self.useTypeCombo)
@@ -200,22 +201,22 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.doorTransitionLabel)
 		self.layout.addWidget(self.doorTransitionCombo)
 		
-		self.layout.addWidget(self.openDoorImage)
 		self.layout.addWidget(self.closedDoorImage)
 		self.layout.addWidget(self.lockedDoorImage)
-		
-		self.layout.addWidget(self.lockedContainerImage)
-		self.layout.addWidget(self.fullContainerImage)
-		self.layout.addWidget(self.emptyContainerImage)
-		
-		self.layout.addWidget(self.obstacleImage)
-		self.layout.addWidget(self.obstacleBlocksLabel)
-		self.layout.addWidget(self.obstacleBlocksCombo)
+		self.layout.addWidget(self.openDoorImage)
 		
 		self.layout.addWidget(self.whatGoesLabel)
 		self.layout.addWidget(self.whatGoesCombo)
 		self.layout.addWidget(self.whatComesLabel)
 		self.layout.addWidget(self.whatComesCombo)
+		
+		self.layout.addWidget(self.fullContainerImage)
+		self.layout.addWidget(self.lockedContainerImage)
+		self.layout.addWidget(self.emptyContainerImage)
+		
+		self.layout.addWidget(self.obstacleBlocksLabel)
+		self.layout.addWidget(self.obstacleBlocksCombo)
+		self.layout.addWidget(self.obstacleImage)
 		
 		# Which widgets are shown with each object
 		self.itemSettings = {
@@ -249,8 +250,8 @@ class SettingsWidget(QtGui.QWidget):
 				self.useTextLabel,
 				self.useTextEdit,
 				self.allTextsButton,
-				self.whereLocatedLabel,
-				self.roomComboItem # TODO: Some better system to move items around
+				#self.whereLocatedLabel,
+				#self.roomComboItem # TODO: Some better system to move items around
 				# TODO: outcomeCombo for choosing trigger outcome
 			],
 			"Object": [
@@ -260,13 +261,13 @@ class SettingsWidget(QtGui.QWidget):
 				self.objectImage,
 				self.examineTextLabel,
 				self.examineTextEdit,
-				self.whereLocatedLabel,
-				self.roomCombo
+				#self.whereLocatedLabel,
+				#self.roomCombo
 				# TODO: whoTriggers for displaying what object triggers
 			],
 			"Door": [
-				self.whereLocatedLabel,
-				self.roomCombo,
+				#self.whereLocatedLabel,
+				#self.roomCombo,
 				
 				self.doorTransitionLabelLine,
 				self.doorTransitionLabel,
@@ -278,8 +279,8 @@ class SettingsWidget(QtGui.QWidget):
 				# TODO: obstacleCombo for "who blocks" values
 			],
 			"Container": [
-				self.whereLocatedLabel,
-				self.roomCombo,
+				#self.whereLocatedLabel,
+				#self.roomCombo,
 				
 				self.lockedContainerImage,
 				self.fullContainerImage,
@@ -291,8 +292,8 @@ class SettingsWidget(QtGui.QWidget):
 				self.whatComesCombo
 			],
 			"Obstacle": [
-				self.whereLocatedLabel,
-				self.roomCombo,
+				#self.whereLocatedLabel,
+				#self.roomCombo,
 				
 				self.obstacleImage,
 				self.obstacleBlocksLabel,
@@ -331,7 +332,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
 		
 		# Location
-		self.setComboboxIndex(item.location, self.roomComboItem)
+		#self.setComboboxIndex(item.location, self.roomComboItem)
 		
 		# Examine text
 		self.setExamineText()
@@ -343,7 +344,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.pickupTextEdit.setText(pickupText)
 		
 		# Set who blocks
-		self.setComboboxIndex(item, self.pickupBlockCombo)
+		#self.setComboboxIndex(item, self.pickupBlockCombo)
 		
 		# Use type of the item
 		itemTarget = self.parent.getItemUse(item)
@@ -377,7 +378,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
 		
 		# Location
-		self.setComboboxIndex(gObject.location, self.roomCombo)
+		#self.setComboboxIndex(gObject.location, self.roomCombo)
 		
 		# Examine text
 		self.setExamineText()
@@ -391,7 +392,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.emptyContainerImage.setSettings(container, container.emptyImage)
 		
 		# Set location
-		self.setComboboxIndex(container.location, self.roomCombo)
+		#self.setComboboxIndex(container.location, self.roomCombo)
 		
 		# Set what goes, what comes from the container
 		self.setComboboxIndex(container.inItem, self.whatGoesCombo)
@@ -404,7 +405,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.obstacleImage.setSettings(obstacle, obstacle.blockingImage)
 		
 		# Set location
-		self.setComboboxIndex(obstacle.location, self.roomCombo)
+		#self.setComboboxIndex(obstacle.location, self.roomCombo)
 	
 	def setobjectImage(self, imagePath, objectImage=None):
 		imgPixmap = self.imageCache.createPixmap(imagePath)
@@ -435,7 +436,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.lockedDoorImage.setSettings(doorObject, doorObject.lockedImage)
 		
 		# Location
-		self.setComboboxIndex(doorObject.location, self.roomCombo)
+		#self.setComboboxIndex(doorObject.location, self.roomCombo)
 		
 		# Door transition room
 		self.setComboboxIndex(doorObject.transition, self.doorTransitionCombo)
