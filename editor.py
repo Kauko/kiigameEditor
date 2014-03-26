@@ -155,11 +155,13 @@ class Editor(QtGui.QMainWindow):
 		layout.addWidget(right_frame)
 		
 		self.textsWidget = TextsWidget(self)
+		right_frame_layout.addWidget(self.textsWidget)
+		
 		self.textsWidget.displayTexts(selectedItem)
 		
 	# Click on an object in the texts tab object list
 	def textItemClicked(self, item):
-		self.textsWidget.displayOptions(item)
+		self.textsWidget.displayTexts(item)
 		
 	def drawTextItems(self, textItems):
 		row = 0
@@ -173,41 +175,39 @@ class Editor(QtGui.QMainWindow):
 		self.text_scene.setSortingEnabled(False)
 		
 		for item in textItems:
-			# Add a row
-			self.text_scene.insertRow(self.text_scene.rowCount())
-			
-			# Add a text item to the first column
-			widgetItem = TextItemWidget(item, self.scenarioData.dataDir)
-			self.text_scene.setItem(row, 0, widgetItem)
-			
-			# Maximum amount of texts for item, 1 for examine
-			maxAmount = 1
-			#TODO: Rewards are not items? Their maxAmount is just 1
+			for itemImage in item.getImages():
+				
+				# Add a row
+				self.text_scene.insertRow(self.text_scene.rowCount())
+				
+				# Add a text item to the first column
+				widgetItem = TextItemWidget(itemImage, item, self.scenarioData.dataDir)
+				self.text_scene.setItem(row, 0, widgetItem)
+				
+				# Maximum amount of texts for item, 1 for examine
+				maxAmount = 1
+				#TODO: Rewards are not items? Their maxAmount is just 1
 
-			if (item.__class__.__name__ == "Item"):
-				print("Item", item.__class__.__name__)
-				maxAmount = imgCount+1
+				if (item.__class__.__name__ == "Item"):
+					maxAmount = imgCount+1
+					
+					if ("src2" in item.getRepresentingImage().imageAttributes):
+						maxAmount = 1
+					
+				elif not (item.__class__.__name__ == "Object"):
+					maxAmount = len(item.getImages())
+					
+				# Add a progressbar to the second column
+				#progressBarItem = ProgressBarItemWidget(item, maxAmount)
+				progressBar = QtGui.QProgressBar()
+				progressBar.setMinimum(0)
+				progressBar.setMaximum(maxAmount)
+				progressBar.setValue(len(item.texts)-1)
 				
-				if ("src2" in item.getRepresentingImage().imageAttributes):
-					maxAmount = 1
+				# TODO: Sorting doesn't work, fix possibly by setItem here and setCellWidget inside item
+				self.text_scene.setCellWidget(row, 1, progressBar)
 				
-			elif not (item.__class__.__name__ == "Object"):
-				print("Not Object", item.__class__.__name__)
-				maxAmount = len(item.getImages())
-				
-			# Add a progressbar to the second column
-			#progressBarItem = ProgressBarItemWidget(item, maxAmount)
-			progressBar = QtGui.QProgressBar()
-		
-			print ("LOL", item.id, maxAmount, len(item.texts)-1)
-			progressBar.setMinimum(0)
-			progressBar.setMaximum(maxAmount)
-			progressBar.setValue(len(item.texts)-1)
-			
-			# TODO: Sorting doesn't work, fix possibly by setItem here and setCellWidget inside item
-			self.text_scene.setCellWidget(row, 1, progressBar)
-			
-			row += 1
+				row += 1
 		self.text_scene.setSortingEnabled(True)
 	
 	# Click on a room in the main tab
@@ -293,23 +293,44 @@ class ItemWidget(QtGui.QListWidgetItem):
 
 # Text item widget that represents items in texts tab
 class TextItemWidget(QtGui.QTableWidgetItem):
-	def __init__(self, textItem, imageDir, parent=None):
+	def __init__(self, textItem, parentItem, imageDir, parent=None):
 		super(TextItemWidget, self).__init__(parent)
 		
 		# Row size, especially height
 		self.setSizeHint(QtCore.QSize(25,25))
 		
 		self.textItem = textItem
-		imageObject = textItem.getRepresentingImage()
+		self.parentItem = parentItem
+		self.objectType = parentItem.__class__.__name__
+		self.texts = textItem.texts
 		
 		textItemName = self.textItem.getName()
 		if not (textItemName):
 			textItemName = "Esineellä ei ole nimeä"
-		self.setText(textItemName)
+		self.setText(textItemName + self.getImageType())
 		
-		imagePath = imageDir+"/"+imageObject.getLocation()
+		imagePath = imageDir+"/"+textItem.imageAttributes["src"]
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
+
+	def getImageType(self):
+		for attribute in dir(self.parentItem):
+			if (self.textItem == getattr(self.parentItem, attribute)):
+				if (attribute == "openImage"):
+					return " - Auki"
+				elif (attribute == "closedImage"):
+					return " - Kiinni"
+				elif (attribute == "lockedImage"):
+					return " - Lukittu"
+				elif (attribute == "emptyImage"):
+					return " - Tyhjä"
+				elif (attribute == "fullImage"):
+					return " - Täysi"
+				elif (attribute == "blockedImage"):
+					return " - Estää"
+				elif (attribute == "closedImage"):
+					return " - Ei estä"
+		return ""
 
 # ProgressBar item that shows how much item has texts completed
 class ProgressBarItemWidget(QtGui.QTableWidgetItem):
@@ -324,7 +345,8 @@ class ProgressBarItemWidget(QtGui.QTableWidgetItem):
 
 	def calculateProgress(self): # If there's many images, .texts doesn't work!
 		
-		if (self.textItem.__class__.__name__ == "Item"):
+		if ("pickup" in self.textItem.texts):
+			print("HIETHITEHITHI")
 			self.maxAmount += 1
 		
 		print ("LOL", self.textItem.id, self.maxAmount, len(self.textItem.texts)-1)
@@ -336,9 +358,55 @@ class ProgressBarItemWidget(QtGui.QTableWidgetItem):
 class TextsWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
 		super(TextsWidget, self).__init__(parent)
+		
+		self.layout = QtGui.QVBoxLayout()
+		self.setLayout(self.layout)
+		
+		print("HTELTHE")
+		self.clickTextLabel = QtGui.QLabel("Teksti klikatessa:")
+		
+		self.clickTextEdit = QtGui.QTextEdit()
+		self.clickTextEdit.setMaximumHeight(50)
+		
+		# Pickup text section
+		self.pickupLabel = QtGui.QLabel("Poiminta")
+		self.separator = QtGui.QLabel("")
+		self.separator.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
+		
+		self.pickupTextLabel = QtGui.QLabel("Teksti poimiessa:")
+		
+		self.pickupTextEdit = QtGui.QTextEdit()
+		self.pickupTextEdit.setMaximumHeight(50)
 
 	def displayTexts(self, item):
 		print("LOOOOO")
+		self.layout.addWidget(self.clickTextLabel)
+		self.layout.addWidget(self.clickTextEdit)
+		self.layout.addWidget(self.pickupTextLabel)
+		self.layout.addWidget(self.pickupTextEdit)
+		self.layout.addWidget(self.separator)
+		
+		# TODO: Texts for open, closed, empty, full, etc.
+		self.itemSettings = [
+			self.pickupTextLabel,
+			self.pickupTextEdit
+		]
+		
+		self.clickTextEdit.setText(item.texts["examine"])
+		
+		if (item.objectType == "Item"):
+			
+			for setting in self.itemSettings:
+				setting.show()
+			if ("pickup" in item.texts):
+				self.pickupTextEdit.setText(item.texts["pickup"])
+			else:
+				self.pickupTextLabel.hide()
+				self.pickupTextEdit.hide()
+				
+		else:
+			for setting in self.itemSettings:
+				setting.hide()
 							
 if __name__ == '__main__':
 	from sys import argv, exit
