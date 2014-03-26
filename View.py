@@ -51,7 +51,7 @@ class View(object):
 			
 	def setName(self, name):
 		self.texts["name"] = name
-			
+		
 	def getMusic(self):
 		try:
 			return self.object["music"]

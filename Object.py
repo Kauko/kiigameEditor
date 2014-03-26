@@ -3,6 +3,7 @@ from random import randint
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
 	generalName = "Kiinteä esine"
+	generalNameAdessive = "Kiinteällä esineellä"
 	
 	# Static method to create unique object ID
 	usedIds = []
@@ -100,9 +101,14 @@ class Object(object):
 		except:
 			return
 
+	# Set item's examine (click) text
+	def setExamineText(self, examineText):
+		self.texts["examine"] = examineText
+		
 # Pickable item
 class Item(Object):
 	generalName = "Käyttöesine"
+	generalNameAdessive = "Käyttöesineellä"
 	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Item, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -162,10 +168,6 @@ class Item(Object):
 	def setPickupText(self, pickupText):
 		self.texts["pickup"] = pickupText
 		
-	# Set item's examine (click) text
-	def setExamineText(self, examineText):
-		self.texts["examine"] = examineText
-		
 	# Get the text displayed when this item is used on its target
 	def getUseText(self):
 		useImage = self.target.getUseImage(self)
@@ -188,6 +190,7 @@ class Item(Object):
 			
 class Container(Object):
 	generalName = "Säiliö"
+	generalNameAdessive = "Säiliöllä"
 	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Container, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -265,6 +268,7 @@ class Container(Object):
 		
 class Door(Object):
 	generalName = "Kulkureitti"
+	generalNameAdessive = "Kulkureitillä"
 	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Door, self).__init__(texts, location, itemId, images, objectAttributes)
@@ -329,6 +333,7 @@ class Door(Object):
 
 class Obstacle(Object):
 	generalName = "Este"
+	generalNameAdessive = "Esteellä"
 	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
 		super(Obstacle, self).__init__(texts, location, itemId, images, objectAttributes)

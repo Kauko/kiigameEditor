@@ -47,7 +47,7 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setViewMode(QtGui.QListView.IconMode)
 		self.left_scene.setFlow(QtGui.QListView.LeftToRight)
 		self.left_scene.setMovement(QtGui.QListView.Static)
-		self.left_scene.itemSelectionChanged.connect(self.roomClicked)
+		self.left_scene.itemClicked.connect(self.roomClicked)
 		# TODO: Double click room, display the room view
 		
 		left_frame_layout.addWidget(self.left_scene)
@@ -71,7 +71,7 @@ class Editor(QtGui.QMainWindow):
 		
 		middle_frame_layout.addWidget(self.middle_scene)
 		
-		self.drawRoomItems(selectedRoom.room.getItems())
+		self.drawRoomItems()
 		#selectedItem = self.middle_scene.itemAt(0, 0)
 		#self.middle_scene.setCurrentItem(selectedItem)
 		
@@ -80,7 +80,6 @@ class Editor(QtGui.QMainWindow):
 		right_frame_layout = QtGui.QVBoxLayout()
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
-		
 		
 		self.settingsWidget = SettingsWidget.SettingsWidget(self)
 		self.settingsWidget.displayOptions(selectedRoom.room)
@@ -125,18 +124,18 @@ class Editor(QtGui.QMainWindow):
 		
 	# Click on a room in the main tab
 	def roomClicked(self):
-		widgetItem = self.left_scene.selectedItems()[0]
-		roomItems = widgetItem.room.getItems()
-		self.drawRoomItems(roomItems)
-		self.settingsWidget.displayOptions(widgetItem.room)
+		self.drawRoomItems()
+		self.settingsWidget.displayOptions(self.left_scene.selectedItems()[0].room)
 		
 	# Click on an item in thre main tab room preview
 	def roomItemClicked(self):
-		widgetItem = self.middle_scene.selectedItems()[0]
-		self.settingsWidget.displayOptions(widgetItem.item)
+		selected = self.middle_scene.selectedItems()
+		if (len(selected) > 0):
+			self.settingsWidget.displayOptions(selected[0].item)
 		
 	# Draw the leftmost frame rooms
 	def drawRooms(self):
+		self.left_scene.clear()
 		for i in range(len(self.scenarioData.roomList)):
 			room = self.scenarioData.roomList[i]
 			widgetItem = RoomWidget(room, self.scenarioData.dataDir)
@@ -144,8 +143,10 @@ class Editor(QtGui.QMainWindow):
 			self.left_scene.addItem(widgetItem)
 			
 	# Draw the middle frame room items
-	def drawRoomItems(self, roomItems):
+	def drawRoomItems(self):
 		self.middle_scene.clear()
+		
+		roomItems = self.left_scene.selectedItems()[0].room.getItems()
 		for item in roomItems:
 			# TODO: Resolve handling text objects (issue #8)
 			if (item.getClassname() == "Text"):
@@ -183,6 +184,7 @@ class RoomWidget(QtGui.QListWidgetItem):
 		
 		roomName = room.getName()
 		if not (roomName):
+			# TODO: Some common delegate for these namings
 			roomName = "Huoneella ei ole nimeä"
 		self.setText(roomName)
 		

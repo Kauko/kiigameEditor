@@ -537,8 +537,11 @@ class SettingsWidget(QtGui.QWidget):
 	def changeObjectImage(self, imagePath, image=None):
 		# If no image, a default image var will be used
 		self.setobjectImage(imagePath, image)
-		
 		self.currentObject.getRepresentingImage().setImagePath(imagePath)
+		
+		self.parent.drawRoomItems()
+		# TODO: Cannot use editor's images folder because of path edits
+		#		-> make every path absolute, they should be cut only in the end
 		
 	# Change music
 	def changeMusic(self, imagePath):
@@ -563,9 +566,18 @@ class SettingsWidget(QtGui.QWidget):
 		print("Change room!")
 		
 	def changeName(self):
-		# TODO: What if blank name?
 		# TODO: Update whatever item listings displaying item's name (main tab, ...)
-		self.currentObject.setName(self.objectNameEdit.text())
+		text = self.objectNameEdit.text()
+		
+		# TODO: Get all other adessives like this too
+		if (len(text) == 0):
+			text = "%s ei ole nimeä" %(self.currentObject.generalNameAdessive)
+			
+		self.currentObject.setName(text)
+		if (self.currentObject.__class__.__name__ == "Room"):
+			self.parent.drawRooms()
+		else:
+			self.parent.drawRoomItems()
 		
 	# Change object use type
 	def changeUseType(self, index):

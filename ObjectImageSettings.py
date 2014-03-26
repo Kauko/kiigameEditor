@@ -99,7 +99,7 @@ class ObjectImageSettings(QtGui.QWidget):
 			except:
 				pass
 						
-		self.parent.setObjectName(self.gameImageObject, "Ovella", self.nameEdit)
+		self.parent.setObjectName(self.gameImageObject, "Kulkureitillä", self.nameEdit)
 		self.parent.setExamineText(self.gameImageObject, self.clickEdit)
 		
 	# Set the correct key item in keyCombo
