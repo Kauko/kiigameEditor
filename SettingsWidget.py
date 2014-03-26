@@ -10,7 +10,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.currentObject = None
 		self.lastObjectType = None
 		self.useTypes = {0: "Ei käyttöä", 1: "Käytä toiseen esineeseen",
-			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Poista este"}
+			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Ota jostakin", 5: "Poista este"}
 			
 		self.layout = QtGui.QVBoxLayout()
 		self.setLayout(self.layout)
@@ -82,7 +82,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.musicClear.clicked.connect(self.clearMusic)
 		
 		# Where from dropdown box
-		self.whereFromLabel = QtGui.QLabel("Mistä sinne pääsee?")
+		self.whereFromLabel = QtGui.QLabel("Mistä kulkureiteistä tänne pääsee?")
 		# TODO: whereFromCombo
 		
 		# Where located
@@ -127,7 +127,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTextLabel = QtGui.QLabel("Teksti käytettäessä:")
 		
 		# Use target
-		self.useTargetCombo = self.createItemCombobox("Ei mikään", connectTo=self.changePickupText)
+		self.useTargetCombo = self.createItemCombobox("Ei valittu", connectTo=self.changeUseTarget)
 		
 		self.allTextsButton = QtGui.QPushButton("Nämä ja muut tekstit")
 		self.allTextsButton.clicked.connect(self.showAllTexts)
@@ -373,7 +373,7 @@ class SettingsWidget(QtGui.QWidget):
 		if (itemTargetType in ("Object", "Item")):
 			useType = 1
 		elif (itemTargetType == "Obstacle"):
-			useType = 4
+			useType = 5
 		elif (itemTargetType in ("Door", "Container")):
 			# Item may unlock door or container or may go into a container
 			if (itemTarget.key == item):
@@ -383,7 +383,14 @@ class SettingsWidget(QtGui.QWidget):
 					if (itemTarget.inItem == item):
 						useType = 3
 				except AttributeError:
-					useType = 0
+					pass
+					
+				try:
+					if (itemTarget.outItem == item):
+						useType = 4
+				except AttributeError:
+					pass
+					
 		self.setItemUse(useType, itemTarget)
 		
 		# Use text
@@ -534,12 +541,15 @@ class SettingsWidget(QtGui.QWidget):
 		self.lockedDoorImage.setDisabled(isDisabled)
 		
 	# Change the image of a gameobject
-	def changeObjectImage(self, imagePath, image=None):
+	def changeObjectImage(self, imagePath, image=None, gameObject=None):
 		# If no image, a default image var will be used
 		self.setobjectImage(imagePath, image)
-		self.currentObject.getRepresentingImage().setImagePath(imagePath)
 		
-		self.parent.drawRoomItems()
+		if not (gameObject):
+			gameObject = self.currentObject
+		gameObject.getRepresentingImage().setSource(imagePath)
+		
+		self.updateParent()
 		# TODO: Cannot use editor's images folder because of path edits
 		#		-> make every path absolute, they should be cut only in the end
 		
@@ -574,6 +584,10 @@ class SettingsWidget(QtGui.QWidget):
 			text = "%s ei ole nimeä" %(self.currentObject.generalNameAdessive)
 			
 		self.currentObject.setName(text)
+		self.updateParent()
+		
+	# Update parent tab elements
+	def updateParent(self):
 		if (self.currentObject.__class__.__name__ == "Room"):
 			self.parent.drawRooms()
 		else:
@@ -610,16 +624,44 @@ class SettingsWidget(QtGui.QWidget):
 			self.allTextsButton.show()
 			
 	# Set item use target
-	def changeUseTarget(self, index):
+	def changeUseTarget(self):
+		index = self.useTargetCombo.currentIndex()
 		targetType = self.useTargetCombo.itemData(index).__class__.__name__ 
+		selectedObject = self.useTargetCombo.itemData(index)
 		
+		objectRole = 0
+		#lockTarget = False
 		if (targetType in ("Door", "Container")):
-			if not (self.useTargetCombo.itemData(index).lockedImage):
-				print("Target doesn't have locked image!")
-				# TODO: What to do if target doesn't have locked image?
-				return
+			useType = self.useTypeCombo.currentIndex()
+			
+			# Unlock something and target object is not set into locked state
+			if (useType == 2 ):
+				# TODO: Really nullify old key?
+				# Get old current object's key and nullify it
+				if (self.currentObject.target.__class__.__name__ in ("Door", "Container")):
+					print("CURRENTOBJECT KEY")
+					self.currentObject.target.setLocked(False)
+					#self.currentObject.key
+					
+				# Nullify selected door's key
+				if (self.useTargetCombo.itemData(index).key):
+					#self.useTargetCombo.itemData(index).key.clearTarget()
+					print("OLD KEEYYEYE", self.useTargetCombo.itemData(index).key)
+					self.useTargetCombo.itemData(index).key.target.setLocked(False)
+					
+				# TODO: Get imagePath for door too from some better place
+				imagePath = "images/container_placeholder.png"
+				selectedObject.setLocked(True, imagePath, self.currentObject)
 				
-		self.currentObject.setTargetObject(self.useTargetCombo.itemData(index))
+			# Put into container
+			elif (useType == 3):
+				objectRole = 1
+				
+			# Get from container
+			elif (useType == 4):
+				objectRole = 2
+				
+		self.currentObject.setTargetObject(selectedObject, objectRole)
 		self.setUseText()
 		
 	# Create new game object
@@ -683,9 +725,9 @@ class SettingsWidget(QtGui.QWidget):
 			objectTypes = ("item", "object")
 		elif (useType == 2):
 			objectTypes = ("door", "container")
-		elif (useType == 3):
+		elif (useType == 3 or useType == 4):
 			objectTypes = ("container",)
-		else:
+		elif (useType == 5):
 			objectTypes = ("obstacle",)
 			
 		self.populateCombobox(objectTypes, combobox, "Ei valittu", objectTypes, self.clearUseTarget)
@@ -699,7 +741,7 @@ class SettingsWidget(QtGui.QWidget):
 	# Handle item combobox
 	def objectComboboxHandler(self, combobox, callback):
 		
-		print("Choice handler", combobox, callback, combobox.itemData(combobox.currentIndex()))
+		#print("Choice handler", combobox, callback, combobox.itemData(combobox.currentIndex()))
 		target = combobox.itemData(combobox.currentIndex())
 		targetType = target.__class__.__name__
 		
@@ -709,6 +751,7 @@ class SettingsWidget(QtGui.QWidget):
 		elif (targetType == "str"):
 			self.createObject(target)
 		else:
+			#print("call")
 			callback()
 		#(lambda s: self.objectComboboxHandler(self.changeOutcome))
 	

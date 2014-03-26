@@ -153,11 +153,23 @@ class Item(Object):
 		self.target = target
 		
 	def setGoesInto(self, target):
+		self.comesFrom = None
 		self.goesInto = target
+		#self.trigger = None
 		self.target = target
 		
 	def setComesFrom(self, target):
+		self.goesInto = None
 		self.comesFrom = target
+		#self.goesInto = None
+		#self.trigger = None
+		self.target = target
+		
+	def clearTarget(self):
+		self.trigger = None
+		self.target = None
+		self.goesInto = None
+		self.comesFrom = None
 		
 	# Set the item use text if target is defined
 	def setUseText(self, useText):
@@ -171,20 +183,35 @@ class Item(Object):
 	# Get the text displayed when this item is used on its target
 	def getUseText(self):
 		useImage = self.target.getUseImage(self)
-		return self.texts[useImage.id]
-		
+		try:
+			return self.texts[useImage.id]
+		except KeyError:
+			self.texts[useImage.id] = ""
+			return ""
+				
 	# Get the image activated by the given item
 	def getUseImage(self, useItem):
 		return self.images[0]
 		
 	# Set the object triggered by this item
-	def setTargetObject(self, targetObject):
+	# objectRole=0 act as a key, =1 act as inItem, =2, act as outItem
+	def setTargetObject(self, targetObject, objectRole=0):
 		triggerType = targetObject.__class__.__name__
-		if (triggerType == "Object"):
+		
+		if (triggerType in ("Object", "Item")):
 			self.trigger = targetObject
 			self.target = targetObject
+			self.goesInto = None
+			self.comesFrom = None
+			
 		elif (triggerType in ("Door", "Container")):
-			targetObject.setKey(self)
+			if (objectRole == 1):
+				targetObject.setInItem(self)
+			elif (objectRole == 2):
+				targetObject.setOutItem(self)
+			else:
+				targetObject.setKey(self)
+				
 		elif (triggerType == "Obstacle"):
 			targetObject.setTrigger(self)
 			
@@ -266,6 +293,18 @@ class Container(Object):
 		self.key = keyObject
 		self.key.setTarget(self)
 		
+	def setInItem(self, inItemObject):
+		self.inItem = inItemObject
+		if (self.inItem == self.key):
+			self.key = None
+		self.inItem.setGoesInto(self)
+		
+	def setOutItem(self, outItemObject):
+		self.outItem = outItemObject
+		if (self.outItem == self.key):
+			self.key = None
+		self.outItem.setComesFrom(self)
+		
 class Door(Object):
 	generalName = "Kulkureitti"
 	generalNameAdessive = "Kulkureitillä"
@@ -301,7 +340,49 @@ class Door(Object):
 			self.transition = getGameObject("room", self.objectAttributes["object"]["transition"])
 		except KeyError:
 			pass
+		
+	# Set or remove locked state with images etc.
+	# When setting locked=True, other parameters are mandatory
+	def setLocked(self, locked, imagePath=None, keyObject=None):
+		if (self.key):
+			self.key.clearTarget()
+			self.key = None
 			
+		if not (locked):
+			print("Resd lock", self.id)
+			try:
+				lockedImage = self.getImage(self.objectAttributes["object"]["locked_image"])
+				del self.images[self.images.index(lockedImage)]
+			except KeyError:
+				pass
+			
+			self.lockedImage = None
+			self.setIsLocked(False)
+			
+		if (locked):
+			
+			print("Add lock", self.id, imagePath, keyObject.id)
+			#texts, location, imageAttributes, objectAttributes
+			#print("MY OBJ", self.openImage.imageAttributes, self.openImage.objectAttributes)
+			#print("REALLY MINE", self.objectAttributes)
+			#imageAttributes = 
+			imageObject = JSONImage(None, self.location, None, self.objectAttributes, imageId=self.id)
+			self.images.append(imageObject)
+			self.lockedImage = imageObject
+			
+			self.objectAttributes["object"]["locked_image"] = imageObject.id
+			
+			self.setIsLocked(True)
+		
+			self.key = keyObject
+			self.objectAttributes["object"]["key"] = keyObject.id
+			
+	def clearLockedImage(self):
+		try:
+			del self.objectAttributes["object"]["locked_image"]
+		except KeyError:
+			return
+					
 	def getImages(self):
 		images = [self.closedImage, self.lockedImage, self.openImage]
 		return list(filter((None).__ne__, images))
@@ -323,6 +404,9 @@ class Door(Object):
 			print("Warning: Attribute 'locked' not defined for door object '%s'" %(self.id))
 		return False
 
+	def setIsLocked(self, isLocked):
+		self.objectAttributes["object"]["locked"] = isLocked
+		
 	# Returns what unlocks the door
 	def getKey(self):
 		return self.key
@@ -330,7 +414,7 @@ class Door(Object):
 	def setKey(self, keyObject):
 		self.key = keyObject
 		self.key.setTarget(self)
-
+		
 class Obstacle(Object):
 	generalName = "Este"
 	generalNameAdessive = "Esteellä"
@@ -387,13 +471,36 @@ class Obstacle(Object):
 class JSONImage(Object):
 	# imageAttributes has to be dict, not a list as with other objects
 	# objectAttributes is a dict with object, attrs and className keys
-	def __init__(self, texts, location, imageAttributes, objectAttributes):
-		super(JSONImage, self).__init__(texts, location, imageAttributes["id"], None, objectAttributes)
+	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
+		if not (texts):
+			texts = {}
+	
+		if not (imageAttributes):
+			imageAttributes = {"object_name": "", "y": 0, "x": 0, "category": "", "id": "", "src": ""}
+			
+		if not (imageId):
+			imageId = imageAttributes["id"]
+			
+		super(JSONImage, self).__init__(texts, location, imageId, None, objectAttributes)
 		self.imageAttributes = imageAttributes
 		
 	def getSource(self):
 		return self.imageAttributes["src"]
 		
-	def setImagePath(self, imagePath):
+	def setSource(self, imagePath):
 		# Cut the plain filename out of the name
 		self.imageAttributes["src"] = "images/"+imagePath.split("/")[-1]
+		
+	def setObjectName(self, objectName):
+		self.imageAttributes["object_name"] = objectName
+		
+	def setCoordinates(self, x, y):
+		self.imageAttributes["x"] = x
+		self.imageAttributes["y"] = y
+		
+	def setCategory(self, category):
+		self.imageAttributes["category"] = category
+		
+	def setObjectName(self, objectId):
+		self.imageAttributes["id"] = objectId
+		

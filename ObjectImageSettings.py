@@ -66,7 +66,7 @@ class ObjectImageSettings(QtGui.QWidget):
 		
 	def changeImage(self, imagePath):
 		self.parent.setobjectImage(imagePath, self.image)
-		self.gameImageObject.setImagePath(imagePath)
+		self.gameImageObject.setSource(imagePath)
 		
 	def setSettings(self, gameObject, gameImageObject):
 		self.gameObject = gameObject
