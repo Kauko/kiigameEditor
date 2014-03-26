@@ -630,7 +630,8 @@ class SettingsWidget(QtGui.QWidget):
 		print("Clicked show all texts")
 		
 	def clearMusic(self):
-		print("Clear music clicked!")
+		self.currentObject.clearMusic()
+		self.musicTextEdit.clear()
 		
 	# Sets the index of a combobox according to given targetObject
 	def setComboboxIndex(self, targetObject, combobox):

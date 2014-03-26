@@ -61,6 +61,9 @@ class View(object):
 	def setMusic(self, filePath):
 		self.object["music"] = "audio/"+filePath.split("/")[-1]
 
+	def clearMusic(self):
+		del self.object["music"]
+
 	# Post-init should be overriden by views
 	def postInit(self, getGameObject):
 		return
