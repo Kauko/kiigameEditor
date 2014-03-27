@@ -52,10 +52,17 @@ class ObjectImageSettings(QtGui.QWidget):
 		self.parent.changeExamineText(self.clickEdit, self.gameImageObject)
 		
 	def clearKey(self):
-		print("Clearing key!")
+		self.gameObject.clearKey()
 		
 	def changeKey(self):
-		print("Changing key!")
+		keyObject = self.keyCombo.itemData(self.keyCombo.currentIndex())
+		if (keyObject):
+			self.gameObject.clearKey()
+			
+			# Set object's key to the object pointed by combobox
+			self.gameObject.setKey(self.keyCombo.itemData(self.keyCombo.currentIndex()))
+		else:
+			return
 		
 	def changeLocked(self):
 		if (self.lockedCheckbox.isChecked()):
@@ -140,4 +147,4 @@ class ObjectImageSettings(QtGui.QWidget):
 		
 	# Set the correct key item in keyCombo
 	def setKey(self):
-		self.parent.setComboboxIndex(self.gameObject.getKey(), self.keyCombo)
+		self.parent.setComboboxIndex(self.gameObject.key, self.keyCombo)

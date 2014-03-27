@@ -360,6 +360,10 @@ class Container(Object):
 			self.lockedImage = None
 			self.setIsLocked(False)
 			
+	def clearKey(self):
+		self.key.clearTarget()
+		self.key = None
+		
 class Door(Object):
 	generalName = "Kulkureitti"
 	generalNameAdessive = "Kulkureitillä"
@@ -481,12 +485,18 @@ class Door(Object):
 		self.objectAttributes["object"]["locked"] = isLocked
 		
 	# Returns what unlocks the door
-	def getKey(self):
-		return self.key
+	#def getKey(self):
+	#	return self.key
 		
 	def setKey(self, keyObject):
 		self.key = keyObject
 		self.key.setTarget(self)
+		
+	# Nullify current key
+	def clearKey(self):
+		if (self.key):
+			self.key.clearTarget()
+		self.key = None
 		
 class Obstacle(Object):
 	generalName = "Este"
