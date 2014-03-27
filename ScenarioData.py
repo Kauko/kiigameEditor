@@ -216,6 +216,14 @@ class ScenarioData(object):
 			for obj in room.objectList:
 				if (obj.id == objectId):
 					return obj
+
+	def getJSONObject(self, imageId):
+		objects = self.getAllObjects()[0]
+		for obj in objects:
+			images = obj.getImages()
+			for img in images:
+				if (img.id == imageId):
+					return img
 				
 	# Get given types of objects found in rooms
 	def getObjectsByType(self, objectType):
