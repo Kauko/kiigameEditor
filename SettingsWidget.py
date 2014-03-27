@@ -448,6 +448,7 @@ class SettingsWidget(QtGui.QWidget):
 	# Set object use type
 	def setItemUse(self, typeIndex, useItem):
 		self.useTypeCombo.setCurrentIndex(typeIndex)
+		self.changeUseType(typeIndex)
 		
 		# Find the combobox item with the given item
 		for i in range(self.useTargetCombo.count()):
@@ -626,11 +627,20 @@ class SettingsWidget(QtGui.QWidget):
 	# Set item use target
 	def changeUseTarget(self):
 		index = self.useTargetCombo.currentIndex()
+		
+		# No use
+		if (index == 0):
+			self.currentObject.clearTarget()
+			
+			#if (self.currentObject.target.__class__.__name__ in ("Door", "Container")):
+			#	self.currentObject.target.setLocked(False)
+			#else:
+			#	self.currentObject.target.clearTrigger()
+				
 		targetType = self.useTargetCombo.itemData(index).__class__.__name__ 
 		selectedObject = self.useTargetCombo.itemData(index)
 		
 		objectRole = 0
-		#lockTarget = False
 		if (targetType in ("Door", "Container")):
 			useType = self.useTypeCombo.currentIndex()
 			
@@ -638,16 +648,13 @@ class SettingsWidget(QtGui.QWidget):
 			if (useType == 2 ):
 				# TODO: Really nullify old key?
 				# Get old current object's key and nullify it
-				if (self.currentObject.target.__class__.__name__ in ("Door", "Container")):
-					print("CURRENTOBJECT KEY")
-					self.currentObject.target.setLocked(False)
-					#self.currentObject.key
+				#if (self.currentObject.target.__class__.__name__ in ("Door", "Container")):
+				#	self.currentObject.target.setLocked(False)
+				self.currentObject.clearTarget()
 					
 				# Nullify selected door's key
 				if (self.useTargetCombo.itemData(index).key):
-					#self.useTargetCombo.itemData(index).key.clearTarget()
-					print("OLD KEEYYEYE", self.useTargetCombo.itemData(index).key)
-					self.useTargetCombo.itemData(index).key.target.setLocked(False)
+					self.useTargetCombo.itemData(index).key.clearTarget()
 					
 				# TODO: Get imagePath for door too from some better place
 				imagePath = "images/container_placeholder.png"
@@ -778,7 +785,6 @@ class SettingsWidget(QtGui.QWidget):
 		if (addChoices):
 			imgPixmap = self.imageCache.createPixmap("images/add_new_icon.png")
 			for choice in addChoices:
-				print("ASKDJASJ",choice)
 				combobox.addItem(imgPixmap, "Lisää uusi %s" %(self.parent.getGeneralName(choice).lower()), userData=choice)
 				itemCounter += 1
 			
@@ -835,3 +841,4 @@ class SettingsWidget(QtGui.QWidget):
 		label = QtGui.QLabel("")
 		label.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		return label
+
