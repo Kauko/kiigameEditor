@@ -48,16 +48,7 @@ class Object(object):
 		except KeyError:
 			self.texts = {}
 			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
-		
-	# Return attributed object image (closed_image etc.) from imageAttributes
-	#def __getAttributeImage__(self, attribute, imageAttributes):
-	#	if (attribute in self.objectAttributes):
-	#		imageId = self.objectAttributes[attribute]
-	#		for attr in imageAttributes:
-	#			if (attr["id"] == imageId):
-	#				return attr
-	#	return None
-		
+			
 	# Fill in attributes from objects that were missing during __init__
 	# Every item needs to implement this
 	def postInit(self, getGameObject):
@@ -153,34 +144,36 @@ class Item(Object):
 		self.target = target
 		
 	def setGoesInto(self, target):
-		self.comesFrom = None
 		self.goesInto = target
-		#self.trigger = None
+		self.comesFrom = None
+		self.trigger = None
 		self.target = target
+		self.outcome = None
 		
 	def setComesFrom(self, target):
 		self.goesInto = None
 		self.comesFrom = target
-		#self.goesInto = None
-		#self.trigger = None
+		self.trigger = None
 		self.target = target
-
+		self.outcome = None
+		
 	def clearTrigger(self):
 		self.trigger = None
 		self.target = None
-
+		self.outcome = None
+		
 	def clearTarget(self):
 		targetType = self.target.__class__.__name__
 		if (targetType in ("Door", "Container")):
 			self.target.setLocked(False)
 		elif (targetType in ("Item", "Obstacle")):
-			print("CLEAR",self.target,self.target.id)
 			self.target.clearTrigger()
-			
+		
 		self.trigger = None
 		self.target = None
 		self.goesInto = None
 		self.comesFrom = None
+		self.outcome = None
 		
 	# Set the item use text if target is defined
 	def setUseText(self, useText):
@@ -190,6 +183,15 @@ class Item(Object):
 	# Set item's pickup text
 	def setPickupText(self, pickupText):
 		self.texts["pickup"] = pickupText
+		
+	def setOutcome(self, outcomeObject):
+		self.outcome = outcomeObject
+		
+	def setConsume(self, isConsumed):
+		self.objectAttributes["object"]["consume"] = isConsumed
+		
+	def getConsume(self):
+		return self.objectAttributes["object"]["consume"]
 		
 	# Get the text displayed when this item is used on its target
 	def getUseText(self):
