@@ -66,7 +66,32 @@ class ObjectImageSettings(QtGui.QWidget):
 		
 	def changeImage(self, imagePath):
 		self.parent.setobjectImage(imagePath, self.image)
+		print("WHAT gameobje", self.gameImageObject)
+		# TODO: Create image if doesn't exist!
 		self.gameImageObject.setSource(imagePath)
+		
+	# Set the whole widget's enabled status
+	def setDisabled(self, isDisabled):
+		super(ObjectImageSettings, self).setDisabled(isDisabled)
+		
+		# If disabled, clear image and clear text fields
+		if (isDisabled):
+			self.gameImageObject = None
+			self.setImage()
+			self.nameEdit.setText("")
+			self.clickEdit.setText("")
+			
+	def setImage(self):
+		# Given gameImageObject may be None (no lockedImage, for example)
+		if (self.gameImageObject):
+			imagePath = self.parent.parent.getImageDir()+"/"+self.gameImageObject.getSource()
+		elif self.objectType == "Door":
+			imagePath = "images/door_placeholder.png"
+		elif self.objectType == "Container":
+			imagePath = "images/container_placeholder.png"
+			
+		# Ask parent to actually draw the image
+		self.parent.setobjectImage(imagePath, self.image)
 		
 	def setSettings(self, gameObject, gameImageObject):
 		self.gameObject = gameObject
@@ -74,13 +99,7 @@ class ObjectImageSettings(QtGui.QWidget):
 		self.objectType = self.gameObject.__class__.__name__
 		
 		# Set image
-		if (self.gameImageObject):
-			imagePath = self.parent.parent.getImageDir()+"/"+self.gameImageObject.getSource()
-		elif self.objectType == "Door":
-			imagePath = "images/door_placeholder.png"
-		elif self.objectType == "Container":
-			imagePath = "images/container_placeholder.png"
-		self.parent.setobjectImage(imagePath, self.image)
+		self.setImage()
 		
 		# Change locked state
 		if (self.canBeLocked):

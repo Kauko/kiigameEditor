@@ -533,15 +533,21 @@ class SettingsWidget(QtGui.QWidget):
 	def changeDoorInitialState(self):
 		print("Change door initial state", self.doorInitialStateCombo.currentIndex())
 		
-		if (self.doorInitialStateCombo.currentIndex() == 1):
-			isDisabled = False
+		# Initially closed, all states are possible
+		if (self.doorInitialStateCombo.currentIndex() == 0):
+			self.closedDoorImage.setDisabled(False)
+			self.lockedDoorImage.setDisabled(False)
+			self.openDoorImage.setDisabled(False)
+		# Initially open, only possible state is open
 		else:
-			isDisabled = True
+			self.closedDoorImage.setDisabled(True)
+			self.lockedDoorImage.setDisabled(True)
+			self.openDoorImage.setDisabled(False)
 			
-		self.openDoorImage.setDisabled(isDisabled)
-		self.closedDoorImage.setDisabled(isDisabled)
-		self.lockedDoorImage.setDisabled(isDisabled)
-		
+			# Remove door's closed and locked images
+			self.currentObject.setClosed(False)
+			self.currentObject.setLocked(False)
+			
 	# Change the image of a gameobject
 	def changeObjectImage(self, imagePath, image=None, gameObject=None):
 		# If no image, a default image var will be used
