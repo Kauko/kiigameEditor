@@ -5,6 +5,9 @@ class Object(object):
 	generalName = "Kiinteä esine"
 	generalNameAdessive = "Kiinteällä esineellä"
 	
+	# Generic attributes for objects
+	objectAttributes = {'object': {'music': ''}, 'className': 'Image'}
+	
 	# Static method to create unique object ID
 	usedIds = []
 	def createUniqueId(newId=None):
@@ -28,8 +31,14 @@ class Object(object):
 			newId = "%s_duplicate_%i" %(originalId, failCount)
 			
 	def __init__(self, texts, location, objectId, images, objectAttributes):
-		# JSONImage doesn't need an image or an ID check
+		if not (objectAttributes):
+			objectAttributes = Object.objectAttributes
+		if not (images):
+			images = [JSONImage.imageAttributes]
+			
+		# Create image objects and objectId
 		self.images = []
+
 		if not (isinstance(self, JSONImage)):
 			for image in images:
 				self.images.append(JSONImage(texts, location, image, objectAttributes))
@@ -37,9 +46,10 @@ class Object(object):
 				self.id = Object.createUniqueId(objectId)
 			else:
 				self.id = Object.createUniqueId()
+		# JSONImage doesn't need an image or an ID check
 		else:
 			self.id = objectId
-		
+			
 		#self.whatBlocks = None # TODO: In interaction instead?
 		self.location = location
 		self.objectAttributes = objectAttributes
@@ -104,10 +114,16 @@ class Item(Object):
 	generalName = "Käyttöesine"
 	generalNameAdessive = "Käyttöesineellä"
 	
+	# Generic attributes for items
+	objectAttributes = {'className': 'Image', 'object': {'consume': False, 'category': 'item', 'outcome': '', 'trigger': ''}}
+	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
+		if not (objectAttributes):
+			objectAttributes = Item.objectAttributes
+		if not (images):
+			images = [JSONImage.imageAttributes]
+			
 		super(Item, self).__init__(texts, location, itemId, images, objectAttributes)
-		#self.interaction = interaction
-		#self.interaction.parentItem = self
 		
 		# Handle these in postInit
 		self.trigger = None # Use on object
@@ -240,7 +256,15 @@ class Container(Object):
 	generalName = "Säiliö"
 	generalNameAdessive = "Säiliöllä"
 	
+	# Generic attributes for containers
+	objectAttributes = {'className': 'Image', 'object': {'locked': False, 'full_image': '', 'state': 'empty', 'in': '', 'empty_image': '', 'out': '', 'category': 'container', 'blocked': False}}
+	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
+		if not (objectAttributes):
+			objectAttributes = Container.objectAttributes
+		if not (images):
+			images = [JSONImage.imageAttributes]
+			
 		super(Container, self).__init__(texts, location, itemId, images, objectAttributes)
 		
 		# Create the available image objects
@@ -412,7 +436,15 @@ class Door(Object):
 	generalName = "Kulkureitti"
 	generalNameAdessive = "Kulkureitillä"
 	
+	# Generic attributes for doors
+	objectAttributes = {'className': 'Image', 'object': {'category': '', 'state': 'open', 'locked': False, 'transition': '', 'blocked': False, 'open_image': ''}}
+	 
 	def __init__(self, texts, location, itemId, images, objectAttributes):
+		if not (objectAttributes):
+			objectAttributes = Door.objectAttributes
+		if not (images):
+			images = [JSONImage.imageAttributes]
+			
 		super(Door, self).__init__(texts, location, itemId, images, objectAttributes)
 		
 		# Create the available image objects
@@ -546,7 +578,15 @@ class Obstacle(Object):
 	generalName = "Este"
 	generalNameAdessive = "Esteellä"
 	
+	# Generic attributes for obstacles
+	objectAttributes = {'className': 'Image', 'object': {'related': [], 'target': '', 'trigger': '', 'blocking_image': '', 'category': 'obstacle', 'blocking': True}}
+	
 	def __init__(self, texts, location, itemId, images, objectAttributes):
+		if not (objectAttributes):
+			objectAttributes = Obstacle.objectAttributes
+		if not (images):
+			images = [JSONImage.imageAttributes]
+			
 		super(Obstacle, self).__init__(texts, location, itemId, images, objectAttributes)
 		# Create the available image objects
 		try:
@@ -612,6 +652,8 @@ class Obstacle(Object):
 		
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
+	imageAttributes = {'category': '', 'id': '', 'object_name': '', 'src': '', 'visible': False, 'x': 0, 'y': 0}
+	
 	# imageAttributes has to be dict, not a list as with other objects
 	# objectAttributes is a dict with object, attrs and className keys
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
@@ -619,7 +661,7 @@ class JSONImage(Object):
 			texts = {}
 	
 		if not (imageAttributes):
-			imageAttributes = {"object_name": "", "y": 0, "x": 0, "category": "", "id": "", "src": ""}
+			imageAttributes = JSONImage.imageAttributes
 			
 		if not (imageId):
 			imageId = imageAttributes["id"]

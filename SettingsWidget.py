@@ -670,7 +670,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Create new game object
 	def createObject(self, objectType):
-		print("Create new object of type", objectType)
+		self.parent.createObject(objectType)
 	
 	def showAllTexts(self):
 		print("Clicked show all texts")

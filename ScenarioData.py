@@ -243,12 +243,6 @@ class ScenarioData(object):
 		elif (objectType == "obstacle"):
 			return Object.Obstacle.generalName
 			
-	#def getObjectImgLoc(self, room, i):
-	#	r = self.roomList[room]
-	#	#o = r.objectList[
-	#	loc = self.dataDir + '/' + o.images[0].imageAttributes['src']
-	#	return loc
-		
 	# Get room, sequence or other object
 	def getGameObject(self, entityType, entityId):
 		if (entityType == "room"):

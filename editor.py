@@ -137,10 +137,7 @@ class Editor(QtGui.QMainWindow):
 			# TODO: Resolve handling text objects (issue #8)
 			if (item.getClassname() == "Text"):
 				continue
-			
-			# TODO: Items appear in slightly wrongs places
-			# TODO: Combination items like purkkainen nalle showing up?
-			# TODO: Some doors are missing
+				
 			img = item.getRepresentingImage()
 			print(self.scenarioData.dataDir + "/" + img.getSource())
 			pixmap = self.imageCache.createPixmap(self.scenarioData.dataDir + "/" + img.getSource())
@@ -149,6 +146,31 @@ class Editor(QtGui.QMainWindow):
 			pos = item.getPosition()
 			pixItem.setPos(pos[0],pos[1])
 			self.spaceScene.addItem(pixItem)
+			
+	def createObject(self, objectType):
+		selectedRoom = self.left_scene.selectedItems()[0]
+		print("Sel",selectedRoom)
+		if (objectType == "room"):
+			self.scenarioData.addRoom(None, None, None)
+			
+		elif (objectType == "sequence"):
+			print("create sequence")
+			
+		elif (objectType == "object"):
+		#imageId, images, imageAttributes
+			selectedRoom.room.addObject()
+		elif (objectType == "item"):
+			selectedRoom.room.addItem()
+		elif (objectType == "door"):
+			selectedRoom.room.addDoor()
+		elif (objectType == "container"):
+			selectedRoom.room.addContainer()
+		elif (objectType == "obstacle"):
+			selectedRoom.room.addObstacle()
+			
+		self.drawRoomItems()
+		self.drawRooms()
+		
 		
 	# Click on a room in the main tab
 	def roomClicked(self):
