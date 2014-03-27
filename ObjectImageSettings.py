@@ -14,6 +14,7 @@ class ObjectImageSettings(QtGui.QWidget):
 		self.titleLabel = QtGui.QLabel(titleLabelText)
 		self.nameLabel = QtGui.QLabel(nameLabelText)
 		self.nameEdit = QtGui.QLineEdit()
+		self.nameEdit.focusOutEvent = lambda s: self.changeNameEdit()
 		
 		self.image = QtGui.QLabel(self)
 		self.image.mousePressEvent = lambda s: self.parent.showImageDialog(lambda imagePath: self.changeImage(imagePath))
@@ -21,6 +22,7 @@ class ObjectImageSettings(QtGui.QWidget):
 		self.clickLabel = QtGui.QLabel("Teksti klikatessa")
 		self.clickEdit = QtGui.QTextEdit()
 		self.clickEdit.setMaximumHeight(50)
+		self.clickEdit.focusOutEvent = lambda s: self.changeClickEdit()
 		
 		self.layout.addWidget(self.labelLine)
 		self.layout.addWidget(self.titleLabel)
@@ -43,6 +45,12 @@ class ObjectImageSettings(QtGui.QWidget):
 		self.layout.addWidget(self.clickLabel)
 		self.layout.addWidget(self.clickEdit)
 		
+	def changeNameEdit(self):
+		self.parent.changeName(self.nameEdit, self.gameImageObject)
+		
+	def changeClickEdit(self):
+		self.parent.changeExamineText(self.clickEdit, self.gameImageObject)
+		
 	def clearKey(self):
 		print("Clearing key!")
 		
@@ -51,22 +59,31 @@ class ObjectImageSettings(QtGui.QWidget):
 		
 	def changeLocked(self):
 		if (self.lockedCheckbox.isChecked()):
-			isDisabled = False
+			# TODO: Get imagePath better way (and clear airfreshener.png)
+			self.gameObject.setLocked(True, "images/airfreshener.png")
+			self.gameImageObject = self.gameObject.lockedImage
 		else:
-			isDisabled = True
-		self.nameLabel.setDisabled(isDisabled)
-		self.nameEdit.setDisabled(isDisabled)
-		self.keyLabel.setDisabled(isDisabled)
-		self.keyCombo.setDisabled(isDisabled)
-		self.image.setDisabled(isDisabled)
-		self.clickLabel.setDisabled(isDisabled)
-		self.clickEdit.setDisabled(isDisabled)
+			self.gameObject.setLocked(False)
+			self.gameImageObject = None
+			self.nameEdit.setText("")
+			self.clickEdit.setText("")
+			
+		self.setImage()
+		self.setLocked()
 		
-		# TODO: Erase locked image, name etc. when unchecked
+	# Disable widget parts if checkbox says so
+	def setLocked(self):
+		notLocked = not self.lockedCheckbox.isChecked()
+		self.nameLabel.setDisabled(notLocked)
+		self.nameEdit.setDisabled(notLocked)
+		self.keyLabel.setDisabled(notLocked)
+		self.keyCombo.setDisabled(notLocked)
+		self.image.setDisabled(notLocked)
+		self.clickLabel.setDisabled(notLocked)
+		self.clickEdit.setDisabled(notLocked)
 		
 	def changeImage(self, imagePath):
 		self.parent.setobjectImage(imagePath, self.image)
-		print("WHAT gameobje", self.gameImageObject)
 		# TODO: Create image if doesn't exist!
 		self.gameImageObject.setSource(imagePath)
 		
@@ -107,7 +124,7 @@ class ObjectImageSettings(QtGui.QWidget):
 				self.lockedCheckbox.setCheckState(QtCore.Qt.CheckState.Checked)
 			else:
 				self.lockedCheckbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
-			self.changeLocked()
+			self.setLocked()
 			self.setKey()
 			
 		# Delete checkbox if obstacle

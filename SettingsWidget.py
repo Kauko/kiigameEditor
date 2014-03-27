@@ -313,7 +313,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
 		
 		# Examine text
-		self.setExamineText()
+		self.setExamineText(self.currentObject)
 		
 		# Pickup text
 		pickupText = item.getPickupText()
@@ -362,7 +362,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
 		
 		# Examine text
-		self.setExamineText()
+		self.setExamineText(self.currentObject)
 			
 	# Set the input field values for containers
 	def setContainerOptions(self, container):
@@ -475,10 +475,7 @@ class SettingsWidget(QtGui.QWidget):
 			self.useTextEdit.setText(useText)
 			
 	# Set examine text for the given object
-	def setExamineText(self, gameObject=None, textEdit=None):
-		if not (gameObject):
-			gameObject = self.currentObject
-			
+	def setExamineText(self, gameObject, textEdit=None):
 		try:
 			text = gameObject.getExamineText()
 		except AttributeError:
@@ -526,8 +523,14 @@ class SettingsWidget(QtGui.QWidget):
 	def changePickupText(self):
 		self.currentObject.setPickupText(self.pickupTextEdit.toPlainText())
 		
-	def changeExamineText(self):
-		self.currentObject.setExamineText(self.examineTextEdit.toPlainText())
+	def changeExamineText(self, textEdit=None, gameObject=None):
+		if not (gameObject):
+			gameObject = self.currentObject
+			
+		if not (textEdit):
+			textEdit = self.examineTextEdit
+			
+		gameObject.setExamineText(textEdit.toPlainText())
 		
 	# TODO: Need setDoorInitialState()
 	def changeDoorInitialState(self):
@@ -590,15 +593,20 @@ class SettingsWidget(QtGui.QWidget):
 		print("Change room transition!", self.doorTransitionCombo.itemData(self.doorTransitionCombo.currentIndex()))
 		self.currentObject.setTransition(self.doorTransitionCombo.itemData(self.doorTransitionCombo.currentIndex()))
 		
-	def changeName(self):
-		# TODO: Update whatever item listings displaying item's name (main tab, ...)
-		text = self.objectNameEdit.text()
-		
+	def changeName(self, textEdit=None, gameObject=None):
+		if not (gameObject):
+			gameObject = self.currentObject
+			
+		if (textEdit):
+			text = textEdit.text()
+		else:
+			text = self.objectNameEdit.text()
+			
 		# TODO: Get all other adessives like this too
 		if (len(text) == 0):
-			text = "%s ei ole nimeä" %(self.currentObject.generalNameAdessive)
-			
-		self.currentObject.setName(text)
+			text = "%s ei ole nimeä" %(gameObject.generalNameAdessive)
+		print("change naem",gameObject)
+		gameObject.setName(text)
 		self.updateParent()
 		
 	# Update parent tab elements

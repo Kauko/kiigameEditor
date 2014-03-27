@@ -328,22 +328,12 @@ class Container(Object):
 		
 	# Set or remove locked state with images etc.
 	# When setting locked=True, other parameters are mandatory
-	def setLocked(self, locked, imagePath=None, keyObject=None):
+	def setLocked(self, setLocked, imagePath=None, keyObject=None):
 		if (self.key):
 			#self.key.clearTarget()
 			self.key = None
 			
-		if not (locked):
-			try:
-				lockedImage = self.getImage(self.objectAttributes["object"]["locked_image"])
-				del self.images[self.images.index(lockedImage)]
-			except KeyError:
-				pass
-							
-			self.lockedImage = None
-			self.setIsLocked(False)
-			
-		if (locked):
+		if (setLocked):
 			imageObject = JSONImage(None, self.location, None, self.objectAttributes, imageId=self.id)
 			self.images.append(imageObject)
 			self.lockedImage = imageObject
@@ -355,6 +345,20 @@ class Container(Object):
 			self.key = keyObject
 			self.key.setTarget(self)
 			self.objectAttributes["object"]["key"] = keyObject.id
+			
+		else:
+			try:
+				del self.images[self.images.index(self.lockedImage)]
+			except ValueError:
+				pass
+				
+			try:
+				self.objectAttributes["object"]["locked_image"]
+			except KeyError:
+				pass
+				
+			self.lockedImage = None
+			self.setIsLocked(False)
 			
 class Door(Object):
 	generalName = "Kulkureitti"
@@ -393,7 +397,7 @@ class Door(Object):
 			pass
 		
 	# Set or remove locked state with images etc.
-	# When setting locked=True, other parameters are mandatory
+	# When setting locked=True, other parameters can be given
 	def setLocked(self, setLocked, imagePath=None, keyObject=None):
 		if (self.key):
 			#self.key.clearTarget()
@@ -401,21 +405,28 @@ class Door(Object):
 			
 		if (setLocked):
 			imageObject = JSONImage(None, self.location, None, self.objectAttributes, imageId=self.id)
+			if (imagePath):
+				imageObject.setSource(imagePath)
+				
 			self.images.append(imageObject)
 			self.lockedImage = imageObject
 			
 			self.objectAttributes["object"]["locked_image"] = imageObject.id
 			
 			self.setIsLocked(True)
-		
-			self.key = keyObject
-			self.key.setTarget(self)
-			self.objectAttributes["object"]["key"] = keyObject.id
 			
+			if (keyObject):
+				self.key = keyObject
+				self.key.setTarget(self)
+				self.objectAttributes["object"]["key"] = keyObject.id
 		else:
 			try:
-				lockedImage = self.getImage(self.objectAttributes["object"]["locked_image"])
-				del self.images[self.images.index(lockedImage)]
+				del self.images[self.images.index(self.lockedImage)]
+			except ValueError:
+				pass
+				
+			try:
+				self.objectAttributes["object"]["locked_image"]
 			except KeyError:
 				pass
 				
@@ -431,12 +442,16 @@ class Door(Object):
 			self.objectAttributes["object"]["closed_image"] = imageObject.id
 		else:
 			try:
-				image = self.getImage(self.objectAttributes["object"]["closed_image"])
-				del self.images[self.images.index(image)]
+				del self.images[self.images.index(self.closedImage)]
+			except ValueError:
+				pass
+			
+			try:
+				del self.objectAttributes["object"]["closed_image"]
 			except KeyError:
 				pass
-							
 			self.closedImage = None
+			
 	def getImages(self):
 		images = [self.closedImage, self.lockedImage, self.openImage]
 		return list(filter((None).__ne__, images))
