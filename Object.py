@@ -374,17 +374,20 @@ class Container(Object):
 			
 		if (setLocked):
 			imageObject = JSONImage(None, self.location, None, self.objectAttributes, imageId=self.id)
+			if (imagePath):
+				imageObject.setSource(imagePath)
+			# TODO: Put other attributes here too	
 			self.images.append(imageObject)
 			self.lockedImage = imageObject
 			
 			self.objectAttributes["object"]["locked_image"] = imageObject.id
 			
 			self.setIsLocked(True)
-		
-			self.key = keyObject
-			self.key.setTarget(self)
-			self.objectAttributes["object"]["key"] = keyObject.id
 			
+			if (keyObject):
+				self.key = keyObject
+				self.key.setTarget(self)
+				self.objectAttributes["object"]["key"] = keyObject.id
 		else:
 			try:
 				del self.images[self.images.index(self.lockedImage)]
@@ -399,8 +402,10 @@ class Container(Object):
 			self.lockedImage = None
 			self.setIsLocked(False)
 			
+	# Nullify current key
 	def clearKey(self):
-		self.key.clearTarget()
+		if (self.key):
+			self.key.clearTarget()
 		self.key = None
 		
 class Door(Object):
