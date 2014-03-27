@@ -78,10 +78,16 @@ class Object(object):
 		try:
 			return self.texts["name"]
 		except:
-			return None
+			return None	
 			
 	def setName(self, name):
 		self.texts["name"] = name
+	
+	def getPosition(self):
+		position = [0,0]
+		position[0] = (self.getRepresentingImage().imageAttributes["x"])
+		position[1] = (self.getRepresentingImage().imageAttributes["y"])
+		return position
 		
 	# Returns of the most "representing" image for an item such as open door
 	# instead closed door image

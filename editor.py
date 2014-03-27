@@ -130,22 +130,25 @@ class Editor(QtGui.QMainWindow):
 		
 		# Display room image
 		pixmap = self.imageCache.createPixmap(self.scenarioData.dataDir + "/" + selectedRoom.room.getRepresentingImage().getSource())
-		pixmap.scaled(790, 534, QtCore.Qt.KeepAspectRatio)
 		self.spaceScene.addPixmap(pixmap)
 		
 		# Display objects
-		
-		
 		for item in selectedRoom.room.getItems():
 			# TODO: Resolve handling text objects (issue #8)
 			if (item.getClassname() == "Text"):
 				continue
 			
+			# TODO: Items appear in slightly wrongs places
+			# TODO: Combination items like purkkainen nalle showing up?
+			# TODO: Some doors are missing
 			img = item.getRepresentingImage()
-			pix = self.imageCache.createPixmap(img.getSource())
-			self.spaceScene.addPixmap(pix)
-		
-		
+			print(self.scenarioData.dataDir + "/" + img.getSource())
+			pixmap = self.imageCache.createPixmap(self.scenarioData.dataDir + "/" + img.getSource())
+			pixItem = QtGui.QGraphicsPixmapItem(pixmap)
+			
+			pos = item.getPosition()
+			pixItem.setPos(pos[0],pos[1])
+			self.spaceScene.addItem(pixItem)
 		
 	# Click on a room in the main tab
 	def roomClicked(self):
