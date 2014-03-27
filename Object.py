@@ -76,10 +76,7 @@ class Object(object):
 		self.texts["name"] = name
 	
 	def getPosition(self):
-		position = [0,0]
-		position[0] = (self.getRepresentingImage().imageAttributes["x"])
-		position[1] = (self.getRepresentingImage().imageAttributes["y"])
-		return position
+		return self.getRepresentingImage().getCoordinates()
 		
 	# Returns of the most "representing" image for an item such as open door
 	# instead closed door image
@@ -321,17 +318,53 @@ class Container(Object):
 		self.key.setTarget(self)
 		
 	def setInItem(self, inItemObject):
+		# Clear old inItem
+		if (self.inItem):
+			self.inItem.clearTarget()
+			
+		# Set new inItem
 		self.inItem = inItemObject
 		if (self.inItem == self.key):
 			self.key = None
 		self.inItem.setGoesInto(self)
 		
+		# Set it to object's attributes
+		self.objectAttributes["object"]["in"] = self.inItem.id
+		
+	def clearInItem(self):
+		if (self.inItem):
+			self.inItem.clearTarget()
+		self.inItem = None
+		
+		try:
+			del self.objectAttributes["object"]["in"]
+		except KeyError:
+			return
+				
 	def setOutItem(self, outItemObject):
+		# Clear old outItem
+		if (self.outItem):
+			self.outItem.clearTarget()
+			
+		# Set new outItem
 		self.outItem = outItemObject
 		if (self.outItem == self.key):
 			self.key = None
 		self.outItem.setComesFrom(self)
 		
+		# Set it to object's attributes
+		self.objectAttributes["object"]["out"] = self.outItem.id
+		
+	def clearOutItem(self):
+		if (self.outItem):
+			self.outItem.clearTarget()
+		self.outItem = None
+		
+		try:
+			del self.objectAttributes["object"]["out"]
+		except KeyError:
+			return
+			
 	# Set or remove locked state with images etc.
 	# When setting locked=True, other parameters are mandatory
 	def setLocked(self, setLocked, imagePath=None, keyObject=None):
@@ -417,7 +450,7 @@ class Door(Object):
 			imageObject = JSONImage(None, self.location, None, self.objectAttributes, imageId=self.id)
 			if (imagePath):
 				imageObject.setSource(imagePath)
-				
+			# TODO: Put other attributes here too	
 			self.images.append(imageObject)
 			self.lockedImage = imageObject
 			
@@ -515,11 +548,11 @@ class Obstacle(Object):
 			self.blockingImage = self.getImage(objectAttributes["object"]["blocking_image"])
 		except KeyError:
 			self.blockingImage = None
-		try:
-			# TODO: To be implemented in kiigame
-			self.unblockingImage = self.getImage(objectAttributes["object"]["unblocking_image"])
-		except KeyError:
-			self.unblockingImage = None
+		# TODO: To be implemented in kiigame
+		#try:
+		#	self.unblockingImage = self.getImage(objectAttributes["object"]["unblocking_image"])
+		#except KeyError:
+		#	self.unblockingImage = None
 			
 		# Handle these in postInit
 		self.blockTarget = None
@@ -552,6 +585,7 @@ class Obstacle(Object):
 	def getKey(self):
 		return self.trigger
 		
+	# Set which object blocks
 	def setTrigger(self, triggerObject):
 		self.trigger = triggerObject
 		self.trigger.setTarget(self)
@@ -559,6 +593,17 @@ class Obstacle(Object):
 	def clearTrigger(self):
 		self.trigger.clearTarget()
 		self.trigger = None
+		
+	def setBlockTarget(self, targetObject):
+		self.blockTarget = targetObject
+		self.objectAttributes["object"]["target"] = targetObject.id
+		
+	def clearBlockTarget(self):
+		self.blockTarget = None
+		try:
+			del self.objectAttributes["object"]["target"]
+		except KeyError:
+			pass
 		
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
@@ -591,6 +636,12 @@ class JSONImage(Object):
 		self.imageAttributes["x"] = x
 		self.imageAttributes["y"] = y
 		
+	def getCoordinates(self):
+		try:
+			return (self.imageAttributes["x"], self.imageAttributes["y"])
+		except KeyError:
+			return	
+			
 	def setCategory(self, category):
 		self.imageAttributes["category"] = category
 		

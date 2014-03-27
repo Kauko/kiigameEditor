@@ -154,9 +154,7 @@ class Editor(QtGui.QMainWindow):
 	def roomClicked(self):
 		self.drawRoomItems()
 		self.settingsWidget.displayOptions(self.left_scene.selectedItems()[0].room)
-		
 		self.updateSpaceTab()
-		self.settingsWidget.displayOptions(widgetItem.room)
 		
 	# Click on an item in the main tab room preview
 	def roomItemClicked(self):

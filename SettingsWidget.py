@@ -138,9 +138,9 @@ class SettingsWidget(QtGui.QWidget):
 		self.emptyContainerImage = ObjectImageSettings("Tyhjä säiliö", "Tyhjän säiliön nimi", parent=self)
 		
 		# Obstacle widgets
-		self.obstacleImage = ObjectImageSettings(None, "Esteen nimi", True, "Onko säiliö lukossa?", parent=self)
+		self.obstacleImage = ObjectImageSettings(None, "Esteen nimi", False, parent=self)
 		self.obstacleBlocksLabel = QtGui.QLabel("Mitä estää?")
-		self.obstacleBlocksCombo = self.createItemCombobox("Ei mitään", ("door",), ("door",), connectTo=self.changeObstacleBlock)
+		self.obstacleBlocksCombo = self.createItemCombobox("Ei mitään", ("door",), ("door",), noChoiceMethod=self.clearObstacleBlock, connectTo=self.changeObstacleBlock)
 		
 		self.whatGoesLabel = QtGui.QLabel("Mikä menee säiliöön?")
 		self.whatGoesCombo = self.createItemCombobox("Ei mikään", ("item",), ("item",), connectTo=self.changeWhatGoes)
@@ -378,8 +378,6 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Set the input field values for obstacles
 	def setObstacleOptions(self, obstacle):
-	
-		# Set image settings for each image
 		self.obstacleImage.setSettings(obstacle, obstacle.blockingImage)
 		
 	def setobjectImage(self, imagePath, objectImage=None):
@@ -581,14 +579,25 @@ class SettingsWidget(QtGui.QWidget):
 		print("Clear useTarget!")
 		
 	def changeObstacleBlock(self):
-		print("Change obstacle block target!")
+		self.currentObject.setBlockTarget(self.obstacleBlocksCombo.itemData(self.obstacleBlocksCombo.currentIndex()))
+		
+	def clearObstacleBlock(self):
+		self.currentObject.clearBlockTarget()
 		
 	def changeWhatGoes(self):
 		print("Change what goes!")
+		self.currentObject.setInItem(self.whatGoesCombo.itemData(self.whatGoesCombo.currentIndex()))
+		
+	def clearWhatGoes(self):
+		self.currentObject.clearInItem()
 		
 	def changeWhatComes(self):
 		print("Change what comes!")
-		
+		self.currentObject.setOutItem(self.whatComesCombo.itemData(self.whatComesCombo.currentIndex()))
+	
+	def clearWhatComes(self):
+		self.currentObject.clearOutItem()
+	
 	def changeDoorTransition(self):
 		print("Change room transition!", self.doorTransitionCombo.itemData(self.doorTransitionCombo.currentIndex()))
 		self.currentObject.setTransition(self.doorTransitionCombo.itemData(self.doorTransitionCombo.currentIndex()))
@@ -605,7 +614,7 @@ class SettingsWidget(QtGui.QWidget):
 		# TODO: Get all other adessives like this too
 		if (len(text) == 0):
 			text = "%s ei ole nimeä" %(gameObject.generalNameAdessive)
-		print("change naem",gameObject)
+			
 		gameObject.setName(text)
 		self.updateParent()
 		
