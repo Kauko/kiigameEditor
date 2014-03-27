@@ -81,7 +81,6 @@ class Editor(QtGui.QMainWindow):
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
 		
-		
 		self.settingsWidget = SettingsWidget.SettingsWidget(self)
 		self.settingsWidget.displayOptions(selectedRoom.room)
 		
@@ -96,6 +95,11 @@ class Editor(QtGui.QMainWindow):
 
 		layout = QtGui.QHBoxLayout()
 		self.spaceTab.setLayout(layout)
+		
+		# Another settings widget for room view
+		self.spaceSettingsWidget = SettingsWidget.SettingsWidget(self)
+		selectedRoom = self.left_scene.selectedItems()[0]
+		self.spaceSettingsWidget.displayOptions(selectedRoom.room)
 
 		# Room
 		left_frame = QtGui.QGroupBox("Huone")
@@ -109,6 +113,8 @@ class Editor(QtGui.QMainWindow):
 		#print(ScenarioData.sc.getRoomBackLoc(0))
 		#print(ScenarioData.sc.getObjectImgLoc(0, 0))
 		
+		# Display objects
+		
 		pixmap = self.imageCache.createPixmap(self.scenarioData.getRoomBackLoc(0))
 		pixmap.scaled(790, 534, QtCore.Qt.KeepAspectRatio)
 		scene.addPixmap(pixmap)
@@ -120,6 +126,11 @@ class Editor(QtGui.QMainWindow):
 		right_frame_layout = QtGui.QVBoxLayout()
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
+		scrollArea = QtGui.QScrollArea()
+		scrollArea.setWidgetResizable(True)
+		scrollArea.setWidget(self.spaceSettingsWidget)
+		
+		right_frame_layout.addWidget(scrollArea)
 		
 		#right_frame_layout.addWidget(self.settingsWidget)
 		
