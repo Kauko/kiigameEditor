@@ -107,41 +107,55 @@ class Editor(QtGui.QMainWindow):
 		left_frame.setLayout(left_frame_layout)
 		layout.addWidget(left_frame)
 
-		# Display room image
-		scene = QtGui.QGraphicsScene(self)
-		view = QtGui.QGraphicsView(scene)
-		#print(ScenarioData.sc.getRoomBackLoc(0))
-		#print(ScenarioData.sc.getObjectImgLoc(0, 0))
-		
-		# Display objects
-		
-		pixmap = self.imageCache.createPixmap(self.scenarioData.getRoomBackLoc(0))
-		pixmap.scaled(790, 534, QtCore.Qt.KeepAspectRatio)
-		scene.addPixmap(pixmap)
-		
-		left_frame_layout.addWidget(view)
-
 		# Settings
 		right_frame = QtGui.QGroupBox("Asetukset")
 		right_frame_layout = QtGui.QVBoxLayout()
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
+		
 		scrollArea = QtGui.QScrollArea()
 		scrollArea.setWidgetResizable(True)
 		scrollArea.setWidget(self.spaceSettingsWidget)
 		
 		right_frame_layout.addWidget(scrollArea)
+		self.spaceScene = QtGui.QGraphicsScene(self)
+		view = QtGui.QGraphicsView(self.spaceScene)
+		left_frame_layout.addWidget(view)
 		
-		#right_frame_layout.addWidget(self.settingsWidget)
+		self.updateSpaceTab()
+	
+	def updateSpaceTab(self):
+		selectedRoom = self.left_scene.selectedItems()[0]
+		self.spaceSettingsWidget.displayOptions(selectedRoom.room)
+		
+		# Display room image
+		pixmap = self.imageCache.createPixmap(self.scenarioData.dataDir + "/" + selectedRoom.room.getRepresentingImage().getSource())
+		pixmap.scaled(790, 534, QtCore.Qt.KeepAspectRatio)
+		self.spaceScene.addPixmap(pixmap)
+		
+		# Display objects
+		
+		
+		for item in selectedRoom.room.getItems():
+			# TODO: Resolve handling text objects (issue #8)
+			if (item.getClassname() == "Text"):
+				continue
+			
+			img = item.getRepresentingImage()
+			pix = self.imageCache.createPixmap(img.getSource())
+			self.spaceScene.addPixmap(pix)
+		
+		
 		
 	# Click on a room in the main tab
 	def roomClicked(self):
 		widgetItem = self.left_scene.selectedItems()[0]
 		roomItems = widgetItem.room.getItems()
 		self.drawRoomItems(roomItems)
+		self.updateSpaceTab()
 		self.settingsWidget.displayOptions(widgetItem.room)
 		
-	# Click on an item in thre main tab room preview
+	# Click on an item in the main tab room preview
 	def roomItemClicked(self):
 		widgetItem = self.middle_scene.selectedItems()[0]
 		self.settingsWidget.displayOptions(widgetItem.item)
