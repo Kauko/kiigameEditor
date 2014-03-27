@@ -440,6 +440,10 @@ class Door(Object):
 		if (self.key == useItem):
 			return self.lockedImage
 			
+	def setTransition(self, roomObject):
+		self.objectAttributes["object"]["transition"] = roomObject.id
+		self.transition = roomObject
+		
 	# Returns True if door is locked, otherwise False
 	def isLocked(self):
 		try:

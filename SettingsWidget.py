@@ -120,7 +120,7 @@ class SettingsWidget(QtGui.QWidget):
 		# Door widgets
 		self.doorTransitionLabel = QtGui.QLabel("Mihin pääsee?")
 		self.doorTransitionCombo = self.createItemCombobox("Ei mihinkään", "room", connectTo=self.changeDoorTransition)
-		self.doorTransitionLabelLine = self.createSeparator()
+		#self.doorTransitionLabelLine = self.createSeparator()
 		
 		self.doorInitialStateLabel = QtGui.QLabel("Tila alussa")
 		self.doorInitialStateCombo = QtGui.QComboBox(self)
@@ -185,7 +185,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.useTextEdit)
 		self.layout.addWidget(self.allTextsButton)
 		
-		self.layout.addWidget(self.doorTransitionLabelLine)
+		#self.layout.addWidget(self.doorTransitionLabelLine)
 		self.layout.addWidget(self.doorTransitionLabel)
 		self.layout.addWidget(self.doorTransitionCombo)
 		
@@ -254,7 +254,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.examineTextEdit,
 			],
 			"Door": [
-				self.doorTransitionLabelLine,
+				#self.doorTransitionLabelLine,
 				self.doorTransitionLabel,
 				self.doorTransitionCombo,
 				
@@ -581,7 +581,8 @@ class SettingsWidget(QtGui.QWidget):
 		print("Change what comes!")
 		
 	def changeDoorTransition(self):
-		print("Change room transition!")
+		print("Change room transition!", self.doorTransitionCombo.itemData(self.doorTransitionCombo.currentIndex()))
+		self.currentObject.setTransition(self.doorTransitionCombo.itemData(self.doorTransitionCombo.currentIndex()))
 		
 	def changeName(self):
 		# TODO: Update whatever item listings displaying item's name (main tab, ...)
