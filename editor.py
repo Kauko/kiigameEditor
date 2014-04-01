@@ -120,6 +120,7 @@ class Editor(QtGui.QMainWindow):
 		right_frame_layout.addWidget(scrollArea)
 		self.spaceScene = QtGui.QGraphicsScene(self)
 		view = QtGui.QGraphicsView(self.spaceScene)
+		view.setDragMode(QtGui.QGraphicsView.ScrollHandDrag)
 		left_frame_layout.addWidget(view)
 		
 		self.updateSpaceTab()
@@ -139,10 +140,12 @@ class Editor(QtGui.QMainWindow):
 				continue
 				
 			img = item.getRepresentingImage()
-			print(self.scenarioData.dataDir + "/" + img.getSource())
+			#print(self.scenarioData.dataDir + "/" + img.getSource())
 			pixmap = self.imageCache.createPixmap(self.scenarioData.dataDir + "/" + img.getSource())
 			pixItem = QtGui.QGraphicsPixmapItem(pixmap)
+			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
 			
+			#TODO: Game crops some amount from the borders, insert that amount into items offset value
 			pos = item.getPosition()
 			pixItem.setPos(pos[0],pos[1])
 			self.spaceScene.addItem(pixItem)
