@@ -79,12 +79,12 @@ class Object(object):
 	def getName(self):
 		try:
 			return self.texts["name"]
-		except:
+		except KeyError:
 			return None	
 			
 	def setName(self, name):
-		self.texts["name"] = name
-	
+		self.getRepresentingImage().texts["name"] = name
+		
 	def getPosition(self):
 		return self.getRepresentingImage().getCoordinates()
 		
@@ -93,7 +93,7 @@ class Object(object):
 	# Every item needs to override this to act properly
 	def getRepresentingImage(self):
 		return self.images[0]
-
+		
 	# Get the image activated by the given item
 	# Should be overriden by other objects
 	def getUseImage(self, useItem):
@@ -668,6 +668,9 @@ class JSONImage(Object):
 			
 		super(JSONImage, self).__init__(texts, location, imageId, None, objectAttributes)
 		self.imageAttributes = imageAttributes
+		
+	def getRepresentingImage(self):
+		return self
 		
 	def getSource(self):
 		return self.imageAttributes["src"]

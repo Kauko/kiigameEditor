@@ -149,28 +149,28 @@ class Editor(QtGui.QMainWindow):
 			
 	def createObject(self, objectType):
 		selectedRoom = self.left_scene.selectedItems()[0]
-		print("Sel",selectedRoom)
 		if (objectType == "room"):
-			self.scenarioData.addRoom(None, None, None)
+			newObject = self.scenarioData.addRoom(None, None, None)
 			
 		elif (objectType == "sequence"):
 			print("create sequence")
 			
 		elif (objectType == "object"):
-		#imageId, images, imageAttributes
-			selectedRoom.room.addObject()
+			newObject = selectedRoom.room.addObject()
 		elif (objectType == "item"):
-			selectedRoom.room.addItem()
+			newObject = selectedRoom.room.addItem()
 		elif (objectType == "door"):
-			selectedRoom.room.addDoor()
+			newObject = selectedRoom.room.addDoor()
 		elif (objectType == "container"):
-			selectedRoom.room.addContainer()
+			newObject = selectedRoom.room.addContainer()
 		elif (objectType == "obstacle"):
-			selectedRoom.room.addObstacle()
-			
-		self.drawRoomItems()
-		self.drawRooms()
+			newObject = selectedRoom.room.addObstacle()
+		print("new ovject", newObject, newObject.id)
 		
+		#widget.setRepresentingImage("airfreshener.png")
+		newObject.getRepresentingImage().setSource("airfreshener.png")
+		widgetItem = ItemWidget(newObject, self.scenarioData.dataDir)
+		self.middle_scene.addItem(widgetItem)
 		
 	# Click on a room in the main tab
 	def roomClicked(self):

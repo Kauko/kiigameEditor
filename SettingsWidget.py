@@ -585,24 +585,22 @@ class SettingsWidget(QtGui.QWidget):
 		self.currentObject.clearBlockTarget()
 		
 	def changeWhatGoes(self):
-		print("Change what goes!")
 		self.currentObject.setInItem(self.whatGoesCombo.itemData(self.whatGoesCombo.currentIndex()))
 		
 	def clearWhatGoes(self):
 		self.currentObject.clearInItem()
 		
 	def changeWhatComes(self):
-		print("Change what comes!")
 		self.currentObject.setOutItem(self.whatComesCombo.itemData(self.whatComesCombo.currentIndex()))
 	
 	def clearWhatComes(self):
 		self.currentObject.clearOutItem()
 	
 	def changeDoorTransition(self):
-		print("Change room transition!", self.doorTransitionCombo.itemData(self.doorTransitionCombo.currentIndex()))
 		self.currentObject.setTransition(self.doorTransitionCombo.itemData(self.doorTransitionCombo.currentIndex()))
 		
 	def changeName(self, textEdit=None, gameObject=None):
+		
 		if not (gameObject):
 			gameObject = self.currentObject
 			
