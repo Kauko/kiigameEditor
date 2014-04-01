@@ -51,7 +51,7 @@ class View(object):
 			
 	def setName(self, name):
 		self.texts["name"] = name
-			
+		
 	def getMusic(self):
 		try:
 			return self.object["music"]
@@ -60,6 +60,9 @@ class View(object):
 
 	def setMusic(self, filePath):
 		self.object["music"] = "audio/"+filePath.split("/")[-1]
+
+	def clearMusic(self):
+		del self.object["music"]
 
 	# Post-init should be overriden by views
 	def postInit(self, getGameObject):
@@ -187,27 +190,41 @@ class Room(View):
 	def postInit(self, getGameObject):
 		for obj in self.objectList:
 			obj.postInit(getGameObject)
-		
-	# TODO: These addX methods
+			
 	# Create new generic object
-	def addObject(self, objectAttributes, imageAttributes):
-		self.objectList.append(Object.Object(texts, self, imageId, images, imageAttributes))
-
+	def addObject(self, texts={}, objectAttributes=None, imageAttributes=None):
+		imageId = self.id + "_object"
+		newObject = Object.Object(texts, self, imageId, imageAttributes, objectAttributes)
+		self.objectList.append(newObject)
+		return newObject
+		
 	# Create new item
-	def addItem(self, objectAttributes, imageAttributes):
-		self.objectList.append(Object.Item(texts, self, imageId, images, imageAttributes))
-
+	def addItem(self, texts={}, objectAttributes=None, imageAttributes=None):
+		imageId = self.id + "_item"
+		newObject = Object.Item(texts, self, imageId, imageAttributes, objectAttributes)
+		self.objectList.append(newObject)
+		return newObject
+		
 	# Create new container
-	def addContainer(self, objectAttributes, imageAttributes):
-		self.objectList.append(Object.Container(texts, self, imageId, images, imageAttributes))
-
+	def addContainer(self, texts={}, objectAttributes=None, imageAttributes=None):
+		imageId = self.id + "_container"
+		newObject = Object.Container(texts, self, imageId, imageAttributes, objectAttributes)
+		self.objectList.append(newObject)
+		return newObject
+		
 	# Create new door
-	def addDoor(self, objectAttributes, imageAttributes):
-		self.objectList.append(Object.Door(texts, self, imageId, images, imageAttributes))
-
+	def addDoor(self, texts={}, objectAttributes=None, imageAttributes=None):
+		imageId = self.id + "_door"
+		newObject = Object.Door(texts, self, imageId, imageAttributes, objectAttributes)
+		self.objectList.append(newObject)
+		return newObject
+		
 	# Create new obstacle
-	def addObstacle(self, objectAttributes, imageAttributes):
-		self.objectList.append(Object.Obstacle(texts, self, imageId, images, imageAttributes))
+	def addObstacle(self, texts={}, objectAttributes=None, imageAttributes=None):
+		imageId = self.id + "_container"
+		newObject = Object.Obstacle(texts, self, imageId, imageAttributes, objectAttributes)
+		self.objectList.append(newObject)
+		return newObject
 		
 # Custom view for custom layers
 class Custom(View):
