@@ -53,6 +53,7 @@ class Object(object):
 		#self.whatBlocks = None # TODO: In interaction instead?
 		self.location = location
 		self.objectAttributes = objectAttributes
+		
 		try:
 			self.texts = texts[self.id]
 		except KeyError:
@@ -777,4 +778,11 @@ class SequenceImage(JSONImage):
 class MenuImage(JSONImage):
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(MenuImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
+
+class Text(JSONImage):
+	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
+		super(Text, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
+		
+	def getSource(self):
+		return "images/airfreshener.png"
 		

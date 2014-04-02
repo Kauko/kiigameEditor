@@ -266,6 +266,14 @@ class SettingsWidget(QtGui.QWidget):
 				self.sequenceFadeLabel,
 				self.sequenceFadeCombo
 			],
+			"End": [
+				self.nameLabel,
+				self.objectNameEdit,
+				self.musicLabel,
+				self.musicTextEdit,
+				self.musicBtn,
+				self.musicClear,
+			],
 			"Item": [
 				self.nameLabel,
 				self.objectNameEdit,
@@ -379,10 +387,10 @@ class SettingsWidget(QtGui.QWidget):
 		self.sequenceFadeCombo.setCurrentIndex(self.currentObject.getDoFade())
 		
 	def setStartOptions(self, start):
-		print("start options")
+		print("Showing start menu settings")
 		
 	def setEndOptions(self, end):
-		print("end options")
+		print("Showing end settings")
 		
 	# Set the input field values for items
 	def setItemOptions(self, item):

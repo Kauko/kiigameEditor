@@ -55,6 +55,7 @@ class Editor(QtGui.QMainWindow):
 		self.addViewsCombo.addItem("Lisää tila")
 		self.addViewsCombo.addItem("Huone", userData="room")
 		self.addViewsCombo.addItem("Välianimaatio", userData="sequence")
+		self.addViewsCombo.addItem("Loppukuva", userData="end")
 		self.addViewsCombo.currentIndexChanged.connect(self.addViewsComboChanged)
 		layout.addWidget(self.addViewsCombo, 0, 0)
 		
@@ -115,7 +116,7 @@ class Editor(QtGui.QMainWindow):
 		
 	def addViewsComboChanged(self):
 		selected = self.addViewsCombo.itemData(self.addViewsCombo.currentIndex())
-		if not (selected in ("room", "sequence")):
+		if not (selected in ("room", "sequence", "end")):
 			return
 		self.createObject(selected)
 		
@@ -209,11 +210,14 @@ class Editor(QtGui.QMainWindow):
 		# Display objects
 		for item in selectedRoom.room.getItems():
 			# TODO: Resolve handling text objects (issue #8)
+			#if (item.getClassname() == "Text"):
+			#	continue
+			
+			img = item.getRepresentingImage()
 			if (item.getClassname() == "Text"):
 				continue
-				
-			img = item.getRepresentingImage()
 			#print(self.scenarioData.dataDir + "/" + img.getSource())
+			
 			pixmap = self.imageCache.createPixmap(self.scenarioData.dataDir + "/" + img.getSource())
 			pixItem = QtGui.QGraphicsPixmapItem(pixmap)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
@@ -387,6 +391,13 @@ class Editor(QtGui.QMainWindow):
 			
 			self.left_scene.addItem(widgetItem)
 			
+		# Ends
+		for i in range(len(self.scenarioData.endViewList)):
+			end = self.scenarioData.endViewList[i]
+			widgetItem = ViewWidget(end, self.scenarioData.dataDir)
+			
+			self.left_scene.addItem(widgetItem)
+			
 	# Draw the middle frame room items
 	def drawRoomItems(self):
 		self.middle_scene.clear()
@@ -399,8 +410,8 @@ class Editor(QtGui.QMainWindow):
 			
 		for item in roomItems:
 			# TODO: Resolve handling text objects (issue #8)
-			if (item.getClassname() == "Text"):
-				continue
+			#if (item.getClassname() == "Text"):
+			#	continue
 				
 			widgetItem = ItemWidget(item, self.scenarioData.dataDir)
 			
@@ -456,7 +467,7 @@ class ItemWidget(QtGui.QListWidgetItem):
 		if not (itemName):
 			itemName = "Esineellä ei ole nimeä"
 		self.setText(itemName)
-		
+		print("IMAGE", imageObject, imageObject.id)
 		imagePath = imageDir+"/"+imageObject.getSource()
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)

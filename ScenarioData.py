@@ -133,8 +133,9 @@ class ScenarioData(object):
 					self.addCustomView(child, viewAttributes, viewImages)
 					
 		# Post-init sets triggers, outcomes etc.
-		for obj in self.roomList:
+		for obj in self.roomList + self.endViewList:
 			obj.postInit(self.getGameObject)
+			
 		self.startView.postInit(self.getGameObject)
 		
 	# Save scenario to JSON files
@@ -230,7 +231,11 @@ class ScenarioData(object):
 			for img in images:
 				if (img.id == imageId):
 					return img
-				
+					
+	def getCustomObject(self, objectId):
+		for obj in self.customObjectList:
+			if (obj.id == objectId):
+				return obj
 	# Get given types of objects found in rooms
 	def getObjectsByType(self, objectType):
 		retObjects = []
@@ -257,17 +262,19 @@ class ScenarioData(object):
 			return Object.Obstacle.generalName
 			
 	# Get room, sequence or other object
-	def getGameObject(self, entityType, entityId):
-		entityType = entityType.lower()
+	def getGameObject(self, objectType, objectId):
+		objectType = objectType.lower()
 		
-		if (entityType == "room"):
-			return self.getRoom(entityId)
-		elif (entityType == "sequence"):
-			return self.getSequence(entityId)
-		elif (entityType == "object"):
-			return self.getObject(entityId)
-		elif (entityType == "menu"):
-			return self.getMenu(entityId)
+		if (objectType == "room"):
+			return self.getRoom(objectId)
+		elif (objectType == "sequence"):
+			return self.getSequence(objectId)
+		elif (objectType == "object"):
+			return self.getObject(objectId)
+		elif (objectType == "menu"):
+			return self.getMenu(objectId)
+		elif (objectType == "custom"):
+			return self.getCustomObject(objectId)
 			
 	# Get all right type of objects, amount of images and secrets,
 	def getAllObjects(self):
