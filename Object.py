@@ -654,7 +654,7 @@ class Obstacle(Object):
 			del self.objectAttributes["object"]["target"]
 		except KeyError:
 			pass
-		
+				
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
 	imageAttributes = {'category': '', 'id': '', 'object_name': '', 'src': '', 'visible': False, 'x': 0, 'y': 0}
@@ -695,7 +695,7 @@ class JSONImage(Object):
 		try:
 			return (self.imageAttributes["x"], self.imageAttributes["y"])
 		except KeyError:
-			return	
+			return
 			
 	def setCategory(self, category):
 		self.imageAttributes["category"] = category
@@ -703,3 +703,11 @@ class JSONImage(Object):
 	def setObjectName(self, objectId):
 		self.imageAttributes["id"] = objectId
 		
+# Differentiate sequence images from others
+class SequenceImage(JSONImage):
+	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
+		super(SequenceImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
+		print(objectAttributes, imageAttributes)
+		#print(location.)
+		
+	

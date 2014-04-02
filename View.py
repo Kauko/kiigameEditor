@@ -40,7 +40,12 @@ class View(object):
 		else:
 			self.texts = {}
 		
+	# Should be overriden by other view classes
 	def getChildren(self):
+		return
+		
+	# Should be overriden by other view classes
+	def getItems(self):
 		return
 		
 	def getName(self):
@@ -77,13 +82,14 @@ class View(object):
 class Sequence(View):
 	def __init__(self, texts, sequenceId, sequenceAttributes, sequenceImages):
 		super(Sequence, self).__init__(texts, sequenceAttributes, sequenceId)
-		
+		#print("SEQATT", sequenceAttributes)
 		# Create sequence image objects
 		self.sequenceImages = []
 		for image in sequenceImages:
 			images = sequenceImages[image].pop("image")[0]
 			imageAttributes = sequenceImages[image]
-			sequenceImage = Object.JSONImage(texts, self, images, imageAttributes)
+			#print("im", images, imageAttributes)
+			sequenceImage = Object.SequenceImage(texts, self, images, imageAttributes)
 			self.sequenceImages.append(sequenceImage)
 			
 	def deleteChild(self, imageId):
@@ -96,6 +102,9 @@ class Sequence(View):
 		
 	def getRepresentingImage(self):
 		return self.sequenceImages[0]
+		
+	def getItems(self):
+		return self.getChildren()
 		
 # Start menu
 class Start(View):
@@ -125,6 +134,9 @@ class Start(View):
 	def getRepresentingImage(self):
 		return self.background
 		
+	def getItems(self):
+		return self.getChildren()
+		
 # End menu
 class End(View):
 	def __init__(self, texts, endAttributes, endImages):
@@ -149,6 +161,9 @@ class End(View):
 
 	def getChildren(self):
 		return self.endImages
+		
+	def getItems(self):
+		return self.getChildren()
 		
 # Any game room
 class Room(View):

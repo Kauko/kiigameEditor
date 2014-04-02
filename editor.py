@@ -259,17 +259,28 @@ class Editor(QtGui.QMainWindow):
 		
 	# Click on an item in the main tab room preview
 	def roomItemClicked(self):
-		selected = self.middle_scene.selectedItems()
-		if (len(selected) > 0):
-			self.settingsWidget.displayOptions(selected[0].item)
+		# TODO: Clear when suitable (like when no items in the view)
+		selected = self.middle_scene.currentItem()
+		if (selected):
+			self.settingsWidget.displayOptions(selected.item)
+			
 		self.setRemoveObjectsButtonDisabled()
 		
-	# Draw the leftmost frame rooms
+	# Draw the leftmost frame items
 	def drawRooms(self):
 		self.left_scene.clear()
+		
+		# Rooms
 		for i in range(len(self.scenarioData.roomList)):
 			room = self.scenarioData.roomList[i]
-			widgetItem = RoomWidget(room, self.scenarioData.dataDir)
+			widgetItem = ViewWidget(room, self.scenarioData.dataDir)
+			
+			self.left_scene.addItem(widgetItem)
+			
+		# Sequences
+		for i in range(len(self.scenarioData.sequenceList)):
+			sequence = self.scenarioData.sequenceList[i]
+			widgetItem = ViewWidget(sequence, self.scenarioData.dataDir)
 			
 			self.left_scene.addItem(widgetItem)
 			
@@ -279,7 +290,7 @@ class Editor(QtGui.QMainWindow):
 		
 		# There might not be a selection in left_scene
 		try:
-			roomItems = self.left_scene.selectedItems()[0].room.getItems()
+			roomItems = self.left_scene.currentItem().room.getItems()
 		except IndexError:
 			return
 			
@@ -295,7 +306,6 @@ class Editor(QtGui.QMainWindow):
 	def getImageDir(self):
 		return self.scenarioData.dataDir
 		
-	# Get View.Room objects
 	def getRoomObjects(self):
 		return self.scenarioData.getRooms()
 		
@@ -311,10 +321,10 @@ class Editor(QtGui.QMainWindow):
 	def getGeneralName(self, objectType):
 		return self.scenarioData.getGeneralName(objectType)
 		
-# Room image with caption used in the main view
-class RoomWidget(QtGui.QListWidgetItem):
+# Widget used to display rooms, sequences, start and end views
+class ViewWidget(QtGui.QListWidgetItem):
 	def __init__(self, room, imageDir, parent=None):
-		super(RoomWidget, self).__init__(parent)
+		super(ViewWidget, self).__init__(parent)
 		
 		self.room = room
 		

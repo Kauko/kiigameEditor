@@ -155,7 +155,7 @@ class ScenarioData(object):
 					# Contents for objects.json from image
 					if ("object_name" in childImage.imageAttributes):
 						scenarioObjects[childImage.imageAttributes["object_name"]] = childImage.objectAttributes["object"]
-					
+						
 				if (type(viewChild) == Object.JSONImage):
 					viewChildren.append(self.__createLayerChildJSON__(viewChild.imageAttributes, viewChild.getClassname()))
 					
@@ -170,7 +170,6 @@ class ScenarioData(object):
 		scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
 		scenarioChildren = self.__createLayerJSON__(scenarioAttrs, scenarioImages, "Stage")
 		
-			
 		imagesJSON = json.dumps(scenarioChildren, sort_keys=True, indent=4, separators=(',', ': '))
 		objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
 		
@@ -178,13 +177,13 @@ class ScenarioData(object):
 		#print(objectsJSON)
 		
 		# Save into file
-		f = open(self.dataDir + "/images.json", "w")
-		f.write(imagesJSON)
-		f.close()
+		#f = open(self.dataDir + "/images.json", "w")
+		#f.write(imagesJSON)
+		#f.close()
 		
-		f = open(self.dataDir + "/objects.json", "w")
-		f.write(objectsJSON)
-		f.close()
+		#f = open(self.dataDir + "/objects.json", "w")
+		#f.write(objectsJSON)
+		#f.close()
 		
 	# Game object layers
 	def __createLayerJSON__(self, attrs, children, className="Layer"):

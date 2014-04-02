@@ -12,6 +12,8 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTypes = {0: "Ei käyttöä", 1: "Käytä toiseen esineeseen",
 			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Ota jostakin", 5: "Poista este"}
 			
+		self.fadeTypes = {0: "Häivytys", 1: "Välittömästi"}
+		
 		self.layout = QtGui.QVBoxLayout()
 		self.setLayout(self.layout)
 		
@@ -24,14 +26,22 @@ class SettingsWidget(QtGui.QWidget):
 		self.createOtionFields()
 		
 	def displayOptions(self, gameObject):
+		self.currentObject = gameObject
+		
 		objectType = gameObject.__class__.__name__
 		self.showWidgets(objectType)
 		self.lastObjectType = objectType
 		
-		self.currentObject = gameObject
-		
 		if (objectType == "Room"):
 			self.setRoomOptions(gameObject)
+		elif (objectType == "Sequence"):
+			self.setSequenceOptions(gameObject)
+		elif (objectType == "SequenceImage"):
+			self.setSequenceImageOptions(gameObject)
+		elif (objectType == "Start"):
+			self.setStartOptions(gameObject)
+		elif (objectType == "End"):
+			self.setEndOptions(gameObject)
 		elif (objectType == "Item"):
 			self.setItemOptions(gameObject)
 		elif (objectType == "Object"):
@@ -154,6 +164,14 @@ class SettingsWidget(QtGui.QWidget):
 		self.outcomeLabel = QtGui.QLabel("Lopputulos")
 		self.outcomeCombobox = self.createItemCombobox("Ei valittu", ("object",), ("object",), noChoiceMethod=self.clearOutcome, connectTo=self.changeOutcome)
 		
+		# Sequence
+		self.sequenceTimeLabel = QtGui.QLabel("Kuvan näyttäaika sekunneissa")
+		self.sequenceTimeEdit = QtGui.QLineEdit()
+		self.sequenceFadeLabel = QtGui.QLabel("Kuvan vaihtumistapa")
+		self.sequenceFadeCombo = QtGui.QComboBox(self)
+		for i in self.fadeTypes:
+			self.sequenceFadeCombo.addItem(self.fadeTypes[i])
+		
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
 		self.layout.addWidget(self.imgTextLabel)
@@ -209,6 +227,11 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.obstacleBlocksCombo)
 		self.layout.addWidget(self.obstacleImage)
 		
+		self.layout.addWidget(self.sequenceTimeLabel)
+		self.layout.addWidget(self.sequenceTimeEdit)
+		self.layout.addWidget(self.sequenceFadeLabel)
+		self.layout.addWidget(self.sequenceFadeCombo)
+		
 		# Which widgets are shown with each object
 		self.itemSettings = {
 			"Room": [
@@ -222,6 +245,22 @@ class SettingsWidget(QtGui.QWidget):
 				self.musicClear,
 				self.whereFromLabel
 				# TODO: doorCombo for "where from" values
+			],
+			"Sequence": [
+				self.nameLabel,
+				self.objectNameEdit,
+				self.musicLabel,
+				self.musicTextEdit,
+				self.musicBtn,
+				self.musicClear,
+			],
+			"SequenceImage": [
+				self.imgTextLabel,
+				self.objectImage,
+				self.sequenceTimeLabel,
+				self.sequenceTimeEdit,
+				self.sequenceFadeLabel,
+				self.sequenceFadeCombo
 			],
 			"Item": [
 				self.nameLabel,
@@ -301,6 +340,33 @@ class SettingsWidget(QtGui.QWidget):
 		except AttributeError:
 			roomMusic = ""
 		self.musicTextEdit.setText(roomMusic)
+		
+	def setSequenceOptions(self, sequence):
+		# Sequence name
+		self.setObjectName(sequence, "Välianimaatiolla")
+		
+		# Sequence background
+		self.setobjectImage(self.parent.getImageDir()+"/"+sequence.getRepresentingImage().getSource())
+		
+		# Sequence music may return None which doesn't have split
+		try:
+			sequenceMusic = sequence.getMusic().split("/")[-1]
+		except AttributeError:
+			sequenceMusic = ""
+		self.musicTextEdit.setText(sequenceMusic)
+	
+	def setSequenceImageOptions(self, sequenceImage):
+		# Image
+		self.setobjectImage(self.parent.getImageDir()+"/"+sequence.getRepresentingImage().getSource())
+		print("ASD")
+		
+		#self.currentObject.setDisplayTime
+		
+	def setStartOptions(self, start):
+		print("start options")
+		
+	def setEndOptions(self, end):
+		print("end options")
 		
 	# Set the input field values for items
 	def setItemOptions(self, item):
