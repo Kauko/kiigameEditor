@@ -48,6 +48,10 @@ class View(object):
 	def getItems(self):
 		return
 		
+	# Should be overriden by other view classes
+	def getItemById(self, itemId):
+		return
+		
 	def getName(self):
 		try:
 			return self.texts["name"]
@@ -65,7 +69,7 @@ class View(object):
 
 	def setMusic(self, filePath):
 		self.object["music"] = "audio/"+filePath.split("/")[-1]
-
+		
 	def clearMusic(self):
 		del self.object["music"]
 
@@ -77,7 +81,26 @@ class View(object):
 	# Should be overriden by other view classes
 	def removeObject(self, childObject):
 		return
-			
+
+class Menu(View):
+	def __init__(self, texts, menuId, menuAttributes, menuImages):
+		super(Menu, self).__init__(texts, menuAttributes, menuId)
+		
+		self.menuImages = []
+		for imageId in menuImages:
+			image = menuImages[imageId].pop("image")[0]
+			imageAttributes = menuImages[imageId]
+			menuImage = Object.MenuImage(texts, self, image, imageAttributes)
+			self.menuImages.append(menuImage)
+
+	def getItemById(self, itemId):
+		for item in self.menuImages:
+			if (item.id == itemId):
+				return item
+
+	def getChildren(self):
+		return self.menuImages
+
 # Game cutscenes
 class Sequence(View):
 	def __init__(self, texts, sequenceId, sequenceAttributes, sequenceImages):
@@ -91,7 +114,10 @@ class Sequence(View):
 			#print("im", images, imageAttributes)
 			sequenceImage = Object.SequenceImage(texts, self, images, imageAttributes)
 			self.sequenceImages.append(sequenceImage)
-			
+
+		print("objecteros\n\n",self.object)
+		#self.object = {"wtf": "LOL"}
+		
 	def deleteChild(self, imageId):
 		for image in self.images:
 			if (image.id == imageId):
@@ -121,15 +147,20 @@ class Start(View):
 				self.beginingImage = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
 			if (imageId == "start"):
 				self.background = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
-			if (imageId == "start_game"):
-				self.startButton = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
-			if (imageId == "start_credits"):
-				self.creditsButton = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
-			if (imageId == "start_empty"):
-				self.emptyButton = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
+			#if (imageId == "start_empty"):
+			#	self.emptyButton = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
 				
+	def postInit(self, getGameObject):
+		# Create menu items
+		menu = getGameObject("menu", self.object["menu"])
+		for imageId,action in menu.object["items"].items():
+			if (action == "start_game"):
+				self.startButton = menu.getItemById(imageId)
+			elif (action == "credits"):
+				self.creditsButton = menu.getItemById(imageId)
+
 	def getChildren(self):
-		return [self.background, self.startButton, self.creditsButton, self.emptyButton, self.beginingImage]
+		return [self.background, self.startButton, self.creditsButton, self.beginingImage]
 
 	def getRepresentingImage(self):
 		return self.background

@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
 
-# TODO: Pre-cache rooms, images, texts etc. ?
-
 from PySide import QtGui, QtCore
 import SettingsWidget, ScenarioData
 from ImageCache import ImageCache
@@ -71,7 +69,7 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setCurrentItem(selectedRoom)
 		
 		# Room items
-		middle_frame = QtGui.QGroupBox("Huoneen esineet")
+		middle_frame = QtGui.QGroupBox("Tilan esineet")
 		middle_frame_layout = QtGui.QVBoxLayout()
 		middle_frame.setLayout(middle_frame_layout)
 		layout.addWidget(middle_frame, 1, 2, 1, 2)

@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 import json, View, Object
 from collections import OrderedDict
 from os.path import dirname, abspath
@@ -11,6 +13,7 @@ class ScenarioData(object):
 		self.miscObjects = []
 		self.startView = None
 		self.endViewList = []
+		self.menuList = []
 		
 		self.dataDir = dirname(abspath(__file__))+"/gamedata/latkazombit"
 		
@@ -124,20 +127,23 @@ class ScenarioData(object):
 					self.addStart(viewAttributes, viewImages)
 				elif (layer == "end"):
 					self.addEnd(viewAttributes, viewImages)
+				elif (layer == "menu"):
+					self.addMenu(child, viewAttributes, viewImages)
 				elif (layer == "custom"):
 					self.addCustomView(child, viewAttributes, viewImages)
-		
+					
 		# Post-init sets triggers, outcomes etc.
 		for obj in self.roomList:
 			obj.postInit(self.getGameObject)
-
+		self.startView.postInit(self.getGameObject)
+		
 	# Save scenario to JSON files
 	def saveScenario(self):
 		scenarioObjects = {}
 		scenarioImages = []
 		
 		# Go through views
-		for view in self.roomList + self.sequenceList + [self.startView] + self.endViewList + self.customObjectList:
+		for view in self.roomList + self.sequenceList + [self.startView] + self.endViewList + self.menuList + self.customObjectList:
 			viewChildren = []
 			
 			# Contents for objects.json from view
@@ -174,7 +180,7 @@ class ScenarioData(object):
 		objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
 		
 		#print(imagesJSON)
-		#print(objectsJSON)
+		print(objectsJSON)
 		
 		# Save into file
 		#f = open(self.dataDir + "/images.json", "w")
@@ -252,15 +258,17 @@ class ScenarioData(object):
 			
 	# Get room, sequence or other object
 	def getGameObject(self, entityType, entityId):
+		entityType = entityType.lower()
+		
 		if (entityType == "room"):
 			return self.getRoom(entityId)
 		elif (entityType == "sequence"):
 			return self.getSequence(entityId)
 		elif (entityType == "object"):
 			return self.getObject(entityId)
+		elif (entityType == "menu"):
+			return self.getMenu(entityId)
 			
-		return None
-	
 	# Get all right type of objects, amount of images and secrets,
 	def getAllObjects(self):
 		retObjects = []
@@ -278,6 +286,11 @@ class ScenarioData(object):
 					
 		return [retObjects, imgCount, secretCount]
 
+	def getMenu(self, menuId):
+		for menu in self.menuList:
+			if (menu.id == menuId):
+				return menu
+				
 	def deleteObject(self, objectId):
 		for obj in self.objectList:
 			if obj.id == objectId:
@@ -307,6 +320,10 @@ class ScenarioData(object):
 	def addCustomView(self, viewId, viewAttributes, viewImages):
 		newView = View.Custom(self.texts, viewId, viewAttributes, viewImages)
 		self.customObjectList.append(newView)
+		
+	def addMenu(self, menuId, menuAttributes, menuImages):
+		newView = View.Menu(self.texts, menuId, menuAttributes, menuImages)
+		self.menuList.append(newView)
 		
 	def deleteView(self):
 		return
