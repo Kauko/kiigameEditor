@@ -761,9 +761,17 @@ class SequenceImage(JSONImage):
 	def getShowTime(self):
 		return self.location.getShowTime(self.id)
 		
+	# Set the display time for this image
+	def setShowTime(self, milliseconds):
+		self.location.setShowTime(self.id, milliseconds)
+		
 	# Get the fade type for this image
 	def getDoFade(self):
 		return self.location.getDoFade(self.id)
+		
+	# Set the fade type for this image
+	def setDoFade(self, doFade):
+		return self.location.setDoFade(self.id, doFade)
 		
 # Differentiate menu images from normal images
 class MenuImage(JSONImage):

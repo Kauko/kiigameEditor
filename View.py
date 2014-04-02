@@ -134,11 +134,23 @@ class Sequence(View):
 			if (self.object["images"][i]["id"] == imageId):
 				return self.object["images"][i]["show_time"]
 				
+	# Set the display time for the given image
+	def setShowTime(self, imageId, milliseconds):
+		for i in self.object["images"]:
+			if (self.object["images"][i]["id"] == imageId):
+				self.object["images"][i]["show_time"] = milliseconds
+				
 	# Get the fade type for the given image
 	def getDoFade(self, imageId):
 		for i in self.object["images"]:
 			if (self.object["images"][i]["id"] == imageId):
 				return self.object["images"][i]["do_fade"]
+				
+	# Set the fade type for the given image
+	def setDoFade(self, imageId, doFade):
+		for i in self.object["images"]:
+			if (self.object["images"][i]["id"] == imageId):
+				self.object["images"][i]["do_fade"] = doFade
 				
 # Start menu
 class Start(View):
