@@ -217,6 +217,14 @@ class ScenarioData(object):
 			for obj in room.objectList:
 				if (obj.id == objectId):
 					return obj
+
+	def getJSONObject(self, imageId):
+		objects = self.getAllObjects()[0]
+		for obj in objects:
+			images = obj.getImages()
+			for img in images:
+				if (img.id == imageId):
+					return img
 				
 	# Get given types of objects found in rooms
 	def getObjectsByType(self, objectType):
@@ -259,6 +267,23 @@ class ScenarioData(object):
 			return self.getObject(entityId)
 			
 		return None
+	
+	# Get all right type of objects, amount of images and secrets,
+	def getAllObjects(self):
+		retObjects = []
+		imgCount = 0
+		secretCount = 0
+		rightTypes = ["Object", "Item", "Container", "Door", "Obstacle"]
+		
+		for room in self.roomList:
+			for object in room.getItems():
+				if (object.__class__.__name__ in rightTypes and object.getClassname() != "Text"):
+						retObjects.append(object)
+						imgCount += len(object.getImages())
+						if (object.getRepresentingImage().imageAttributes["category"] == "secret"):
+							secretCount += 1
+					
+		return [retObjects, imgCount, secretCount]
 
 	def deleteObject(self, objectId):
 		for obj in self.objectList:

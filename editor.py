@@ -25,9 +25,11 @@ class Editor(QtGui.QMainWindow):
 		
 		self.createMainTab()
 		self.createSpaceTab()
+		self.createTextsTab()
 		
 		tabWidget.addTab(self.mainTab, "Päänäkymä")
 		tabWidget.addTab(self.spaceTab, "Tila")
+		tabWidget.addTab(self.textsTab, "Tekstit")
 		
 	def createMainTab(self):
 		self.mainTab = QtGui.QWidget()
@@ -81,7 +83,6 @@ class Editor(QtGui.QMainWindow):
 		right_frame.setLayout(right_frame_layout)
 		layout.addWidget(right_frame)
 		
-		
 		self.settingsWidget = SettingsWidget.SettingsWidget(self)
 		self.settingsWidget.displayOptions(selectedRoom.room)
 		
@@ -123,6 +124,115 @@ class Editor(QtGui.QMainWindow):
 		
 		#right_frame_layout.addWidget(self.settingsWidget)
 		
+	def createTextsTab(self):
+		self.textsTab = QtGui.QWidget()
+
+		layout = QtGui.QHBoxLayout()
+		self.textsTab.setLayout(layout)
+
+		# Objects
+		left_frame = QtGui.QGroupBox("Esineet")
+		left_frame_layout = QtGui.QVBoxLayout()
+		left_frame.setLayout(left_frame_layout)
+		layout.addWidget(left_frame)
+		
+		# Set-up widget for showing room items
+		self.text_scene = QtGui.QTableWidget(self)
+		#text_scene.setMovement(QtGui.QListView.Static)
+		self.text_scene.itemClicked.connect(self.textItemClicked)
+		
+		left_frame_layout.addWidget(self.text_scene)
+		
+		# Draw all items and their progress bar
+		objects = self.scenarioData.getAllObjects()
+		self.drawTextItems(objects)
+		
+		# Select the first item
+		selectedItem = self.text_scene.itemAt(0, 0)
+		self.text_scene.setCurrentItem(selectedItem)
+		
+		# Texts
+		self.texts_frame = QtGui.QGroupBox("Tekstit - %s" %(selectedItem.text()))
+		self.texts_frame_layout = QtGui.QVBoxLayout()
+		self.texts_frame.setLayout(self.texts_frame_layout)
+		layout.addWidget(self.texts_frame)
+		
+		self.textsWidget = TextsWidget(self.scenarioData)
+		self.texts_frame_layout.addWidget(self.textsWidget)
+		
+		self.textsWidget.displayTexts(selectedItem)
+		
+	# Click on an object in the texts tab object list
+	def textItemClicked(self, item):
+		self.textsWidget.displayTexts(item)
+		self.texts_frame.setTitle("Tekstit - %s" %(item.text()))
+		
+	def drawTextItems(self, textItems):
+		row = 0
+		secretCount = textItems.pop()
+		imgCount = textItems.pop()
+		textItems = textItems.pop()
+		
+		self.text_scene.setRowCount(0)
+		self.text_scene.setColumnCount(2)
+		
+		# Disable sorting for row count, enable it after adding items
+		self.text_scene.setSortingEnabled(False)
+		
+		for item in textItems:
+			for itemImage in item.getImages():
+				textCount = len(item.texts)
+				
+				# Add a row
+				self.text_scene.insertRow(self.text_scene.rowCount())
+				
+				# Add a text item to the first column
+				widgetItem = TextItemWidget(itemImage, item, self.scenarioData.dataDir, 25)
+				self.text_scene.setItem(row, 0, widgetItem)
+				print("JTOEAJOTAEJOEAT")
+				
+				# Maximum amount of texts for item
+				maxAmount = 0
+				if ("examine" in item.texts):
+					maxAmount += 1
+					print ("examine", maxAmount)
+					
+				if ("pickup" in item.texts):
+					maxAmount += 1
+					print ("pickup", maxAmount)
+				# TODO: Sorting doesn't work, fix possibly by setItem here and setCellWidget inside item
+				nameCount = 0
+				if ("name" in item.texts):
+					textCount -= 1
+				
+				if (item.__class__.__name__ == "Item"
+					or item.getRepresentingImage().imageAttributes["category"] == "reward"):
+					# Max amount is number of all images minus item itself and secrets (no interaction)
+					maxAmount += imgCount-1-secretCount
+					print (item.texts.keys())
+					
+					# Different pictures for the inventory and the room
+					if ("src2" in itemImage.imageAttributes):
+						maxAmount = 1
+						print("soosi 2")
+					
+				#elif not (item.__class__.__name__ == "Object"):
+				#	maxAmount = len(item.getImages())
+				#	print("heloo", item.__class__.__name__, len(item.getImages()))
+				print ("hellleo", item.id, textCount, maxAmount)
+					
+				# Add a progressbar to the second column
+				#progressBarItem = ProgressBarItemWidget(item, maxAmount)
+				progressBar = QtGui.QProgressBar()
+				progressBar.setMinimum(0)
+				progressBar.setMaximum(maxAmount)
+				progressBar.setValue(textCount)
+				
+				self.text_scene.setCellWidget(row, 1, progressBar)
+				
+				row += 1
+		self.text_scene.setSortingEnabled(True)
+	
 	# Click on a room in the main tab
 	def roomClicked(self):
 		widgetItem = self.left_scene.selectedItems()[0]
@@ -209,6 +319,258 @@ class ItemWidget(QtGui.QListWidgetItem):
 		imagePath = imageDir+"/"+imageObject.getSource()
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
+
+# Text item widget that represents items in texts tab
+class TextItemWidget(QtGui.QTableWidgetItem):
+	def __init__(self, textItem, parentItem, imageDir, cellSize, parent=None):
+		super(TextItemWidget, self).__init__(parent)
+		
+		# Row size, especially height
+		self.setSizeHint(QtCore.QSize(cellSize, cellSize))
+		
+		self.id = textItem.id
+		self.textItem = textItem
+		self.parentItem = parentItem
+		self.objectType = parentItem.__class__.__name__
+		self.texts = textItem.texts
+		
+		if (self.textItem.imageAttributes["category"] == "reward"):
+			self.objectType = "Item"
+		
+		try:
+			self.target = parentItem.getUse().getName()
+		except:
+			self.target = None
+		
+		try:
+			self.useText = parentItem.getUseText()
+		except:
+			self.useText = ""
+		
+		textItemName = self.textItem.getName()
+		if not (textItemName):
+			textItemName = "Esineellä ei ole nimeä"
+		else:
+			textItemName += self.getImageType()
+		self.setText(textItemName)
+		
+		imagePath = imageDir+"/"+textItem.imageAttributes["src"]
+		icon = QtGui.QIcon(imagePath)
+		self.setIcon(icon)
+
+	def getImageType(self):
+		for attribute in dir(self.parentItem):
+			if (self.textItem == getattr(self.parentItem, attribute)):
+				if (attribute == "openImage"):
+					return " - Auki"
+				elif (attribute == "closedImage"):
+					return " - Kiinni"
+				elif (attribute == "lockedImage"):
+					return " - Lukittu"
+				elif (attribute == "emptyImage"):
+					return " - Tyhjä"
+				elif (attribute == "fullImage"):
+					return " - Täysi"
+				elif (attribute == "blockingImage"):
+					return " - Estää"
+				elif (attribute == "unblockingImage"):
+					return " - Ei estä"
+				elif (attribute == "blockedImage"):
+					return " - Estetty"
+		return ""
+
+# ProgressBar item that shows how much item has texts completed
+class ProgressBarItemWidget(QtGui.QTableWidgetItem):
+	def __init__(self, textItem, maxAmount, parent=None):
+		super(ProgressBarItemWidget, self).__init__(parent)
+		
+		self.progressBar = QtGui.QProgressBar()
+		self.textItem = textItem
+		self.maxAmount = maxAmount
+		
+		self.calculateProgress()
+
+	def calculateProgress(self): # If there's many images, .texts doesn't work!
+		
+		print ("LOL", self.textItem.id, self.maxAmount, len(self.textItem.texts)-1)
+		self.progressBar.setMinimum(0)
+		self.progressBar.setMaximum(self.maxAmount)
+		self.progressBar.setValue(len(self.textItem.texts)-1)
+
+# Texts widget that shows texts of specific item in the texts tab
+class TextsWidget(QtGui.QWidget):
+	def __init__(self, scenarioData, parent=None):
+		super(TextsWidget, self).__init__(parent)
+
+		self.scenarioData = scenarioData
+		self.layout = QtGui.QGridLayout()
+		self.setLayout(self.layout)
+		
+		# Examine
+		self.clickTextLabel = QtGui.QLabel("Teksti klikatessa:")
+		self.clickTextEdit = QtGui.QTextEdit()
+		self.clickTextEdit.setMaximumHeight(50)
+		
+		# Pickup text
+		self.pickupTextLabel = QtGui.QLabel("Teksti poimiessa:")
+		self.pickupTextEdit = QtGui.QTextEdit()
+		self.pickupTextEdit.setMaximumHeight(50)
+		
+		# Use text
+		self.useTextLabel = QtGui.QLabel("")
+		self.useTextEdit = QtGui.QTextEdit()
+		self.useTextEdit.setMaximumHeight(50)
+		
+		# Default text
+		self.defaultTextLabel = QtGui.QLabel("Oletusteksti puuttuville teksteille:")
+		self.defaultTextEdit = QtGui.QTextEdit()
+		self.defaultTextEdit.setMaximumHeight(50)
+		
+		# Default text without use text
+		self.defaultTextLabel2 = QtGui.QLabel("Oletusteksti puuttuville teksteille:")
+		self.defaultTextEdit2 = QtGui.QTextEdit()
+		self.defaultTextEdit2.setMaximumHeight(50)
+		
+		# Separator
+		self.separator = QtGui.QLabel("")
+		self.separator.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
+		
+		# Display options for interaction texts
+		self.displayOptionGroupBox = QtGui.QGroupBox("Näytä")
+		self.displayOptionLayout = QtGui.QVBoxLayout()
+		self.displayOptionGroupBox.setLayout(self.displayOptionLayout)
+		self.displayAll = QtGui.QRadioButton("Kaikki")
+		self.displayMissing = QtGui.QRadioButton("Puuttuvat")
+		self.displayDone = QtGui.QRadioButton("Tehdyt")
+		
+		# Interaction texts
+		self.interactionTextGroupBox = QtGui.QGroupBox("Tekstit muiden esineiden kanssa")
+		self.interactionTextLayout = QtGui.QVBoxLayout()
+		self.text_scene = QtGui.QTableWidget(self)
+		self.interactionTextGroupBox.setLayout(self.interactionTextLayout)
+
+	def displayTexts(self, item):
+		# TODO: InteractionTextGroupBox should take 3/4 of the width
+		self.layout.addWidget(self.clickTextLabel, 0, 0)
+		self.layout.addWidget(self.clickTextEdit, 1, 0)
+		self.layout.addWidget(self.pickupTextLabel, 0, 1)
+		self.layout.addWidget(self.pickupTextEdit, 1, 1)
+		self.layout.addWidget(self.useTextLabel, 2, 0)
+		self.layout.addWidget(self.useTextEdit, 3, 0)
+		self.layout.addWidget(self.defaultTextLabel2, 2, 0)
+		self.layout.addWidget(self.defaultTextEdit2, 3, 0)
+		self.layout.addWidget(self.defaultTextLabel, 2, 1)
+		self.layout.addWidget(self.defaultTextEdit, 3, 1)
+		self.layout.addWidget(self.separator, 4, 0, 1, 0)
+		self.layout.addWidget(self.interactionTextGroupBox, 5, 0, 4, 1)
+		self.layout.addWidget(self.displayOptionGroupBox, 5, 1)
+		self.layout.addWidget(self.displayAll, 6, 1)
+		self.layout.addWidget(self.displayMissing, 7, 1)
+		self.layout.addWidget(self.displayDone, 8, 1)
+		
+		# Display option buttons
+		self.displayAll.setChecked(True)
+		self.displayOptionLayout.addWidget(self.displayAll)
+		self.displayOptionLayout.addWidget(self.displayMissing)
+		self.displayOptionLayout.addWidget(self.displayDone)
+		
+		# Interaction texts
+		self.interactionTextLayout.addWidget(self.text_scene)
+		self.text_scene.setRowCount(0)
+		self.text_scene.setColumnCount(2)
+		
+		# TODO: Texts for open, closed, empty, full, etc.
+		self.itemSettings = [
+			self.pickupTextLabel,
+			self.pickupTextEdit,
+			self.useTextLabel,
+			self.useTextEdit,
+			self.defaultTextLabel,
+			self.defaultTextEdit,
+			self.defaultTextLabel2,
+			self.defaultTextEdit2,
+			self.displayOptionGroupBox,
+			self.displayAll,
+			self.displayMissing,
+			self.displayDone,
+			self.interactionTextGroupBox,
+		]
+		
+		if (item.textItem.imageAttributes["category"] == "secret" or "src2" in item.textItem.imageAttributes):
+			self.clickTextEdit.setText(item.texts["pickup"])
+		else:
+			self.clickTextEdit.setText(item.texts["examine"])
+		
+		# Item
+		if (item.objectType == "Item" and "src2" not in item.textItem.imageAttributes):
+			targets = self.scenarioData.getAllObjects()[0]
+			row = 0
+			for setting in self.itemSettings:
+				setting.show()
+			
+			try:
+				self.pickupTextEdit.setText(item.texts["pickup"])
+			except:
+				pass
+				
+			try:
+				if (item.target):
+					# TODO: Better text for label?
+					self.useTextLabel.setText("Teksti käyttökohteelle ”%s”:" %(item.target))
+					self.useTextEdit.setText(item.useText)
+					self.defaultTextLabel2.hide()
+					self.defaultTextEdit2.hide()
+					print("LTELKELKTLKTEKLETL")
+				else:
+					print ("jiteowjoi")
+					self.useTextLabel.hide()
+					self.useTextEdit.hide()
+					self.defaultTextLabel.hide()
+					self.defaultTextEdit.hide()
+					
+				self.text_scene.update()
+			except:
+				self.useTextLabel.hide()
+				self.useTextEdit.hide()
+				self.text_scene.update()
+				
+			try:
+				self.defaultTextEdit.setText(item.texts["default"])
+				self.defaultTextEdit2.setText(item.texts["default"])
+			except:
+				pass
+			
+			# Interaction texts
+			self.text_scene.setSortingEnabled(False)
+			for target in targets:
+				for targetImage in target.getImages():
+					# Target image
+					if (targetImage.id == item.id or targetImage.imageAttributes["category"] == "secret"):
+						continue
+					self.text_scene.insertRow(self.text_scene.rowCount())
+					imageObject = self.scenarioData.getJSONObject(targetImage.id)
+					# TODO: cell size doesn't work!
+					targetItem = TextItemWidget(imageObject, self.scenarioData.getObject(target.id), self.scenarioData.dataDir, 100)
+					self.text_scene.setItem(row, 0, targetItem)
+
+					# Interaction text with the target
+					try:
+						interactionText = item.texts[targetImage.id]
+					except:
+						interactionText = ""
+					 
+					interactionTextItem = QtGui.QTableWidgetItem()
+					interactionTextItem.setText(interactionText)
+					self.text_scene.setItem(row, 1, interactionTextItem)
+					
+					row += 1
+			self.text_scene.resizeRowsToContents()
+			self.text_scene.setSortingEnabled(True)
+		
+		# Everyone else
+		else:
+			for setting in self.itemSettings:
+				setting.hide()
 							
 if __name__ == '__main__':
 	from sys import argv, exit
