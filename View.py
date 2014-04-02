@@ -105,19 +105,15 @@ class Menu(View):
 class Sequence(View):
 	def __init__(self, texts, sequenceId, sequenceAttributes, sequenceImages):
 		super(Sequence, self).__init__(texts, sequenceAttributes, sequenceId)
-		#print("SEQATT", sequenceAttributes)
+		
 		# Create sequence image objects
 		self.sequenceImages = []
 		for image in sequenceImages:
 			images = sequenceImages[image].pop("image")[0]
 			imageAttributes = sequenceImages[image]
-			#print("im", images, imageAttributes)
 			sequenceImage = Object.SequenceImage(texts, self, images, imageAttributes)
 			self.sequenceImages.append(sequenceImage)
-
-		print("objecteros\n\n",self.object)
-		#self.object = {"wtf": "LOL"}
-		
+			
 	def deleteChild(self, imageId):
 		for image in self.images:
 			if (image.id == imageId):
@@ -132,6 +128,18 @@ class Sequence(View):
 	def getItems(self):
 		return self.getChildren()
 		
+	# Get the display time for the given image
+	def getShowTime(self, imageId):
+		for i in self.object["images"]:
+			if (self.object["images"][i]["id"] == imageId):
+				return self.object["images"][i]["show_time"]
+				
+	# Get the fade type for the given image
+	def getDoFade(self, imageId):
+		for i in self.object["images"]:
+			if (self.object["images"][i]["id"] == imageId):
+				return self.object["images"][i]["do_fade"]
+				
 # Start menu
 class Start(View):
 	def __init__(self, texts, startAttributes, startImages):

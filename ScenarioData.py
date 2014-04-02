@@ -180,7 +180,7 @@ class ScenarioData(object):
 		objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
 		
 		#print(imagesJSON)
-		print(objectsJSON)
+		#print(objectsJSON)
 		
 		# Save into file
 		#f = open(self.dataDir + "/images.json", "w")

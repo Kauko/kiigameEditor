@@ -12,7 +12,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTypes = {0: "Ei käyttöä", 1: "Käytä toiseen esineeseen",
 			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Ota jostakin", 5: "Poista este"}
 			
-		self.fadeTypes = {0: "Häivytys", 1: "Välittömästi"}
+		self.fadeTypes = {0: "Välittömästi", 1: "Häivytys"}
 		
 		self.layout = QtGui.QVBoxLayout()
 		self.setLayout(self.layout)
@@ -357,10 +357,12 @@ class SettingsWidget(QtGui.QWidget):
 	
 	def setSequenceImageOptions(self, sequenceImage):
 		# Image
-		self.setobjectImage(self.parent.getImageDir()+"/"+sequence.getRepresentingImage().getSource())
-		print("ASD")
+		self.setobjectImage(self.parent.getImageDir()+"/"+sequenceImage.getRepresentingImage().getSource())
 		
-		#self.currentObject.setDisplayTime
+		# Image display time and fade type
+		self.sequenceTimeEdit.setText(str(self.currentObject.getShowTime()))
+		
+		self.sequenceFadeCombo.setCurrentIndex(self.currentObject.getDoFade())
 		
 	def setStartOptions(self, start):
 		print("start options")

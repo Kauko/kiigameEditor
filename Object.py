@@ -756,10 +756,17 @@ class JSONImage(Object):
 class SequenceImage(JSONImage):
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(SequenceImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
-		#print(objectAttributes, imageAttributes)
-		#print(location.)
-
+		
+	# Get the display time for this image
+	def getShowTime(self):
+		return self.location.getShowTime(self.id)
+		
+	# Get the fade type for this image
+	def getDoFade(self):
+		return self.location.getDoFade(self.id)
+		
 # Differentiate menu images from normal images
 class MenuImage(JSONImage):
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(MenuImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
+		
