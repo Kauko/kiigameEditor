@@ -49,7 +49,7 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setViewMode(QtGui.QListView.IconMode)
 		self.left_scene.setFlow(QtGui.QListView.LeftToRight)
 		self.left_scene.setMovement(QtGui.QListView.Static)
-		self.left_scene.itemClicked.connect(self.roomClicked)
+		self.left_scene.itemSelectionChanged.connect(self.roomClicked)
 		# TODO: Double click room, display the room view
 		left_frame_layout.addWidget(self.left_scene)
 		
@@ -267,7 +267,7 @@ class Editor(QtGui.QMainWindow):
 		# Set-up widget for showing room items
 		self.text_scene = QtGui.QTableWidget(self)
 		#text_scene.setMovement(QtGui.QListView.Static)
-		self.text_scene.itemClicked.connect(self.textItemClicked)
+		self.text_scene.itemSelectionChanged.connect(self.textItemClicked)
 		
 		left_frame_layout.addWidget(self.text_scene)
 		
@@ -291,9 +291,13 @@ class Editor(QtGui.QMainWindow):
 		self.textsWidget.displayTexts(selectedItem)
 		
 	# Click on an object in the texts tab object list
-	def textItemClicked(self, item):
-		self.textsWidget.displayTexts(item)
-		self.texts_frame.setTitle("Tekstit - %s" %(item.text()))
+	def textItemClicked(self):
+		selected = self.text_scene.currentItem()
+		if (selected):
+			# TODO: Handle this better? Now there's a warning at the
+			# beginning that textsWidget doesn't exist
+			self.textsWidget.displayTexts(selected)
+			self.texts_frame.setTitle("Tekstit - %s" %(selected.text()))
 		
 	def drawTextItems(self, textItems):
 		row = 0
@@ -317,17 +321,14 @@ class Editor(QtGui.QMainWindow):
 				# Add a text item to the first column
 				widgetItem = TextItemWidget(itemImage, item, self.scenarioData.dataDir, 25)
 				self.text_scene.setItem(row, 0, widgetItem)
-				print("JTOEAJOTAEJOEAT")
 				
 				# Maximum amount of texts for item
 				maxAmount = 0
 				if ("examine" in item.texts):
 					maxAmount += 1
-					print ("examine", maxAmount)
 					
 				if ("pickup" in item.texts):
 					maxAmount += 1
-					print ("pickup", maxAmount)
 				# TODO: Sorting doesn't work, fix possibly by setItem here and setCellWidget inside item
 				nameCount = 0
 				if ("name" in item.texts):
@@ -337,17 +338,10 @@ class Editor(QtGui.QMainWindow):
 					or item.getRepresentingImage().imageAttributes["category"] == "reward"):
 					# Max amount is number of all images minus item itself and secrets (no interaction)
 					maxAmount += imgCount-1-secretCount
-					print (item.texts.keys())
 					
 					# Different pictures for the inventory and the room
 					if ("src2" in itemImage.imageAttributes):
 						maxAmount = 1
-						print("soosi 2")
-					
-				#elif not (item.__class__.__name__ == "Object"):
-				#	maxAmount = len(item.getImages())
-				#	print("heloo", item.__class__.__name__, len(item.getImages()))
-				print ("hellleo", item.id, textCount, maxAmount)
 					
 				# Add a progressbar to the second column
 				#progressBarItem = ProgressBarItemWidget(item, maxAmount)
@@ -669,19 +663,14 @@ class TextsWidget(QtGui.QWidget):
 					self.useTextEdit.setText(item.useText)
 					self.defaultTextLabel2.hide()
 					self.defaultTextEdit2.hide()
-					print("LTELKELKTLKTEKLETL")
 				else:
-					print ("jiteowjoi")
 					self.useTextLabel.hide()
 					self.useTextEdit.hide()
 					self.defaultTextLabel.hide()
 					self.defaultTextEdit.hide()
-					
-				self.text_scene.update()
 			except:
 				self.useTextLabel.hide()
 				self.useTextEdit.hide()
-				self.text_scene.update()
 				
 			try:
 				self.defaultTextEdit.setText(item.texts["default"])
