@@ -254,10 +254,11 @@ class ScenarioData(object):
 			
 		return None
 	
-	# Get all right type of objects and amount images they have
+	# Get all right type of objects, amount of images and secrets,
 	def getAllObjects(self):
 		retObjects = []
 		imgCount = 0
+		secretCount = 0
 		rightTypes = ["Object", "Item", "Container", "Door", "Obstacle"]
 		
 		for room in self.roomList:
@@ -265,8 +266,10 @@ class ScenarioData(object):
 				if (object.__class__.__name__ in rightTypes and object.getClassname() != "Text"):
 						retObjects.append(object)
 						imgCount += len(object.getImages())
+						if (object.getRepresentingImage().imageAttributes["category"] == "secret"):
+							secretCount += 1
 					
-		return [retObjects, imgCount]
+		return [retObjects, imgCount, secretCount]
 
 	def deleteObject(self, objectId):
 		for obj in self.objectList:

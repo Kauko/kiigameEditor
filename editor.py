@@ -166,17 +166,19 @@ class Editor(QtGui.QMainWindow):
 		
 	def drawTextItems(self, textItems):
 		row = 0
+		secretCount = textItems.pop()
 		imgCount = textItems.pop()
 		textItems = textItems.pop()
 		
 		self.text_scene.setRowCount(0)
 		self.text_scene.setColumnCount(2)
 		
-		#Disable sorting for row count, enable it after adding items
+		# Disable sorting for row count, enable it after adding items
 		self.text_scene.setSortingEnabled(False)
 		
 		for item in textItems:
 			for itemImage in item.getImages():
+				textCount = len(item.texts)
 				
 				# Add a row
 				self.text_scene.insertRow(self.text_scene.rowCount())
@@ -184,30 +186,44 @@ class Editor(QtGui.QMainWindow):
 				# Add a text item to the first column
 				widgetItem = TextItemWidget(itemImage, item, self.scenarioData.dataDir, 25)
 				self.text_scene.setItem(row, 0, widgetItem)
+				print("JTOEAJOTAEJOEAT")
 				
-				# Maximum amount of texts for item, 1 for examine
-				maxAmount = 1
-				# TODO: Rewards are not items? Their maxAmount is just 1
-				# TODO: Secret items do not work
+				# Maximum amount of texts for item
+				maxAmount = 0
+				if ("examine" in item.texts):
+					maxAmount += 1
+					print ("examine", maxAmount)
+					
+				if ("pickup" in item.texts):
+					maxAmount += 1
+					print ("pickup", maxAmount)
 				# TODO: Sorting doesn't work, fix possibly by setItem here and setCellWidget inside item
+				nameCount = 0
+				if ("name" in item.texts):
+					textCount -= 1
 				
-				if (item.__class__.__name__ == "Item"):
-					maxAmount = imgCount
+				if (item.__class__.__name__ == "Item"
+					or item.getRepresentingImage().imageAttributes["category"] == "reward"):
+					# Max amount is number of all images minus item itself and secrets (no interaction)
+					maxAmount += imgCount-1-secretCount
+					print (item.texts.keys())
 					
-					if ("src2" in item.getRepresentingImage().imageAttributes):
+					# Different pictures for the inventory and the room
+					if ("src2" in itemImage.imageAttributes):
 						maxAmount = 1
-					elif ("pickup" in item.texts):
-						maxAmount += 1
+						print("soosi 2")
 					
-				elif not (item.__class__.__name__ == "Object"):
-					maxAmount = len(item.getImages())
+				#elif not (item.__class__.__name__ == "Object"):
+				#	maxAmount = len(item.getImages())
+				#	print("heloo", item.__class__.__name__, len(item.getImages()))
+				print ("hellleo", item.id, textCount, maxAmount)
 					
 				# Add a progressbar to the second column
 				#progressBarItem = ProgressBarItemWidget(item, maxAmount)
 				progressBar = QtGui.QProgressBar()
 				progressBar.setMinimum(0)
 				progressBar.setMaximum(maxAmount)
-				progressBar.setValue(len(item.texts)-1)
+				progressBar.setValue(textCount)
 				
 				self.text_scene.setCellWidget(row, 1, progressBar)
 				
@@ -309,6 +325,9 @@ class TextItemWidget(QtGui.QTableWidgetItem):
 		self.objectType = parentItem.__class__.__name__
 		self.texts = textItem.texts
 		
+		if (self.textItem.imageAttributes["category"] == "reward"):
+			self.objectType = "Item"
+		
 		try:
 			self.target = parentItem.getUse().getName()
 		except:
@@ -322,7 +341,9 @@ class TextItemWidget(QtGui.QTableWidgetItem):
 		textItemName = self.textItem.getName()
 		if not (textItemName):
 			textItemName = "Esineellä ei ole nimeä"
-		self.setText(textItemName + self.getImageType())
+		else:
+			textItemName += self.getImageType()
+		self.setText(textItemName)
 		
 		imagePath = imageDir+"/"+textItem.imageAttributes["src"]
 		icon = QtGui.QIcon(imagePath)
@@ -341,10 +362,12 @@ class TextItemWidget(QtGui.QTableWidgetItem):
 					return " - Tyhjä"
 				elif (attribute == "fullImage"):
 					return " - Täysi"
-				elif (attribute == "blockedImage"):
+				elif (attribute == "blockingImage"):
 					return " - Estää"
-				elif (attribute == "closedImage"):
+				elif (attribute == "unblockingImage"):
 					return " - Ei estä"
+				elif (attribute == "blockedImage"):
+					return " - Estetty"
 		return ""
 
 # ProgressBar item that shows how much item has texts completed
@@ -394,6 +417,11 @@ class TextsWidget(QtGui.QWidget):
 		self.defaultTextEdit = QtGui.QTextEdit()
 		self.defaultTextEdit.setMaximumHeight(50)
 		
+		# Default text without use text
+		self.defaultTextLabel2 = QtGui.QLabel("Oletusteksti puuttuville teksteille:")
+		self.defaultTextEdit2 = QtGui.QTextEdit()
+		self.defaultTextEdit2.setMaximumHeight(50)
+		
 		# Separator
 		self.separator = QtGui.QLabel("")
 		self.separator.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
@@ -420,6 +448,8 @@ class TextsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.pickupTextEdit, 1, 1)
 		self.layout.addWidget(self.useTextLabel, 2, 0)
 		self.layout.addWidget(self.useTextEdit, 3, 0)
+		self.layout.addWidget(self.defaultTextLabel2, 2, 0)
+		self.layout.addWidget(self.defaultTextEdit2, 3, 0)
 		self.layout.addWidget(self.defaultTextLabel, 2, 1)
 		self.layout.addWidget(self.defaultTextEdit, 3, 1)
 		self.layout.addWidget(self.separator, 4, 0, 1, 0)
@@ -448,6 +478,8 @@ class TextsWidget(QtGui.QWidget):
 			self.useTextEdit,
 			self.defaultTextLabel,
 			self.defaultTextEdit,
+			self.defaultTextLabel2,
+			self.defaultTextEdit2,
 			self.displayOptionGroupBox,
 			self.displayAll,
 			self.displayMissing,
@@ -455,12 +487,17 @@ class TextsWidget(QtGui.QWidget):
 			self.interactionTextGroupBox,
 		]
 		
-		self.clickTextEdit.setText(item.texts["examine"])
+		if (item.textItem.imageAttributes["category"] == "secret" or "src2" in item.textItem.imageAttributes):
+			self.clickTextEdit.setText(item.texts["pickup"])
+		else:
+			self.clickTextEdit.setText(item.texts["examine"])
 		
 		# Item
-		if (item.objectType == "Item"):
+		if (item.objectType == "Item" and "src2" not in item.textItem.imageAttributes):
 			targets = self.scenarioData.getAllObjects()[0]
 			row = 0
+			for setting in self.itemSettings:
+				setting.show()
 			
 			try:
 				self.pickupTextEdit.setText(item.texts["pickup"])
@@ -468,43 +505,58 @@ class TextsWidget(QtGui.QWidget):
 				pass
 				
 			try:
-				# TODO: Better text for label?
-				self.useTextLabel.setText("Teksti käyttökohteelle ”%s”:" %(item.target))
-				self.useTextEdit.setText(item.useText)
+				if (item.target):
+					# TODO: Better text for label?
+					self.useTextLabel.setText("Teksti käyttökohteelle ”%s”:" %(item.target))
+					self.useTextEdit.setText(item.useText)
+					self.defaultTextLabel2.hide()
+					self.defaultTextEdit2.hide()
+					print("LTELKELKTLKTEKLETL")
+				else:
+					print ("jiteowjoi")
+					self.useTextLabel.hide()
+					self.useTextEdit.hide()
+					self.defaultTextLabel.hide()
+					self.defaultTextEdit.hide()
+					
+				self.text_scene.update()
 			except:
 				self.useTextLabel.hide()
 				self.useTextEdit.hide()
+				self.text_scene.update()
 				
 			try:
 				self.defaultTextEdit.setText(item.texts["default"])
+				self.defaultTextEdit2.setText(item.texts["default"])
 			except:
 				pass
 			
+			# Interaction texts
 			self.text_scene.setSortingEnabled(False)
 			for target in targets:
 				for targetImage in target.getImages():
 					# Target image
+					if (targetImage.id == item.id or targetImage.imageAttributes["category"] == "secret"):
+						continue
 					self.text_scene.insertRow(self.text_scene.rowCount())
 					imageObject = self.scenarioData.getJSONObject(targetImage.id)
 					# TODO: cell size doesn't work!
-					targetItem = TextItemWidget(imageObject, self.scenarioData.getObject(target), self.scenarioData.dataDir, 50)
+					targetItem = TextItemWidget(imageObject, self.scenarioData.getObject(target.id), self.scenarioData.dataDir, 100)
 					self.text_scene.setItem(row, 0, targetItem)
-					row += 1
-					
+
 					# Interaction text with the target
 					try:
 						interactionText = item.texts[targetImage.id]
 					except:
 						interactionText = ""
-					
-					print(interactionText)
-					interactionTextItem = QtGui.QTableWidgetItem(interactionText)
+					 
+					interactionTextItem = QtGui.QTableWidgetItem()
+					interactionTextItem.setText(interactionText)
 					self.text_scene.setItem(row, 1, interactionTextItem)
 					
+					row += 1
+			self.text_scene.resizeRowsToContents()
 			self.text_scene.setSortingEnabled(True)
-				
-			for setting in self.itemSettings:
-				setting.show()
 		
 		# Everyone else
 		else:

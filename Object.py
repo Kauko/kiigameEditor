@@ -246,6 +246,10 @@ class Door(Object):
 			self.openImage = self.getImage(objectAttributes["object"]["open_image"])
 		except KeyError:
 			self.openImage = None
+		try:
+			self.blockedImage = self.getImage(objectAttributes["object"]["blocked_image"])
+		except KeyError:
+			self.blockedImage = None
 		
 		self.texts = {}
 		
@@ -258,6 +262,9 @@ class Door(Object):
 				
 			if (self.openImage):
 				self.texts.update(texts[self.openImage.id])
+				
+			if (self.blockedImage):
+				self.texts.update(texts[self.blockedImage.id])
 		except KeyError:
 			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
 			
@@ -278,7 +285,7 @@ class Door(Object):
 			pass
 			
 	def getImages(self):
-		images = [self.closedImage, self.lockedImage, self.openImage]
+		images = [self.closedImage, self.lockedImage, self.openImage, self.blockedImage]
 		return list(filter((None).__ne__, images))
 		
 	def getRepresentingImage(self):
