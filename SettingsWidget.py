@@ -577,6 +577,8 @@ class SettingsWidget(QtGui.QWidget):
 		
 	def clearUseTarget(self):
 		print("Clear useTarget!")
+		# TODO: This is run even when populating the combobox
+		#self.currentObject.clearTarget()
 		
 	def changeObstacleBlock(self):
 		self.currentObject.setBlockTarget(self.obstacleBlocksCombo.itemData(self.obstacleBlocksCombo.currentIndex()))

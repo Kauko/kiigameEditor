@@ -67,6 +67,11 @@ class View(object):
 	# Post-init should be overriden by views
 	def postInit(self, getGameObject):
 		return
+		
+	# Remove given object
+	# Should be overriden by other view classes
+	def removeObject(self, childObject):
+		return
 			
 # Game cutscenes
 class Sequence(View):
@@ -225,6 +230,9 @@ class Room(View):
 		newObject = Object.Obstacle(texts, self, imageId, imageAttributes, objectAttributes)
 		self.objectList.append(newObject)
 		return newObject
+		
+	def removeObject(self, childObject):
+		self.objectList.remove(childObject)
 		
 # Custom view for custom layers
 class Custom(View):

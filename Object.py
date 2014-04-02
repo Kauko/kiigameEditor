@@ -109,6 +109,11 @@ class Object(object):
 	def setExamineText(self, examineText):
 		self.texts["examine"] = examineText
 		
+	# TODO: Should remove all texts referring to this object
+	# Remove this object
+	def remove(self):
+		self.location.removeObject(self)
+		
 # Pickable item
 class Item(Object):
 	generalName = "Käyttöesine"

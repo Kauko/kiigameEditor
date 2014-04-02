@@ -32,14 +32,14 @@ class Editor(QtGui.QMainWindow):
 	def createMainTab(self):
 		self.mainTab = QtGui.QWidget()
 		
-		layout = QtGui.QHBoxLayout()
+		layout = QtGui.QGridLayout()
 		self.mainTab.setLayout(layout)
 		
 		# Room preview
-		left_frame = QtGui.QGroupBox("Huoneet")
+		left_frame = QtGui.QGroupBox("Tilat")
 		left_frame_layout = QtGui.QGridLayout()
 		left_frame.setLayout(left_frame_layout)
-		layout.addWidget(left_frame)
+		layout.addWidget(left_frame, 1, 0, 1, 2)
 		
 		# Set-up widget for showing rooms
 		self.left_scene = QtGui.QListWidget(self)
@@ -49,8 +49,19 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setMovement(QtGui.QListView.Static)
 		self.left_scene.itemClicked.connect(self.roomClicked)
 		# TODO: Double click room, display the room view
-		
 		left_frame_layout.addWidget(self.left_scene)
+		
+		self.addViewsCombo = QtGui.QComboBox(self)
+		self.addViewsCombo.addItem("Lisää tila")
+		self.addViewsCombo.addItem("Huone", userData="room")
+		self.addViewsCombo.addItem("Välianimaatio", userData="sequence")
+		self.addViewsCombo.currentIndexChanged.connect(self.addViewsComboChanged)
+		layout.addWidget(self.addViewsCombo, 0, 0)
+		
+		self.removeViewsButton = QtGui.QPushButton("Poista valittu tila")
+		self.setRemoveViewsButtonDisabled()
+		self.removeViewsButton.clicked.connect(self.removeViewsButtonClicked)
+		layout.addWidget(self.removeViewsButton, 0, 1)
 		
 		# Draw rooms and select the first one
 		self.drawRooms()
@@ -61,25 +72,37 @@ class Editor(QtGui.QMainWindow):
 		middle_frame = QtGui.QGroupBox("Huoneen esineet")
 		middle_frame_layout = QtGui.QVBoxLayout()
 		middle_frame.setLayout(middle_frame_layout)
-		layout.addWidget(middle_frame)
+		layout.addWidget(middle_frame, 1, 2, 1, 2)
 		
 		# Set-up widget for showing room items
 		self.middle_scene = QtGui.QListWidget(self)
 		self.middle_scene.setIconSize(QtCore.QSize(100, 100))
 		self.middle_scene.setMovement(QtGui.QListView.Static)
 		self.middle_scene.itemSelectionChanged.connect(self.roomItemClicked)
-		
 		middle_frame_layout.addWidget(self.middle_scene)
 		
+		self.addObjectsCombo = QtGui.QComboBox(self)
+		self.addObjectsCombo.addItem("Lisää esine valittuun huoneeseen")
+		self.addObjectsCombo.addItem("Kiinteä esine", userData="object")
+		self.addObjectsCombo.addItem("Käyttöesine", userData="item")
+		self.addObjectsCombo.addItem("Ovi", userData="door")
+		self.addObjectsCombo.addItem("Säiliö", userData="container")
+		self.addObjectsCombo.addItem("Este", userData="obstacle")
+		self.addObjectsCombo.currentIndexChanged.connect(self.addObjectsComboChanged)
+		layout.addWidget(self.addObjectsCombo, 0, 2)
+		
+		self.removeObjectsButton = QtGui.QPushButton("Poista valittu esine")
+		self.setRemoveObjectsButtonDisabled()
+		self.removeObjectsButton.clicked.connect(self.removeObjectsButtonClicked)
+		layout.addWidget(self.removeObjectsButton, 0, 3)
+		
 		self.drawRoomItems()
-		#selectedItem = self.middle_scene.itemAt(0, 0)
-		#self.middle_scene.setCurrentItem(selectedItem)
 		
 		# Settings for items and rooms
 		right_frame = QtGui.QGroupBox("Asetukset")
 		right_frame_layout = QtGui.QVBoxLayout()
 		right_frame.setLayout(right_frame_layout)
-		layout.addWidget(right_frame)
+		layout.addWidget(right_frame, 1, 4)
 		
 		self.settingsWidget = SettingsWidget.SettingsWidget(self)
 		self.settingsWidget.displayOptions(selectedRoom.room)
@@ -89,6 +112,56 @@ class Editor(QtGui.QMainWindow):
 		scrollArea.setWidgetResizable(True)
 		scrollArea.setWidget(self.settingsWidget)
 		right_frame_layout.addWidget(scrollArea)
+		
+	def addViewsComboChanged(self):
+		selected = self.addViewsCombo.itemData(self.addViewsCombo.currentIndex())
+		if not (selected in ("room", "sequence")):
+			return
+		self.createObject(selected)
+		
+		self.addObjectsCombo.setCurrentIndex(0)
+		self.left_scene.setCurrentRow(self.left_scene.count()-1)
+		
+	def removeViewsButtonClicked(self):
+		selected = self.left_scene.currentItem()
+		
+		row = self.left_scene.currentRow()
+		self.left_scene.takeItem(row)
+		
+		self.drawRoomItems()
+		
+	def addObjectsComboChanged(self):
+		selected = self.addObjectsCombo.itemData(self.addObjectsCombo.currentIndex())
+		if not (selected in ("object", "item", "door", "container", "obstacle", )):
+			return
+		self.createObject(selected)
+		
+		self.addObjectsCombo.setCurrentIndex(0)
+		self.middle_scene.setCurrentRow(self.middle_scene.count()-1)
+		
+	def removeObjectsButtonClicked(self):
+		selected = self.middle_scene.currentItem()
+		
+		row = self.middle_scene.currentRow()
+		self.middle_scene.takeItem(row)
+		
+	def setRemoveObjectsButtonDisabled(self):
+		selected = self.middle_scene.selectedItems()
+		if (len(selected) == 0):
+			isDisabled = True
+		else:
+			isDisabled = False
+			
+		self.removeObjectsButton.setDisabled(isDisabled)
+		
+	def setRemoveViewsButtonDisabled(self):
+		selected = self.left_scene.selectedItems()
+		if (len(selected) == 0):
+			isDisabled = True
+		else:
+			isDisabled = False
+			
+		self.removeViewsButton.setDisabled(isDisabled)
 		
 	def createSpaceTab(self):
 		self.spaceTab = QtGui.QWidget()
@@ -102,7 +175,7 @@ class Editor(QtGui.QMainWindow):
 		self.spaceSettingsWidget.displayOptions(selectedRoom.room)
 
 		# Room
-		left_frame = QtGui.QGroupBox("Huone")
+		left_frame = QtGui.QGroupBox("Tila")
 		left_frame_layout = QtGui.QVBoxLayout()
 		left_frame.setLayout(left_frame_layout)
 		layout.addWidget(left_frame)
@@ -168,6 +241,8 @@ class Editor(QtGui.QMainWindow):
 			newObject = selectedRoom.room.addContainer()
 		elif (objectType == "obstacle"):
 			newObject = selectedRoom.room.addObstacle()
+		else:
+			return
 		print("new ovject", newObject, newObject.id)
 		
 		#widget.setRepresentingImage("airfreshener.png")
@@ -180,12 +255,14 @@ class Editor(QtGui.QMainWindow):
 		self.drawRoomItems()
 		self.settingsWidget.displayOptions(self.left_scene.selectedItems()[0].room)
 		self.updateSpaceTab()
+		self.setRemoveViewsButtonDisabled()
 		
 	# Click on an item in the main tab room preview
 	def roomItemClicked(self):
 		selected = self.middle_scene.selectedItems()
 		if (len(selected) > 0):
 			self.settingsWidget.displayOptions(selected[0].item)
+		self.setRemoveObjectsButtonDisabled()
 		
 	# Draw the leftmost frame rooms
 	def drawRooms(self):
@@ -200,7 +277,12 @@ class Editor(QtGui.QMainWindow):
 	def drawRoomItems(self):
 		self.middle_scene.clear()
 		
-		roomItems = self.left_scene.selectedItems()[0].room.getItems()
+		# There might not be a selection in left_scene
+		try:
+			roomItems = self.left_scene.selectedItems()[0].room.getItems()
+		except IndexError:
+			return
+			
 		for item in roomItems:
 			# TODO: Resolve handling text objects (issue #8)
 			if (item.getClassname() == "Text"):
@@ -239,7 +321,7 @@ class RoomWidget(QtGui.QListWidgetItem):
 		roomName = room.getName()
 		if not (roomName):
 			# TODO: Some common delegate for these namings
-			roomName = "Huoneella ei ole nimeä"
+			roomName = "Tilalla ei ole nimeä"
 		self.setText(roomName)
 		
 		imagePath = imageDir+"/"+room.getRepresentingImage().getSource()
