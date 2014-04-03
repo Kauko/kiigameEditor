@@ -551,26 +551,31 @@ class TextsWidget(QtGui.QWidget):
 		self.clickTextLabel = QtGui.QLabel("Teksti klikatessa:")
 		self.clickTextEdit = QtGui.QTextEdit()
 		self.clickTextEdit.setMaximumHeight(50)
+		self.clickTextEdit.focusOutEvent = lambda s: self.changeText("click")
 		
 		# Pickup text
 		self.pickupTextLabel = QtGui.QLabel("Teksti poimiessa:")
 		self.pickupTextEdit = QtGui.QTextEdit()
 		self.pickupTextEdit.setMaximumHeight(50)
+		self.pickupTextEdit.focusOutEvent = lambda s: self.changeText("pickup")
 		
 		# Use text
 		self.useTextLabel = QtGui.QLabel("")
 		self.useTextEdit = QtGui.QTextEdit()
 		self.useTextEdit.setMaximumHeight(50)
+		self.useTextEdit.focusOutEvent = lambda s: self.changeText("use")
 		
 		# Default text
 		self.defaultTextLabel = QtGui.QLabel("Oletusteksti puuttuville teksteille:")
 		self.defaultTextEdit = QtGui.QTextEdit()
 		self.defaultTextEdit.setMaximumHeight(50)
+		self.defaultTextEdit.focusOutEvent = lambda s: self.changeText("default")
 		
 		# Default text without use text
 		self.defaultTextLabel2 = QtGui.QLabel("Oletusteksti puuttuville teksteille:")
 		self.defaultTextEdit2 = QtGui.QTextEdit()
 		self.defaultTextEdit2.setMaximumHeight(50)
+		self.defaultTextEdit2.focusOutEvent = lambda s: self.changeText("default")
 		
 		# Separator
 		self.separator = QtGui.QLabel("")
@@ -589,8 +594,10 @@ class TextsWidget(QtGui.QWidget):
 		self.interactionTextLayout = QtGui.QVBoxLayout()
 		self.text_scene = QtGui.QTableWidget(self)
 		self.interactionTextGroupBox.setLayout(self.interactionTextLayout)
+		self.text_scene.cellChanged.connect(self.changeInteractionText)
 
 	def displayTexts(self, item):
+		self.currentItem = item
 		# TODO: InteractionTextGroupBox should take 3/4 of the width
 		self.layout.addWidget(self.clickTextLabel, 0, 0)
 		self.layout.addWidget(self.clickTextEdit, 1, 0)
@@ -637,28 +644,28 @@ class TextsWidget(QtGui.QWidget):
 			self.interactionTextGroupBox,
 		]
 		
-		if (item.textItem.imageAttributes["category"] == "secret" or "src2" in item.textItem.imageAttributes):
-			self.clickTextEdit.setText(item.texts["pickup"])
+		if (self.currentItem.textItem.imageAttributes["category"] == "secret" or "src2" in self.currentItem.textItem.imageAttributes):
+			self.clickTextEdit.setText(self.currentItem.texts["pickup"])
 		else:
-			self.clickTextEdit.setText(item.texts["examine"])
+			self.clickTextEdit.setText(self.currentItem.texts["examine"])
 		
 		# Item
-		if (item.objectType == "Item" and "src2" not in item.textItem.imageAttributes):
+		if (self.currentItem.objectType == "Item" and "src2" not in self.currentItem.textItem.imageAttributes):
 			targets = self.scenarioData.getAllObjects()[0]
 			row = 0
 			for setting in self.itemSettings:
 				setting.show()
 			
 			try:
-				self.pickupTextEdit.setText(item.texts["pickup"])
+				self.pickupTextEdit.setText(self.currentItem.texts["pickup"])
 			except:
 				pass
 				
 			try:
-				if (item.target):
+				if (self.currentItem.target):
 					# TODO: Better text for label?
-					self.useTextLabel.setText("Teksti käyttökohteelle ”%s”:" %(item.target))
-					self.useTextEdit.setText(item.useText)
+					self.useTextLabel.setText("Teksti käyttökohteelle ”%s”:" %(self.currentItem.target))
+					self.useTextEdit.setText(self.currentItem.useText)
 					self.defaultTextLabel2.hide()
 					self.defaultTextEdit2.hide()
 				else:
@@ -671,8 +678,8 @@ class TextsWidget(QtGui.QWidget):
 				self.useTextEdit.hide()
 				
 			try:
-				self.defaultTextEdit.setText(item.texts["default"])
-				self.defaultTextEdit2.setText(item.texts["default"])
+				self.defaultTextEdit.setText(self.currentItem.texts["default"])
+				self.defaultTextEdit2.setText(self.currentItem.texts["default"])
 			except:
 				pass
 			
@@ -681,7 +688,7 @@ class TextsWidget(QtGui.QWidget):
 			for target in targets:
 				for targetImage in target.getImages():
 					# Target image
-					if (targetImage.id == item.id or targetImage.imageAttributes["category"] == "secret"):
+					if (targetImage.id == self.currentItem.id or targetImage.imageAttributes["category"] == "secret"):
 						continue
 					self.text_scene.insertRow(self.text_scene.rowCount())
 					imageObject = self.scenarioData.getJSONObject(targetImage.id)
@@ -691,7 +698,7 @@ class TextsWidget(QtGui.QWidget):
 
 					# Interaction text with the target
 					try:
-						interactionText = item.texts[targetImage.id]
+						interactionText = self.currentItem.texts[targetImage.id]
 					except:
 						interactionText = ""
 					 
@@ -707,6 +714,34 @@ class TextsWidget(QtGui.QWidget):
 		else:
 			for setting in self.itemSettings:
 				setting.hide()
+	
+	def changeText(self, textType, gameObject=None, textEdit=None):
+		if not (gameObject):
+			gameObject = self.currentItem
+			
+		if (textType == "click"):
+			if not (textEdit):
+				textEdit = self.clickTextEdit
+			gameObject.parentItem.setExamineText(textEdit.toPlainText())
+		elif (textType == "pickup"):
+			if not (textEdit):
+				textEdit = self.pickupTextEdit
+			gameObject.parentItem.setPickupText(textEdit.toPlainText())
+		elif (textType == "use"):
+			if not (textEdit):
+				textEdit = self.useTextEdit
+			gameObject.parentItem.setUseText(textEdit.toPlainText())
+			gameObject.useText = textEdit.toPlainText()
+		elif (textType == "default"):
+			if not (textEdit):
+				textEdit = self.defaultTextEdit
+			gameObject.parentItem.setDefaultText(textEdit.toPlainText())
+		elif (textType == "interaction"):
+			print ("Joo")
+
+	def changeInteractionText(self, row, column):
+		item = self.text_scene.itemAt(row, column)
+		print ("tewjiotjewiojtiojt", item.id, row, column)
 							
 if __name__ == '__main__':
 	from sys import argv, exit

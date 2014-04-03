@@ -208,6 +208,10 @@ class Item(Object):
 	def setPickupText(self, pickupText):
 		self.texts["pickup"] = pickupText
 		
+	# Set item's default text
+	def setDefaultText(self, defaultText):
+		self.texts["default"] = defaultText
+		
 	def setOutcome(self, outcomeObject):
 		self.outcome = outcomeObject
 		
