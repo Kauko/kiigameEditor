@@ -29,7 +29,7 @@ class ScenarioData(object):
 			f.close()
 				
 	def parseImages(self):
-		with open(self.dataDir + "/images.json", encoding="utf-8") as f:
+		with open(self.dataDir + "/images.json", encoding='utf-8') as f:
 			images = json.load(f)
 			f.close()
 			
@@ -140,6 +140,7 @@ class ScenarioData(object):
 		
 	# Save scenario to JSON files
 	def saveScenario(self):
+		scenarioTexts = {}
 		scenarioObjects = {}
 		scenarioImages = []
 		
@@ -168,6 +169,13 @@ class ScenarioData(object):
 					
 			layerJSON = self.__createLayerJSON__(view.attrs, viewChildren, view.classname)
 			scenarioImages.append(layerJSON)
+			
+		# Go through self.texts and add modified texts from objects
+		objects = self.getAllObjects()[0]
+		for object in objects:
+			for objectImage in object.getImages():
+				if (objectImage.id in self.texts):
+					self.texts[objectImage.id] = objectImage.texts
 		
 		# Miscellaneous objects
 		for misc in self.miscObjects:
@@ -177,13 +185,19 @@ class ScenarioData(object):
 		scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
 		scenarioChildren = self.__createLayerJSON__(scenarioAttrs, scenarioImages, "Stage")
 		
+		textsJSON = json.dumps(self.texts, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
 		imagesJSON = json.dumps(scenarioChildren, sort_keys=True, indent=4, separators=(',', ': '))
 		objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
 		
+		print(textsJSON)
 		#print(imagesJSON)
 		#print(objectsJSON)
 		
 		# Save into file
+		f = open(self.dataDir + "/texts_lol.json", "w", encoding='utf-8')
+		f.write(textsJSON)
+		f.close()
+
 		#f = open(self.dataDir + "/images.json", "w")
 		#f.write(imagesJSON)
 		#f.close()

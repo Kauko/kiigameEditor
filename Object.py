@@ -206,11 +206,28 @@ class Item(Object):
 			
 	# Set item's pickup text
 	def setPickupText(self, pickupText):
-		self.texts["pickup"] = pickupText
+		if (pickupText == ""):
+			self.removeText("pickup")
+		else:
+			self.texts["pickup"] = pickupText
 		
 	# Set item's default text
 	def setDefaultText(self, defaultText):
-		self.texts["default"] = defaultText
+		if (defaultText == ""):
+			self.removeText("default")
+		else:
+			self.texts["default"] = defaultText
+		
+	def setInteractionText(self, targetId, interactionText):
+		if (interactionText == ""):
+			self.removeText(targetId)
+		else:
+			self.texts[targetId] = interactionText
+		
+	def removeText(self, textKey):
+		newTexts = dict(self.texts)
+		del newTexts[textKey]
+		self.texts = newTexts
 		
 	def setOutcome(self, outcomeObject):
 		self.outcome = outcomeObject
