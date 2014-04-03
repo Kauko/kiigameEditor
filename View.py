@@ -191,23 +191,24 @@ class Start(View):
 			
 			# Create objects according to its category
 			if (imageId == "begining"):
-				self.beginingImage = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
+				self.beginingImage = Object.BeginingImage(texts, self, imageAttributes, objectAttributes)
 			if (imageId == "start"):
 				self.background = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
-			#if (imageId == "start_empty"):
-			#	self.emptyButton = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
 				
 	def postInit(self, getGameObject):
 		# Create menu items
 		menu = getGameObject("menu", self.object["menu"])
 		for imageId,action in menu.object["items"].items():
+			print("LOL", action, menu)
 			if (action == "start_game"):
 				self.startButton = menu.getItemById(imageId)
 			elif (action == "credits"):
 				self.creditsButton = menu.getItemById(imageId)
-
+			elif (action == "none"):
+				self.emptyButton = menu.getItemById(imageId)
+				
 	def getChildren(self):
-		return [self.background, self.startButton, self.creditsButton, self.beginingImage]
+		return [self.background, self.startButton, self.creditsButton, self.emptyButton, self.beginingImage]
 
 	def getRepresentingImage(self):
 		return self.background

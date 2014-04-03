@@ -111,9 +111,14 @@ class Editor(QtGui.QMainWindow):
 		
 	def populateAddObjectsCombo(self):
 		selectedType = self.left_scene.currentItem().room.__class__.__name__
-		print("selecto", selectedType)
-		self.addObjectsCombo.clear()
 		
+		
+		if (selectedType == "Start"):
+			self.addObjectsCombo.setDisabled(True)
+			self.setRemoveObjectsButtonDisabled(forceDisable=True)
+			return
+		self.addObjectsCombo.setDisabled(False)
+		self.addObjectsCombo.clear()
 		self.addObjectsCombo.addItem("Lisää esine valittuun tilaan")
 		if (selectedType == "Room"):
 			self.addObjectsCombo.addItem("Kiinteä esine", userData="object")
@@ -158,18 +163,18 @@ class Editor(QtGui.QMainWindow):
 		row = self.middle_scene.currentRow()
 		self.middle_scene.takeItem(row)
 		
-	def setRemoveObjectsButtonDisabled(self):
+	def setRemoveObjectsButtonDisabled(self, forceDisable=False):
 		selected = self.middle_scene.selectedItems()
-		if (len(selected) == 0):
+		if (len(selected) == 0 or forceDisable == True):
 			isDisabled = True
 		else:
 			isDisabled = False
 			
 		self.removeObjectsButton.setDisabled(isDisabled)
 		
-	def setRemoveViewsButtonDisabled(self):
+	def setRemoveViewsButtonDisabled(self, forceDisable=False):
 		selected = self.left_scene.selectedItems()
-		if (len(selected) == 0):
+		if (len(selected) == 0 and forceDisable == False):
 			isDisabled = True
 		else:
 			isDisabled = False
@@ -419,6 +424,10 @@ class Editor(QtGui.QMainWindow):
 			widgetItem = ViewWidget(end, self.scenarioData.dataDir)
 			
 			self.left_scene.addItem(widgetItem)
+			
+		# Start
+		widgetItem = ViewWidget(self.scenarioData.startView, self.scenarioData.dataDir)
+		self.left_scene.addItem(widgetItem)
 			
 	# Draw the middle frame room items
 	def drawRoomItems(self):

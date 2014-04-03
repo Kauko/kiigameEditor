@@ -786,11 +786,20 @@ class SequenceImage(JSONImage):
 		
 # Differentiate menu images from normal images
 class MenuImage(JSONImage):
-	generalName = "Kuva"
-	generalNameAdessive = "Kuvalla"
+	generalName = "Valikkokuva"
+	generalNameAdessive = "Valikkokuvalla"
 	
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(MenuImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
+
+# Differentiate begining image from normal images
+# This is here mostly for the general name and adessive
+class BeginingImage(JSONImage):
+	generalName = "Alkuruutu"
+	generalNameAdessive = "Alkuruudulla"
+	
+	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
+		super(BeginingImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
 
 class Text(JSONImage):
 	generalName = "Teksti"

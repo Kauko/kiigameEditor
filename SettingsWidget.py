@@ -52,6 +52,12 @@ class SettingsWidget(QtGui.QWidget):
 			self.setContainerOptions(gameObject)
 		elif (objectType == "Obstacle"):
 			self.setObstacleOptions(gameObject)
+		elif (objectType == "JSONImage"):
+			self.setJSONImageOptions(gameObject)
+		elif (objectType == "Start"):
+			self.setStartOptions(gameObject)
+		elif (objectType == "MenuImage"):
+			self.setMenuImageOptions(gameObject)
 			
 	def showWidgets(self, objectType):
 		if (self.lastObjectType):
@@ -278,6 +284,18 @@ class SettingsWidget(QtGui.QWidget):
 			],
 			"Text": [
 			],
+			"JSONImage": [
+				self.imgTextLabel,
+				self.objectImage,
+			],
+			"Start": [
+				self.musicLabel,
+				self.musicTextEdit
+			],
+			"MenuImage": [
+				self.imgTextLabel,
+				self.objectImage,
+			],
 			"Item": [
 				self.nameLabel,
 				self.objectNameEdit,
@@ -350,10 +368,27 @@ class SettingsWidget(QtGui.QWidget):
 		doFade = (self.sequenceFadeCombo.currentIndex() == True)
 		self.currentObject.setDoFade(doFade)
 		
+	def setStartOptions(self, startObject):
+		# Music may return None which doesn't have split
+		try:
+			music = startObject.getMusic().split("/")[-1]
+		except AttributeError:
+			music = ""
+		self.musicTextEdit.setText(music)
+		
+	def setMenuImageOptions(self, menuObject):
+		# Start name
+		self.setObjectName(menuObject, menuObject.generalNameAdessive)
+		
+	# Generic JSON images
+	def setJSONImageOptions(self, imageObject):
+		# Image
+		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getRepresentingImage().getSource())
+		
 	# Set the input field values for rooms
 	def setRoomOptions(self, room):
 		# Room name
-		self.setObjectName(room, "Huoneella")
+		self.setObjectName(room, room.generalNameAdessive)
 		
 		# Room background
 		self.setobjectImage(self.parent.getImageDir()+"/"+room.getRepresentingImage().getSource())
@@ -367,7 +402,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	def setSequenceOptions(self, sequence):
 		# Sequence name
-		self.setObjectName(sequence, "Välianimaatiolla")
+		self.setObjectName(sequence, sequence.generalNameAdessive)
 		
 		# Sequence background
 		self.setobjectImage(self.parent.getImageDir()+"/"+sequence.getRepresentingImage().getSource())
@@ -401,7 +436,7 @@ class SettingsWidget(QtGui.QWidget):
 		imageObject = item.getRepresentingImage()
 		
 		# Object name
-		self.setObjectName(imageObject, "Esineellä")
+		self.setObjectName(imageObject, item.generalNameAdessive)
 		
 		# Item image
 		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
@@ -449,10 +484,10 @@ class SettingsWidget(QtGui.QWidget):
 		self.setUseText()
 			
 	# Set the input field values for generic objects
-	def setGenericOptions(self, gObject):
-		self.setObjectName(gObject, "Esineellä")
+	def setGenericOptions(self, genericObject):
+		self.setObjectName(genericObject, genericObject.generalNameAdessive)
 		
-		imageObject = gObject.getRepresentingImage()
+		imageObject = genericObject.getRepresentingImage()
 		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
 		
 		# Examine text
@@ -808,7 +843,7 @@ class SettingsWidget(QtGui.QWidget):
 			# TODO: Some model to eliminate redundancy from getName/roomName patterns
 			roomName = room.getName()
 			if not (roomName):
-				roomName = "Huoneella ei ole nimeä"
+				roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
 			imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+room.getRepresentingImage().getSource())
 			
 			roomIcon = QtGui.QIcon(imgPixmap)
@@ -873,7 +908,7 @@ class SettingsWidget(QtGui.QWidget):
 				roomObject = room["room"]
 				roomName = roomObject.getName()
 				if not (roomName):
-					roomName = "Huoneella ei ole nimeä"
+					roomName = "%s ei ole nimeä" %(roomObject.generalNameAdessive)
 				imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+roomObject.getRepresentingImage().getSource())
 				
 				roomIcon = QtGui.QIcon(imgPixmap)
