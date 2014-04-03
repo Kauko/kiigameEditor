@@ -274,8 +274,7 @@ class Editor(QtGui.QMainWindow):
 		left_frame_layout.addWidget(self.text_scene)
 		
 		# Draw all items and their progress bar
-		objects = self.scenarioData.getAllObjects()
-		self.drawTextItems(objects)
+		self.drawTextItems()
 		
 		# Select the first item
 		selectedItem = self.text_scene.itemAt(0, 0)
@@ -287,7 +286,7 @@ class Editor(QtGui.QMainWindow):
 		self.texts_frame.setLayout(self.texts_frame_layout)
 		layout.addWidget(self.texts_frame)
 		
-		self.textsWidget = TextsWidget(self.scenarioData)
+		self.textsWidget = TextsWidget(self.scenarioData, self)
 		self.texts_frame_layout.addWidget(self.textsWidget)
 		
 		self.textsWidget.displayTexts(selectedItem)
@@ -301,8 +300,9 @@ class Editor(QtGui.QMainWindow):
 			self.textsWidget.displayTexts(selected)
 			self.texts_frame.setTitle("Tekstit - %s" %(selected.text()))
 		
-	def drawTextItems(self, textItems):
-		row = 0
+	def drawTextItems(self):
+		print("DRAW")
+		textItems = self.scenarioData.getAllObjects()
 		secretCount = textItems.pop()
 		imgCount = textItems.pop()
 		textItems = textItems.pop()
@@ -312,7 +312,7 @@ class Editor(QtGui.QMainWindow):
 		
 		# Disable sorting for row count, enable it after adding items
 		self.text_scene.setSortingEnabled(False)
-		
+		row = 0
 		for item in textItems:
 			for itemImage in item.getImages():
 				textCount = len(item.texts)
@@ -326,27 +326,34 @@ class Editor(QtGui.QMainWindow):
 				
 				# Maximum amount of texts for item
 				maxAmount = 0
-				if ("examine" in item.texts):
+				if ("examine" in itemImage.texts):
 					maxAmount += 1
+					if (itemImage.texts["examine"] == ""):
+						textCount -= 1
 					
-				if ("pickup" in item.texts):
+				if ("pickup" in itemImage.texts):
 					maxAmount += 1
 				# TODO: Sorting doesn't work, fix possibly by setItem here and setCellWidget inside item
 				nameCount = 0
-				if ("name" in item.texts):
+				if ("name" in itemImage.texts):
 					textCount -= 1
-				
+					
+				if (itemImage.imageAttributes["category"] == "secret"):
+					maxAmount = 1
+					
 				if (item.__class__.__name__ == "Item"
-					or item.getRepresentingImage().imageAttributes["category"] == "reward"):
+					or itemImage.imageAttributes["category"] == "reward"):
 					# Max amount is number of all images minus item itself and secrets (no interaction)
 					maxAmount += imgCount-1-secretCount
 					
 					# Different pictures for the inventory and the room
-					if ("src2" in itemImage.imageAttributes):
+					if ("src2" in itemImage.imageAttributes or itemImage.imageAttributes["category"] == "secret"):
 						maxAmount = 1
 					
 				# Add a progressbar to the second column
 				#progressBarItem = ProgressBarItemWidget(item, maxAmount)
+				if (itemImage.imageAttributes["category"] == "secret"):
+					print (itemImage.id, maxAmount, textCount)
 				progressBar = QtGui.QProgressBar()
 				progressBar.setMinimum(0)
 				progressBar.setMaximum(maxAmount)
@@ -532,28 +539,29 @@ class TextItemWidget(QtGui.QTableWidgetItem):
 		return ""
 
 # ProgressBar item that shows how much item has texts completed
-class ProgressBarItemWidget(QtGui.QTableWidgetItem):
-	def __init__(self, textItem, maxAmount, parent=None):
-		super(ProgressBarItemWidget, self).__init__(parent)
-		
-		self.progressBar = QtGui.QProgressBar()
-		self.textItem = textItem
-		self.maxAmount = maxAmount
-		
-		self.calculateProgress()
-
-	def calculateProgress(self): # If there's many images, .texts doesn't work!
-		
-		print ("LOL", self.textItem.id, self.maxAmount, len(self.textItem.texts)-1)
-		self.progressBar.setMinimum(0)
-		self.progressBar.setMaximum(self.maxAmount)
-		self.progressBar.setValue(len(self.textItem.texts)-1)
+#class ProgressBarItemWidget(QtGui.QTableWidgetItem):
+#	def __init__(self, textItem, maxAmount, parent=None):
+#		super(ProgressBarItemWidget, self).__init__(parent)
+#
+#		self.progressBar = QtGui.QProgressBar()
+#		self.textItem = textItem
+#		self.maxAmount = maxAmount
+#
+#		self.calculateProgress()
+#
+#	def calculateProgress(self): # If there's many images, .texts doesn't work!
+#
+#		print ("LOL", self.textItem.id, self.maxAmount, len(self.textItem.texts)-1)
+#		self.progressBar.setMinimum(0)
+#		self.progressBar.setMaximum(self.maxAmount)
+#		self.progressBar.setValue(len(self.textItem.texts)-1)
 
 # Texts widget that shows texts of specific item in the texts tab
 class TextsWidget(QtGui.QWidget):
 	def __init__(self, scenarioData, parent=None):
 		super(TextsWidget, self).__init__(parent)
 
+		self.parent = parent
 		self.scenarioData = scenarioData
 		self.layout = QtGui.QGridLayout()
 		self.setLayout(self.layout)
@@ -608,6 +616,7 @@ class TextsWidget(QtGui.QWidget):
 		self.text_scene.cellChanged.connect(self.changeInteractionText)
 
 	def displayTexts(self, item):
+		print ("DISPLAY")
 		self.currentItem = item
 		# TODO: InteractionTextGroupBox should take 3/4 of the width
 		self.layout.addWidget(self.clickTextLabel, 0, 0)
@@ -655,6 +664,7 @@ class TextsWidget(QtGui.QWidget):
 			self.interactionTextGroupBox,
 		]
 		
+		# TODO: Secrets are not working right when removing their text
 		if (self.currentItem.textItem.imageAttributes["category"] == "secret" or "src2" in self.currentItem.textItem.imageAttributes):
 			self.clickTextEdit.setText(self.currentItem.texts["pickup"])
 		else:
@@ -733,26 +743,33 @@ class TextsWidget(QtGui.QWidget):
 		if (textType == "click"):
 			if not (textEdit):
 				textEdit = self.clickTextEdit
-			gameObject.parentItem.setExamineText(textEdit.toPlainText())
+			gameObject.textItem.setExamineText(textEdit.toPlainText())
 		elif (textType == "pickup"):
 			if not (textEdit):
 				textEdit = self.pickupTextEdit
-			gameObject.parentItem.setPickupText(textEdit.toPlainText())
+			gameObject.textItem.setPickupText(textEdit.toPlainText())
 		elif (textType == "use"):
 			if not (textEdit):
 				textEdit = self.useTextEdit
-			gameObject.parentItem.setUseText(textEdit.toPlainText())
+			gameObject.textItem.setUseText(textEdit.toPlainText())
 			gameObject.useText = textEdit.toPlainText()
 		elif (textType == "default"):
 			if not (textEdit):
 				textEdit = self.defaultTextEdit
-			gameObject.parentItem.setDefaultText(textEdit.toPlainText())
-		elif (textType == "interaction"):
-			print ("Joo")
+			gameObject.textItem.setDefaultText(textEdit.toPlainText())
+		
+		self.parent.drawTextItems()
 
 	def changeInteractionText(self, row, column):
-		item = self.text_scene.itemAt(row, column)
-		print ("tewjiotjewiojtiojt", item.id, row, column)
+		# TODO: Disable editing on first column
+		if not (column == 0):
+			targetObject = self.text_scene.item(row, 0)
+			try:
+				interactionText = self.text_scene.selectedItems()[0].text()
+				self.currentItem.textItem.setInteractionText(targetObject.id, interactionText)
+				self.parent.drawTextItems()
+			except:
+				pass
 							
 if __name__ == '__main__':
 	from sys import argv, exit
