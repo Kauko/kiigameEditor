@@ -222,20 +222,35 @@ class End(View):
 		
 # Any game room
 class Room(View):
+	# Generic attributes for rooms
+	roomAttributes = {'className': 'Layer', 'attrs': {'object_name': '', 'id': '', 'visible': False, 'category': 'room', 'start': False}, 'object': {'music': ''}}
+	
 	def __init__(self, texts, roomId, roomAttributes, roomImages):
+		if not (roomAttributes):
+			roomAttributes = Room.roomAttributes
+			
 		super(Room, self).__init__(texts, roomAttributes, roomId)
 		
 		# Create objects inside the room including the background
-		# TODO: This could be done in super
+		# TODO: Parsing objects could as well be done in View?
+		
 		self.objectList = []
+		
+		if not (roomImages):
+			self.background = Object.JSONImage(texts, self, None, None)
+			self.background.setCategory("room_background")
+			print("BACKGROU", self.background, self.background.imageAttributes)
+			return
+			
+		self.background = None
+		
 		for imageId in roomImages:
 			images = roomImages[imageId].pop("image")
 			imageAttributes = roomImages[imageId]
 			imageCategory = images[0]["category"]
 			
-			# Create objects according to its category
+			# Create objects according to their category
 			if (imageAttributes["className"] == "Text"):
-				print("WWWWTAIOSDUOASDUISIO\n\n", imageCategory)
 				self.objectList.append(Object.Text(texts, self, images, imageAttributes, imageId))
 			elif (imageCategory == "room_background"):
 				self.background = Object.JSONImage(texts, self, images[0], imageAttributes)

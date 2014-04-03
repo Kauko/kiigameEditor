@@ -118,7 +118,7 @@ class Editor(QtGui.QMainWindow):
 		selected = self.addViewsCombo.itemData(self.addViewsCombo.currentIndex())
 		if not (selected in ("room", "sequence", "end")):
 			return
-		self.createObject(selected)
+		self.createView(selected)
 		
 		self.addObjectsCombo.setCurrentIndex(0)
 		self.left_scene.setCurrentRow(self.left_scene.count()-1)
@@ -229,13 +229,8 @@ class Editor(QtGui.QMainWindow):
 			
 	def createObject(self, objectType):
 		selectedRoom = self.left_scene.selectedItems()[0]
-		if (objectType == "room"):
-			newObject = self.scenarioData.addRoom(None, None, None)
-			
-		elif (objectType == "sequence"):
-			print("create sequence")
-			
-		elif (objectType == "object"):
+		
+		if (objectType == "object"):
 			newObject = selectedRoom.room.addObject()
 		elif (objectType == "item"):
 			newObject = selectedRoom.room.addItem()
@@ -247,12 +242,24 @@ class Editor(QtGui.QMainWindow):
 			newObject = selectedRoom.room.addObstacle()
 		else:
 			return
-		print("new ovject", newObject, newObject.id)
-		
-		#widget.setRepresentingImage("airfreshener.png")
+			
 		newObject.getRepresentingImage().setSource("airfreshener.png")
 		widgetItem = ItemWidget(newObject, self.scenarioData.dataDir)
 		self.middle_scene.addItem(widgetItem)
+		
+	def createView(self, objectType):
+		if (objectType == "room"):
+			newObject = self.scenarioData.addRoom(None, None, None)
+		elif (objectType == "sequence"):
+			newObject = self.scenarioData.addSequence(None, None, None)
+		elif (objectType == "end"):
+			newObject = self.scenarioData.addEnd(None, None, None)
+		else:
+			return
+			
+		newObject.getRepresentingImage().setSource("airfreshener.png")
+		widgetItem = ViewWidget(newObject, self.scenarioData.dataDir)
+		self.left_scene.addItem(widgetItem)
 		
 	def createTextsTab(self):
 		self.textsTab = QtGui.QWidget()

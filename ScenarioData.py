@@ -299,7 +299,7 @@ class ScenarioData(object):
 				return menu
 				
 	def deleteObject(self, objectId):
-		for obj in self.objectList:
+		for obj in self.objectList:	
 			if obj.id == objectId:
 				self.objectList.remove(obj)
 
@@ -311,26 +311,32 @@ class ScenarioData(object):
 	def addEnd(self, endAttributes, endImages):
 		newView = View.End(self.texts, endAttributes, endImages)
 		self.endViewList.append(newView)
+		return newView
 		
 	def addStart(self, startAttributes, startImages):
 		newView = View.Start(self.texts, startAttributes, startImages)
 		self.startView = newView
+		return newView
 		
 	def addSequence(self, sequenceId, sequenceAttributes, sequenceImages):
 		newView = View.Sequence(self.texts, sequenceId, sequenceAttributes, sequenceImages)
 		self.sequenceList.append(newView)
-
+		return newView
+		
 	def addRoom(self, roomId, roomAttributes, roomImages):
 		newView = View.Room(self.texts, roomId, roomAttributes, roomImages)
 		self.roomList.append(newView)
+		return newView
 		
 	def addCustomView(self, viewId, viewAttributes, viewImages):
 		newView = View.Custom(self.texts, viewId, viewAttributes, viewImages)
 		self.customObjectList.append(newView)
+		return newView
 		
 	def addMenu(self, menuId, menuAttributes, menuImages):
 		newView = View.Menu(self.texts, menuId, menuAttributes, menuImages)
 		self.menuList.append(newView)
+		return newView
 		
 	def deleteView(self):
 		return
