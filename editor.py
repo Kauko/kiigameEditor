@@ -18,16 +18,16 @@ class Editor(QtGui.QMainWindow):
 		# TODO: Menubar
 		menubar = self.menuBar()
 		
-		tabWidget = QtGui.QTabWidget()
-		self.setCentralWidget(tabWidget)
+		self.tabWidget = QtGui.QTabWidget()
+		self.setCentralWidget(self.tabWidget)
 		
 		self.createMainTab()
 		self.createSpaceTab()
 		self.createTextsTab()
 		
-		tabWidget.addTab(self.mainTab, "Päänäkymä")
-		tabWidget.addTab(self.spaceTab, "Tila")
-		tabWidget.addTab(self.textsTab, "Tekstit")
+		self.tabWidget.addTab(self.mainTab, "Päänäkymä")
+		self.tabWidget.addTab(self.spaceTab, "Tila")
+		self.tabWidget.addTab(self.textsTab, "Tekstit")
 		
 	def createMainTab(self):
 		self.mainTab = QtGui.QWidget()
@@ -111,8 +111,7 @@ class Editor(QtGui.QMainWindow):
 		right_frame_layout.addWidget(scrollArea)
 		
 	def roomDoubleClicked(self):
-		# TODO: Show space
-		print("Room double clicked!")
+		self.tabWidget.setCurrentIndex(1)
 		
 	def populateAddObjectsCombo(self):
 		selectedType = self.left_scene.currentItem().room.__class__.__name__
