@@ -53,6 +53,7 @@ class Object(object):
 		#self.whatBlocks = None # TODO: In interaction instead?
 		self.location = location
 		self.objectAttributes = objectAttributes
+		
 		try:
 			self.texts = texts[self.id]
 		except KeyError:
@@ -760,10 +761,32 @@ class JSONImage(Object):
 class SequenceImage(JSONImage):
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(SequenceImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
-		#print(objectAttributes, imageAttributes)
-		#print(location.)
-
+		
+	# Get the display time for this image
+	def getShowTime(self):
+		return self.location.getShowTime(self.id)
+		
+	# Set the display time for this image
+	def setShowTime(self, milliseconds):
+		self.location.setShowTime(self.id, milliseconds)
+		
+	# Get the fade type for this image
+	def getDoFade(self):
+		return self.location.getDoFade(self.id)
+		
+	# Set the fade type for this image
+	def setDoFade(self, doFade):
+		return self.location.setDoFade(self.id, doFade)
+		
 # Differentiate menu images from normal images
 class MenuImage(JSONImage):
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(MenuImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
+
+class Text(JSONImage):
+	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
+		super(Text, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
+		
+	def getSource(self):
+		return "images/airfreshener.png"
+		

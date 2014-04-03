@@ -12,7 +12,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTypes = {0: "Ei käyttöä", 1: "Käytä toiseen esineeseen",
 			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Ota jostakin", 5: "Poista este"}
 			
-		self.fadeTypes = {0: "Häivytys", 1: "Välittömästi"}
+		self.fadeTypes = {0: "Välittömästi", 1: "Häivytys"}
 		
 		self.layout = QtGui.QVBoxLayout()
 		self.setLayout(self.layout)
@@ -165,12 +165,16 @@ class SettingsWidget(QtGui.QWidget):
 		self.outcomeCombobox = self.createItemCombobox("Ei valittu", ("object",), ("object",), noChoiceMethod=self.clearOutcome, connectTo=self.changeOutcome)
 		
 		# Sequence
-		self.sequenceTimeLabel = QtGui.QLabel("Kuvan näyttäaika sekunneissa")
+		self.sequenceTimeLabel = QtGui.QLabel("Kuvan näyttöaika (0-10 sekuntia)")
 		self.sequenceTimeEdit = QtGui.QLineEdit()
+		self.sequenceTimeEdit.setInputMask("9,9")
+		self.sequenceTimeEdit.focusOutEvent = lambda s: self.changeSequenceTime()
+		
 		self.sequenceFadeLabel = QtGui.QLabel("Kuvan vaihtumistapa")
 		self.sequenceFadeCombo = QtGui.QComboBox(self)
 		for i in self.fadeTypes:
 			self.sequenceFadeCombo.addItem(self.fadeTypes[i])
+		self.sequenceFadeCombo.currentIndexChanged.connect(self.changeSequenceFadeCombo)
 		
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
@@ -262,6 +266,14 @@ class SettingsWidget(QtGui.QWidget):
 				self.sequenceFadeLabel,
 				self.sequenceFadeCombo
 			],
+			"End": [
+				self.nameLabel,
+				self.objectNameEdit,
+				self.musicLabel,
+				self.musicTextEdit,
+				self.musicBtn,
+				self.musicClear,
+			],
 			"Item": [
 				self.nameLabel,
 				self.objectNameEdit,
@@ -326,6 +338,14 @@ class SettingsWidget(QtGui.QWidget):
 			for item in self.itemSettings[key]:
 				item.hide()
 				
+	def changeSequenceTime(self):
+		time = int(float(self.sequenceTimeEdit.text().replace(",", "."))*1000)
+		self.currentObject.setShowTime(time)
+		
+	def changeSequenceFadeCombo(self):
+		doFade = (self.sequenceFadeCombo.currentIndex() == True)
+		self.currentObject.setDoFade(doFade)
+		
 	# Set the input field values for rooms
 	def setRoomOptions(self, room):
 		# Room name
@@ -357,16 +377,20 @@ class SettingsWidget(QtGui.QWidget):
 	
 	def setSequenceImageOptions(self, sequenceImage):
 		# Image
-		self.setobjectImage(self.parent.getImageDir()+"/"+sequence.getRepresentingImage().getSource())
-		print("ASD")
+		self.setobjectImage(self.parent.getImageDir()+"/"+sequenceImage.getRepresentingImage().getSource())
 		
-		#self.currentObject.setDisplayTime
+		# Set image display time. It needs to be converted into str and dots replaced
+		time = str(self.currentObject.getShowTime()/1000).replace(".", ",")
+		self.sequenceTimeEdit.setText(time)
+		
+		# Image fade type
+		self.sequenceFadeCombo.setCurrentIndex(self.currentObject.getDoFade())
 		
 	def setStartOptions(self, start):
-		print("start options")
+		print("Showing start menu settings")
 		
 	def setEndOptions(self, end):
-		print("end options")
+		print("Showing end settings")
 		
 	# Set the input field values for items
 	def setItemOptions(self, item):

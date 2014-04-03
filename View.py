@@ -92,7 +92,7 @@ class Menu(View):
 			imageAttributes = menuImages[imageId]
 			menuImage = Object.MenuImage(texts, self, image, imageAttributes)
 			self.menuImages.append(menuImage)
-
+			
 	def getItemById(self, itemId):
 		for item in self.menuImages:
 			if (item.id == itemId):
@@ -105,19 +105,15 @@ class Menu(View):
 class Sequence(View):
 	def __init__(self, texts, sequenceId, sequenceAttributes, sequenceImages):
 		super(Sequence, self).__init__(texts, sequenceAttributes, sequenceId)
-		#print("SEQATT", sequenceAttributes)
+		
 		# Create sequence image objects
 		self.sequenceImages = []
 		for image in sequenceImages:
 			images = sequenceImages[image].pop("image")[0]
 			imageAttributes = sequenceImages[image]
-			#print("im", images, imageAttributes)
 			sequenceImage = Object.SequenceImage(texts, self, images, imageAttributes)
 			self.sequenceImages.append(sequenceImage)
-
-		print("objecteros\n\n",self.object)
-		#self.object = {"wtf": "LOL"}
-		
+			
 	def deleteChild(self, imageId):
 		for image in self.images:
 			if (image.id == imageId):
@@ -132,6 +128,30 @@ class Sequence(View):
 	def getItems(self):
 		return self.getChildren()
 		
+	# Get the display time for the given image
+	def getShowTime(self, imageId):
+		for i in self.object["images"]:
+			if (self.object["images"][i]["id"] == imageId):
+				return self.object["images"][i]["show_time"]
+				
+	# Set the display time for the given image
+	def setShowTime(self, imageId, milliseconds):
+		for i in self.object["images"]:
+			if (self.object["images"][i]["id"] == imageId):
+				self.object["images"][i]["show_time"] = milliseconds
+				
+	# Get the fade type for the given image
+	def getDoFade(self, imageId):
+		for i in self.object["images"]:
+			if (self.object["images"][i]["id"] == imageId):
+				return self.object["images"][i]["do_fade"]
+				
+	# Set the fade type for the given image
+	def setDoFade(self, imageId, doFade):
+		for i in self.object["images"]:
+			if (self.object["images"][i]["id"] == imageId):
+				self.object["images"][i]["do_fade"] = doFade
+				
 # Start menu
 class Start(View):
 	def __init__(self, texts, startAttributes, startImages):
@@ -179,12 +199,13 @@ class End(View):
 			objectAttributes = endImages[imageId]
 			imageId = imageAttributes["id"]
 			
-			# Create objects according to its category
-			#if (imageId == "rewards_text"):
-			#	self.endText = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
-			#else:
 			self.endImages.append(Object.JSONImage(texts, self, imageAttributes, objectAttributes))
-				
+			
+	def postInit(self, getGameObject):
+		# Create text item
+		# TODO: Connect texts and ends in kiigame to get rid of hard coded ID
+		self.endText = getGameObject("custom", "end_texts").getRepresentingImage()
+		
 	def deleteChild(self, imageId):
 		for image in self.endImages:
 			if (image.id == imageId):
@@ -194,7 +215,10 @@ class End(View):
 		return self.endImages
 		
 	def getItems(self):
-		return self.getChildren()
+		return self.endText,
+		
+	def getRepresentingImage(self):
+		return self.endImages[0]
 		
 # Any game room
 class Room(View):
@@ -210,7 +234,10 @@ class Room(View):
 			imageCategory = images[0]["category"]
 			
 			# Create objects according to its category
-			if (imageCategory == "room_background"):
+			if (imageAttributes["className"] == "Text"):
+				print("WWWWTAIOSDUOASDUISIO\n\n", imageCategory)
+				self.objectList.append(Object.Text(texts, self, images, imageAttributes, imageId))
+			elif (imageCategory == "room_background"):
 				self.background = Object.JSONImage(texts, self, images[0], imageAttributes)
 			# TODO: Secret items - fix it in kiigame first
 			elif (imageCategory == "item"):
@@ -290,7 +317,12 @@ class Custom(View):
 			images = viewImages[imageId].pop("image")
 			imageAttributes = viewImages[imageId]
 			
-			self.objectList.append(Object.Object(texts, self, imageId, images, imageAttributes))
+			print("attr", imageAttributes["className"], imageId)
+			if (imageAttributes["className"] == "Text"):
+				newObject = Object.Text(texts, self, images, imageAttributes, imageId)
+			else:
+				newObject = Object.Object(texts, self, imageId, images, imageAttributes)
+			self.objectList.append(newObject)
 				
 	def deleteChild(self, objectId):
 		for obj in self.objectList:
@@ -301,5 +333,8 @@ class Custom(View):
 		return self.objectList
 		
 	def getRepresentingImage(self):
-		return self.objectList[0].getRepresentingImage()
+		return self.objectList[0]#.getRepresentingImage()
 		
+	def getItems(self):
+		print("JELLO")
+		return self.objectList
