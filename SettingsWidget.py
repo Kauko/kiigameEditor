@@ -267,12 +267,16 @@ class SettingsWidget(QtGui.QWidget):
 				self.sequenceFadeCombo
 			],
 			"End": [
+				self.imgTextLabel,
+				self.objectImage,
 				self.nameLabel,
 				self.objectNameEdit,
 				self.musicLabel,
 				self.musicTextEdit,
 				self.musicBtn,
 				self.musicClear,
+			],
+			"Text": [
 			],
 			"Item": [
 				self.nameLabel,

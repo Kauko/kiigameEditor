@@ -113,6 +113,9 @@ class Sequence(View):
 	# Generic attributes for sequences
 	sequenceAttributes = {'attrs': {'id': '', 'object_name': '', 'visible': False, 'category': 'sequence'}, 'object': {'music': '', 'images': {}, 'category': 'sequence'}, 'className': 'Layer'}
 	
+	generalName = "Välianimaatio"
+	generalNameAdessive = "Välianimaatiolla"
+	
 	def __init__(self, texts, sequenceId, sequenceAttributes, sequenceImages):
 		if not (sequenceAttributes):
 			sequenceAttributes = Sequence.sequenceAttributes
@@ -175,6 +178,9 @@ class Sequence(View):
 				
 # Start menu
 class Start(View):
+	generalName = "Alkukuva"
+	generalNameAdessive = "Alkukuvalla"
+	
 	def __init__(self, texts, startAttributes, startImages):
 		super(Start, self).__init__(texts, startAttributes, "start")
 		
@@ -213,6 +219,9 @@ class Start(View):
 class End(View):
 	# Generic attributes for ends
 	endAttributes = {'object': {'music': '', 'sequence': '', 'category': 'end', 'menu': ''}, 'className': 'Layer', 'attrs': {'category': 'end', 'id': '', 'visible': False, 'object_name': ''}}
+	
+	generalName = "Loppu"
+	generalNameAdessive = "Lopulla"
 	
 	def __init__(self, texts, endId, endAttributes, endImages):
 		if not (endAttributes):
@@ -261,6 +270,9 @@ class End(View):
 class Room(View):
 	# Generic attributes for rooms
 	roomAttributes = {'className': 'Layer', 'attrs': {'object_name': '', 'id': '', 'visible': False, 'category': 'room', 'start': False}, 'object': {'music': ''}}
+	
+	generalName = "Huone"
+	generalNameAdessive = "Huoneella"
 	
 	def __init__(self, texts, roomId, roomAttributes, roomImages):
 		if not (roomAttributes):
@@ -360,6 +372,9 @@ class Room(View):
 		
 # Custom view for custom layers
 class Custom(View):
+	generalName = "Erikoisnäkymä"
+	generalNameAdessive = "Erikoisnäkymällä"
+	
 	def __init__(self, texts, viewId, viewAttributes, viewImages):
 		super(Custom, self).__init__(texts, viewAttributes, viewId)
 		

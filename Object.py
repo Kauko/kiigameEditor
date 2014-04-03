@@ -712,6 +712,10 @@ class Obstacle(Object):
 class JSONImage(Object):
 	imageAttributes = {'category': '', 'id': '', 'object_name': '', 'src': '', 'visible': False, 'x': 0, 'y': 0}
 	
+	generalName = "Kuva"
+	generalNameAdessive = "Kuvalla"
+	
+	
 	# imageAttributes has to be dict, not a list as with other objects
 	# objectAttributes is a dict with object, attrs and className keys
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
@@ -758,6 +762,9 @@ class JSONImage(Object):
 		
 # Differentiate sequence images from normal images
 class SequenceImage(JSONImage):
+	generalName = "Kuva"
+	generalNameAdessive = "Kuvalla"
+	
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(SequenceImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
 		
@@ -779,10 +786,16 @@ class SequenceImage(JSONImage):
 		
 # Differentiate menu images from normal images
 class MenuImage(JSONImage):
+	generalName = "Kuva"
+	generalNameAdessive = "Kuvalla"
+	
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(MenuImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
 
 class Text(JSONImage):
+	generalName = "Teksti"
+	generalNameAdessive = "Tekstillä"
+	
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(Text, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
 		
