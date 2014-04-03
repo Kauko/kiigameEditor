@@ -717,7 +717,7 @@ class JSONImage(Object):
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		if not (texts):
 			texts = {}
-		print("CREAINT ",imageId)
+			
 		if not (imageAttributes):
 			imageAttributes = JSONImage.imageAttributes
 			

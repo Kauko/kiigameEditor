@@ -40,6 +40,8 @@ class View(object):
 		else:
 			self.texts = {}
 		
+		self.placeholderImage = None # If no representingImage, use this
+		
 	# Should be overriden by other view classes
 	def getChildren(self):
 		return
@@ -82,6 +84,11 @@ class View(object):
 	def removeObject(self, childObject):
 		return
 
+	def createPlaceholderImage(self, imagePath, texts):
+		self.placeholderImage = Object.JSONImage(texts, self, None, None, self.id)
+		self.placeholderImage.setSource(imagePath)
+		return
+
 class Menu(View):
 	def __init__(self, texts, menuId, menuAttributes, menuImages):
 		super(Menu, self).__init__(texts, menuAttributes, menuId)
@@ -113,11 +120,9 @@ class Sequence(View):
 		super(Sequence, self).__init__(texts, sequenceAttributes, sequenceId)
 		
 		self.sequenceImages = []
-		self.placeholderImage = None # If no other images, use this
+		self.createPlaceholderImage("airfreshener.png", texts)
 		
 		if not (sequenceImages):
-			self.placeholderImage = Object.JSONImage(texts, self, None, None, self.id)
-			self.placeholderImage.setSource("images/airfreshener.png")
 			return
 		
 		# Create sequence image objects
@@ -138,8 +143,7 @@ class Sequence(View):
 	def getRepresentingImage(self):
 		if (len(self.sequenceImages) == 0):
 			return self.placeholderImage
-		else:
-			return self.sequenceImages[0]
+		return self.sequenceImages[0]
 			
 		
 	def getItems(self):
@@ -207,10 +211,22 @@ class Start(View):
 		
 # End menu
 class End(View):
-	def __init__(self, texts, endAttributes, endImages):
-		super(End, self).__init__(texts, endAttributes, "end")
+	# Generic attributes for ends
+	endAttributes = {'object': {'music': '', 'sequence': '', 'category': 'end', 'menu': ''}, 'className': 'Layer', 'attrs': {'category': 'end', 'id': '', 'visible': False, 'object_name': ''}}
+	
+	def __init__(self, texts, endId, endAttributes, endImages):
+		if not (endAttributes):
+			endAttributes = End.endAttributes
+			
+		super(End, self).__init__(texts, endAttributes, endId)
 		
 		self.endImages = []
+		self.createPlaceholderImage("airfreshener.png", texts)
+		self.endText = None
+		
+		if not (endImages):
+			return
+		
 		for imageId in endImages:
 			imageAttributes = endImages[imageId].pop("image")[0]
 			objectAttributes = endImages[imageId]
@@ -232,11 +248,15 @@ class End(View):
 		return self.endImages
 		
 	def getItems(self):
-		return self.endText,
+		if (self.endText):
+			return self.endText,
+		return ()
 		
 	def getRepresentingImage(self):
+		if (len(self.endImages) == 0):
+			return self.placeholderImage
 		return self.endImages[0]
-		
+			
 # Any game room
 class Room(View):
 	# Generic attributes for rooms
@@ -250,11 +270,9 @@ class Room(View):
 		
 		self.objectList = []
 		self.background = None
-		self.placeholderImage = None
+		self.createPlaceholderImage("airfreshener.png", texts)
 		
 		if not (roomImages):
-			self.placeholderImage = Object.JSONImage(texts, self, None, None, self.id)
-			self.placeholderImage.setSource("images/airfreshener.png")
 			return
 			
 		# Create objects inside the room including the background
@@ -296,8 +314,7 @@ class Room(View):
 	def getRepresentingImage(self):
 		if (self.background):
 			return self.background
-		else:
-			return self.placeholderImage
+		return self.placeholderImage
 			
 	def postInit(self, getGameObject):
 		for obj in self.objectList:

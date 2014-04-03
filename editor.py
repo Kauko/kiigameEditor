@@ -417,10 +417,6 @@ class Editor(QtGui.QMainWindow):
 			return
 			
 		for item in roomItems:
-			# TODO: Resolve handling text objects (issue #8)
-			#if (item.getClassname() == "Text"):
-			#	continue
-				
 			widgetItem = ItemWidget(item, self.scenarioData.dataDir)
 			
 			self.middle_scene.addItem(widgetItem)
@@ -460,7 +456,7 @@ class ViewWidget(QtGui.QListWidgetItem):
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
 		
-# Item widget that represents items in game rooms
+# Item widget that represents items in game views
 class ItemWidget(QtGui.QListWidgetItem):
 	def __init__(self, item, imageDir, parent=None):
 		super(ItemWidget, self).__init__(parent)
@@ -475,7 +471,7 @@ class ItemWidget(QtGui.QListWidgetItem):
 		if not (itemName):
 			itemName = "Esineellä ei ole nimeä"
 		self.setText(itemName)
-		print("IMAGE", imageObject, imageObject.id)
+		
 		imagePath = imageDir+"/"+imageObject.getSource()
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)

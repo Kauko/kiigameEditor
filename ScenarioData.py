@@ -126,7 +126,7 @@ class ScenarioData(object):
 				elif (layer == "start"):
 					self.addStart(viewAttributes, viewImages)
 				elif (layer == "end"):
-					self.addEnd(viewAttributes, viewImages)
+					self.addEnd(child, viewAttributes, viewImages)
 				elif (layer == "menu"):
 					self.addMenu(child, viewAttributes, viewImages)
 				elif (layer == "custom"):
@@ -308,8 +308,8 @@ class ScenarioData(object):
 			if (roomObject):
 				room.deleteObject(objectId)
 				
-	def addEnd(self, endAttributes, endImages):
-		newView = View.End(self.texts, endAttributes, endImages)
+	def addEnd(self, endId, endAttributes, endImages):
+		newView = View.End(self.texts, endId, endAttributes, endImages)
 		self.endViewList.append(newView)
 		return newView
 		
