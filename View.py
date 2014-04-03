@@ -103,11 +103,24 @@ class Menu(View):
 
 # Game cutscenes
 class Sequence(View):
+	# Generic attributes for sequences
+	sequenceAttributes = {'attrs': {'id': '', 'object_name': '', 'visible': False, 'category': 'sequence'}, 'object': {'music': '', 'images': {}, 'category': 'sequence'}, 'className': 'Layer'}
+	
 	def __init__(self, texts, sequenceId, sequenceAttributes, sequenceImages):
+		if not (sequenceAttributes):
+			sequenceAttributes = Sequence.sequenceAttributes
+			
 		super(Sequence, self).__init__(texts, sequenceAttributes, sequenceId)
 		
-		# Create sequence image objects
 		self.sequenceImages = []
+		self.placeholderImage = None # If no other images, use this
+		
+		if not (sequenceImages):
+			self.placeholderImage = Object.JSONImage(texts, self, None, None, self.id)
+			self.placeholderImage.setSource("images/airfreshener.png")
+			return
+		
+		# Create sequence image objects
 		for image in sequenceImages:
 			images = sequenceImages[image].pop("image")[0]
 			imageAttributes = sequenceImages[image]
@@ -123,7 +136,11 @@ class Sequence(View):
 		return self.sequenceImages
 		
 	def getRepresentingImage(self):
-		return self.sequenceImages[0]
+		if (len(self.sequenceImages) == 0):
+			return self.placeholderImage
+		else:
+			return self.sequenceImages[0]
+			
 		
 	def getItems(self):
 		return self.getChildren()
@@ -231,19 +248,18 @@ class Room(View):
 			
 		super(Room, self).__init__(texts, roomAttributes, roomId)
 		
-		# Create objects inside the room including the background
-		# TODO: Parsing objects could as well be done in View?
-		
 		self.objectList = []
+		self.background = None
+		self.placeholderImage = None
 		
 		if not (roomImages):
-			self.background = Object.JSONImage(texts, self, None, None)
-			self.background.setCategory("room_background")
-			print("BACKGROU", self.background, self.background.imageAttributes)
+			self.placeholderImage = Object.JSONImage(texts, self, None, None, self.id)
+			self.placeholderImage.setSource("images/airfreshener.png")
 			return
 			
+		# Create objects inside the room including the background
+		# TODO: Parsing objects could as well be done in View?
 		self.background = None
-		
 		for imageId in roomImages:
 			images = roomImages[imageId].pop("image")
 			imageAttributes = roomImages[imageId]
@@ -278,8 +294,11 @@ class Room(View):
 		return self.objectList
 		
 	def getRepresentingImage(self):
-		return self.background
-		
+		if (self.background):
+			return self.background
+		else:
+			return self.placeholderImage
+			
 	def postInit(self, getGameObject):
 		for obj in self.objectList:
 			obj.postInit(getGameObject)

@@ -250,14 +250,15 @@ class Editor(QtGui.QMainWindow):
 	def createView(self, objectType):
 		if (objectType == "room"):
 			newObject = self.scenarioData.addRoom(None, None, None)
+			newObject.getRepresentingImage().setSource("airfreshener.png")
 		elif (objectType == "sequence"):
 			newObject = self.scenarioData.addSequence(None, None, None)
 		elif (objectType == "end"):
 			newObject = self.scenarioData.addEnd(None, None, None)
+			newObject.getRepresentingImage().setSource("airfreshener.png")
 		else:
 			return
 			
-		newObject.getRepresentingImage().setSource("airfreshener.png")
 		widgetItem = ViewWidget(newObject, self.scenarioData.dataDir)
 		self.left_scene.addItem(widgetItem)
 		

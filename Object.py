@@ -49,7 +49,6 @@ class Object(object):
 		# JSONImage doesn't need an image or an ID check
 		else:
 			self.id = objectId
-			
 		#self.whatBlocks = None # TODO: In interaction instead?
 		self.location = location
 		self.objectAttributes = objectAttributes
@@ -718,7 +717,7 @@ class JSONImage(Object):
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		if not (texts):
 			texts = {}
-	
+		print("CREAINT ",imageId)
 		if not (imageAttributes):
 			imageAttributes = JSONImage.imageAttributes
 			
