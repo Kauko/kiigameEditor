@@ -90,7 +90,7 @@ class ObjectImageSettings(QtGui.QWidget):
 		self.clickEdit.setDisabled(notLocked)
 		
 	def changeImage(self, imagePath):
-		self.parent.setobjectImage(imagePath, self.image)
+		self.parent.setObjectImage(imagePath, self.image)
 		# TODO: Create image if doesn't exist!
 		self.gameImageObject.setSource(imagePath)
 		
@@ -115,7 +115,7 @@ class ObjectImageSettings(QtGui.QWidget):
 			imagePath = "images/container_placeholder.png"
 			
 		# Ask parent to actually draw the image
-		self.parent.setobjectImage(imagePath, self.image)
+		self.parent.setObjectImage(imagePath, self.image)
 		
 	def setSettings(self, gameObject, gameImageObject):
 		self.gameObject = gameObject

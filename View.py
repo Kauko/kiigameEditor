@@ -199,7 +199,6 @@ class Start(View):
 		# Create menu items
 		menu = getGameObject("menu", self.object["menu"])
 		for imageId,action in menu.object["items"].items():
-			print("LOL", action, menu)
 			if (action == "start_game"):
 				self.startButton = menu.getItemById(imageId)
 			elif (action == "credits"):

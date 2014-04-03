@@ -808,6 +808,12 @@ class Text(JSONImage):
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(Text, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
 		
+	# Always return a placeholder image
+	# TODO: Absolute source
 	def getSource(self):
 		return "images/airfreshener.png"
+		
+	# No setting source for a text
+	def setSource(self):
+		return
 		

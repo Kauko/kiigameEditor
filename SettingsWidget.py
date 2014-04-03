@@ -57,7 +57,9 @@ class SettingsWidget(QtGui.QWidget):
 		elif (objectType == "Start"):
 			self.setStartOptions(gameObject)
 		elif (objectType == "MenuImage"):
-			self.setMenuImageOptions(gameObject)
+			self.setJSONImageOptions(gameObject)
+		elif (objectType == "BeginingImage"):
+			self.setJSONImageOptions(gameObject)
 			
 	def showWidgets(self, objectType):
 		if (self.lastObjectType):
@@ -284,13 +286,19 @@ class SettingsWidget(QtGui.QWidget):
 			],
 			"Text": [
 			],
+			"BeginingImage": [
+				self.imgTextLabel,
+				self.objectImage,
+			],
 			"JSONImage": [
 				self.imgTextLabel,
 				self.objectImage,
 			],
 			"Start": [
 				self.musicLabel,
-				self.musicTextEdit
+				self.musicTextEdit,
+				self.musicBtn,
+				self.musicClear,
 			],
 			"MenuImage": [
 				self.imgTextLabel,
@@ -368,22 +376,35 @@ class SettingsWidget(QtGui.QWidget):
 		doFade = (self.sequenceFadeCombo.currentIndex() == True)
 		self.currentObject.setDoFade(doFade)
 		
+	# Start menu
 	def setStartOptions(self, startObject):
+		# Start music
+		self.setObjectMusic(startObject)
+		
+	# End view
+	def setEndOptions(self, endObject):
+		# End name
+		self.setObjectName(endObject, endObject.generalNameAdessive)
+		
+		# End image
+		self.setObjectImage(self.parent.getImageDir()+"/"+endObject.getRepresentingImage().getSource())
+		
+	# Set either currentObject or the given object's music
+	def setObjectMusic(self, gameObject=None):
+		if not (gameObject):
+			gameObject = self.currentObject
+		
 		# Music may return None which doesn't have split
 		try:
-			music = startObject.getMusic().split("/")[-1]
+			music = gameObject.getMusic().split("/")[-1]
 		except AttributeError:
 			music = ""
 		self.musicTextEdit.setText(music)
 		
-	def setMenuImageOptions(self, menuObject):
-		# Start name
-		self.setObjectName(menuObject, menuObject.generalNameAdessive)
-		
 	# Generic JSON images
 	def setJSONImageOptions(self, imageObject):
 		# Image
-		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getRepresentingImage().getSource())
+		self.setObjectImage(self.parent.getImageDir()+"/"+imageObject.getRepresentingImage().getSource())
 		
 	# Set the input field values for rooms
 	def setRoomOptions(self, room):
@@ -391,32 +412,24 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(room, room.generalNameAdessive)
 		
 		# Room background
-		self.setobjectImage(self.parent.getImageDir()+"/"+room.getRepresentingImage().getSource())
+		self.setObjectImage(self.parent.getImageDir()+"/"+room.getRepresentingImage().getSource())
 		
-		# Room music may return None which doesn't have split
-		try:
-			roomMusic = room.getMusic().split("/")[-1]
-		except AttributeError:
-			roomMusic = ""
-		self.musicTextEdit.setText(roomMusic)
+		# Room music
+		self.setObjectMusic(room)
 		
 	def setSequenceOptions(self, sequence):
 		# Sequence name
 		self.setObjectName(sequence, sequence.generalNameAdessive)
 		
 		# Sequence background
-		self.setobjectImage(self.parent.getImageDir()+"/"+sequence.getRepresentingImage().getSource())
+		self.setObjectImage(self.parent.getImageDir()+"/"+sequence.getRepresentingImage().getSource())
 		
-		# Sequence music may return None which doesn't have split
-		try:
-			sequenceMusic = sequence.getMusic().split("/")[-1]
-		except AttributeError:
-			sequenceMusic = ""
-		self.musicTextEdit.setText(sequenceMusic)
+		# Sequence music
+		self.setObjectMusic(sequence)
 	
 	def setSequenceImageOptions(self, sequenceImage):
 		# Image
-		self.setobjectImage(self.parent.getImageDir()+"/"+sequenceImage.getRepresentingImage().getSource())
+		self.setObjectImage(self.parent.getImageDir()+"/"+sequenceImage.getRepresentingImage().getSource())
 		
 		# Set image display time. It needs to be converted into str and dots replaced
 		time = str(self.currentObject.getShowTime()/1000).replace(".", ",")
@@ -424,12 +437,6 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Image fade type
 		self.sequenceFadeCombo.setCurrentIndex(self.currentObject.getDoFade())
-		
-	def setStartOptions(self, start):
-		print("Showing start menu settings")
-		
-	def setEndOptions(self, end):
-		print("Showing end settings")
 		
 	# Set the input field values for items
 	def setItemOptions(self, item):
@@ -439,7 +446,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(imageObject, item.generalNameAdessive)
 		
 		# Item image
-		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
+		self.setObjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
 		
 		# Examine text
 		self.setExamineText(self.currentObject)
@@ -488,7 +495,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(genericObject, genericObject.generalNameAdessive)
 		
 		imageObject = genericObject.getRepresentingImage()
-		self.setobjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
+		self.setObjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
 		
 		# Examine text
 		self.setExamineText(self.currentObject)
@@ -509,7 +516,7 @@ class SettingsWidget(QtGui.QWidget):
 	def setObstacleOptions(self, obstacle):
 		self.obstacleImage.setSettings(obstacle, obstacle.blockingImage)
 		
-	def setobjectImage(self, imagePath, objectImage=None):
+	def setObjectImage(self, imagePath, objectImage=None):
 		imgPixmap = self.imageCache.createPixmap(imagePath)
 		
 		# TODO: Have spacing for smaller items
@@ -681,7 +688,7 @@ class SettingsWidget(QtGui.QWidget):
 	# Change the image of a gameobject
 	def changeObjectImage(self, imagePath, image=None, gameObject=None):
 		# If no image, a default image var will be used
-		self.setobjectImage(imagePath, image)
+		self.setObjectImage(imagePath, image)
 		
 		if not (gameObject):
 			gameObject = self.currentObject

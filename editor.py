@@ -48,7 +48,8 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setFlow(QtGui.QListView.LeftToRight)
 		self.left_scene.setMovement(QtGui.QListView.Static)
 		self.left_scene.itemSelectionChanged.connect(self.roomClicked)
-		# TODO: Double click room, display the room view
+		self.left_scene.doubleClicked.connect(self.roomDoubleClicked)
+		self.left_scene.clicked.connect(self.roomClicked)
 		left_frame_layout.addWidget(self.left_scene)
 		
 		self.addViewsCombo = QtGui.QComboBox(self)
@@ -109,17 +110,23 @@ class Editor(QtGui.QMainWindow):
 		scrollArea.setWidget(self.settingsWidget)
 		right_frame_layout.addWidget(scrollArea)
 		
+	def roomDoubleClicked(self):
+		# TODO: Show space
+		print("Room double clicked!")
+		
 	def populateAddObjectsCombo(self):
 		selectedType = self.left_scene.currentItem().room.__class__.__name__
 		
-		
+		# Disable adding objects in the start view
 		if (selectedType == "Start"):
 			self.addObjectsCombo.setDisabled(True)
 			self.setRemoveObjectsButtonDisabled(forceDisable=True)
 			return
+			
 		self.addObjectsCombo.setDisabled(False)
 		self.addObjectsCombo.clear()
 		self.addObjectsCombo.addItem("Lisää esine valittuun tilaan")
+		
 		if (selectedType == "Room"):
 			self.addObjectsCombo.addItem("Kiinteä esine", userData="object")
 			self.addObjectsCombo.addItem("Käyttöesine", userData="item")
