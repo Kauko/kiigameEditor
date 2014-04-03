@@ -117,7 +117,7 @@ class Editor(QtGui.QMainWindow):
 		selectedType = self.left_scene.currentItem().room.__class__.__name__
 		
 		# Disable adding objects in the start view
-		if (selectedType == "Start"):
+		if (selectedType in ("Start", "End")):
 			self.addObjectsCombo.setDisabled(True)
 			self.setRemoveObjectsButtonDisabled(forceDisable=True)
 			return
@@ -134,8 +134,6 @@ class Editor(QtGui.QMainWindow):
 			self.addObjectsCombo.addItem("Este", userData="obstacle")
 		elif (selectedType == "Sequence"):
 			self.addObjectsCombo.addItem("Kuva", userData="sequenceimage")
-		elif (selectedType == "End"):
-			self.addObjectsCombo.addItem("Kuva", userData="end")
 			
 	def addViewsComboChanged(self):
 		selected = self.addViewsCombo.itemData(self.addViewsCombo.currentIndex())
