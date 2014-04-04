@@ -266,7 +266,7 @@ class Editor(QtGui.QMainWindow):
 		else:
 			return
 			
-		newObject.getRepresentingImage().setSource("airfreshener.png")
+		newObject.getRepresentingImage().setSource(self.editorImagePath+"object_placeholder.png")
 		widgetItem = ItemWidget(newObject, self.scenarioData.dataDir)
 		self.middle_scene.addItem(widgetItem)
 		
@@ -274,13 +274,13 @@ class Editor(QtGui.QMainWindow):
 		
 		if (objectType == "room"):
 			newObject = self.scenarioData.addRoom(None, None, None)
-			#newObject.getRepresentingImage().setSource("airfreshener.png")
 			newObject.createPlaceholderImage(self.editorImagePath+"room_placeholder.png")
 		elif (objectType == "sequence"):
 			newObject = self.scenarioData.addSequence(None, None, None)
+			newObject.createPlaceholderImage(self.editorImagePath+"sequence_placeholder.png")
 		elif (objectType == "end"):
 			newObject = self.scenarioData.addEnd(None, None, None)
-			newObject.getRepresentingImage().setSource("airfreshener.png")
+			newObject.createPlaceholderImage(self.editorImagePath+"end_placeholder.png")
 		else:
 			return
 			
