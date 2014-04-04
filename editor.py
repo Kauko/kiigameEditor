@@ -455,6 +455,7 @@ class Editor(QtGui.QMainWindow):
 			
 			self.left_scene.addItem(widgetItem)
 			
+		# TODO: Draw sequence images in order, allow reordering them with mouse
 		# Sequences
 		for i in range(len(self.scenarioData.sequenceList)):
 			sequence = self.scenarioData.sequenceList[i]
