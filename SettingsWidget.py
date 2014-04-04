@@ -2,6 +2,18 @@ from PySide import QtGui, QtCore
 from ObjectImageSettings import ObjectImageSettings
 from ImageCache import ImageCache
 
+# TODO: remove useTypes[4], set it only in container instead
+# TODO: locked container is unfinished/buggy (Legendan kaappi)
+# TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2)
+# TODO: Add ending checkbox to generic objects
+# TODO: Duplicate images when changing newly added image (copy generic attribute dict instead of using it as is)
+# TODO: Door state is initially closed even though should be open (Vessan ovi wc2)
+# TODO: Fix names in unnameable objects (start menu images)
+# TODO: Adding new sequence images is buggy (doesn't create new sequence entry in the object despite the image)
+# TODO: When removing sequence images remove the entry too
+# TODO: Hiuskeepperi has correct use target but no outcome
+#		the poster_withglue is not listed in the outcome combobox
+
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
@@ -9,6 +21,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 		self.currentObject = None
 		self.lastObjectType = None
+		
 		self.useTypes = {0: "Ei käyttöä", 1: "Käytä toiseen esineeseen",
 			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Ota jostakin", 5: "Poista este"}
 			
