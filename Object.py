@@ -852,3 +852,9 @@ class Text(JSONImage):
 	def getFileName(self):
 		return
 		
+	def getText(self):
+		return self.imageAttributes["text"]
+		
+	def setText(self, text):
+		self.imageAttributes["text"] = text
+		print("SETTO", self.imageAttributes["text"])

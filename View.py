@@ -382,7 +382,7 @@ class Custom(View):
 			imageAttributes = viewImages[imageId]
 			
 			if (imageAttributes["className"] == "Text"):
-				newObject = Object.Text(self, images, imageAttributes, imageId)
+				newObject = Object.Text(self, images[0], imageAttributes, imageId)
 			else:
 				newObject = Object.Object(self, imageId, images, imageAttributes)
 			self.objectList.append(newObject)
@@ -399,5 +399,4 @@ class Custom(View):
 		return self.objectList[0]#.getRepresentingImage()
 		
 	def getItems(self):
-		print("JELLO")
 		return self.objectList
