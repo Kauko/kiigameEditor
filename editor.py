@@ -281,7 +281,7 @@ class Editor(QtGui.QMainWindow):
 			return
 			
 		newObject.getRepresentingImage().setSource(self.editorImagePath+"object_placeholder.png")
-		widgetItem = ItemWidget(newObject, self.scenarioData.dataDir)
+		widgetItem = ItemWidget(newObject)
 		self.middle_scene.addItem(widgetItem)
 		
 	def createView(self, objectType):
@@ -466,7 +466,10 @@ class Editor(QtGui.QMainWindow):
 			return
 			
 		for item in roomItems:
-			widgetItem = ItemWidget(item, self.scenarioData.dataDir)
+			imagePath = None
+			if (item.__class__.__name__ == "Text"):
+				imagePath = self.editorImagePath+"text_placeholder.png"
+			widgetItem = ItemWidget(item, imagePath)
 			
 			self.middle_scene.addItem(widgetItem)
 			
@@ -507,7 +510,7 @@ class ViewWidget(QtGui.QListWidgetItem):
 		
 # Item widget that represents items in game views
 class ItemWidget(QtGui.QListWidgetItem):
-	def __init__(self, item, imageDir, parent=None):
+	def __init__(self, item, imagePath=None, parent=None):
 		super(ItemWidget, self).__init__(parent)
 		
 		# Row size, especially height
@@ -521,7 +524,10 @@ class ItemWidget(QtGui.QListWidgetItem):
 			itemName = "%s ei ole nimeä" %(item.generalNameAdessive)
 		self.setText(itemName)
 		
-		imagePath = imageObject.absoluteImagePath
+		# imagePath can be overriden
+		if not (imagePath):
+			imagePath = imageObject.absoluteImagePath
+			
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
 

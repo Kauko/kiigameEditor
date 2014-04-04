@@ -790,7 +790,6 @@ class SettingsWidget(QtGui.QWidget):
 				if (self.useTargetCombo.itemData(index).key):
 					self.useTargetCombo.itemData(index).key.clearTarget()
 					
-				# TODO: Get imagePath for door too from some better place
 				# Set the object to be locked with new key
 				imagePath = "images/container_placeholder.png"
 				selectedObject.setLocked(True, imagePath, self.currentObject)
