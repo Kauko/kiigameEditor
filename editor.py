@@ -179,6 +179,7 @@ class Editor(QtGui.QMainWindow):
 		
 		self.addObjectsCombo.setCurrentIndex(0)
 		self.middle_scene.setCurrentRow(self.middle_scene.count()-1)
+		self.drawTextItems()
 		
 	def removeObjectsButtonClicked(self):
 		selected = self.middle_scene.currentItem()
@@ -739,7 +740,10 @@ class TextsWidget(QtGui.QWidget):
 		if (self.currentItem.textItem.imageAttributes["category"] == "secret" or "src2" in self.currentItem.textItem.imageAttributes):
 			self.clickTextEdit.setText(self.currentItem.texts["pickup"])
 		else:
-			self.clickTextEdit.setText(self.currentItem.texts["examine"])
+			if not ("examine" in self.currentItem.texts):
+				self.currentItem.texts["examine"] = ""
+			else:
+				self.clickTextEdit.setText(self.currentItem.texts["examine"])
 		
 		# Item
 		if (self.currentItem.objectType == "Item" and "src2" not in self.currentItem.textItem.imageAttributes):
