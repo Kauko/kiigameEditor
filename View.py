@@ -175,6 +175,14 @@ class Sequence(View):
 			if (self.object["images"][i]["id"] == imageId):
 				self.object["images"][i]["do_fade"] = doFade
 				
+	# Create new item
+	def addImage(self, objectAttributes=None, imageAttributes=None):
+		imageId = self.id + "_image"
+		#newObject = Object.JSONImage(self, imageId, imageAttributes, objectAttributes)
+		newObject = Object.JSONImage(self, objectAttributes, imageAttributes)
+		self.sequenceImages.append(newObject)
+		return newObject
+		
 # Start menu
 class Start(View):
 	generalName = "Alkukuva"

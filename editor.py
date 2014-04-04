@@ -5,6 +5,9 @@ import SettingsWidget, ScenarioData
 from ImageCache import ImageCache
 from os.path import dirname, abspath
 
+# TODO: Keeping mouse down and moving it around in item combo shows items
+#		one step behind
+
 class Editor(QtGui.QMainWindow):
 	def __init__(self, parent=None):
 		super(Editor, self).__init__(parent)
@@ -170,7 +173,7 @@ class Editor(QtGui.QMainWindow):
 		
 	def addObjectsComboChanged(self):
 		selected = self.addObjectsCombo.itemData(self.addObjectsCombo.currentIndex())
-		if not (selected in ("object", "item", "door", "container", "obstacle", )):
+		if not (selected in ("object", "item", "door", "container", "obstacle", "sequenceimage")):
 			return
 		self.createObject(selected)
 		
@@ -266,6 +269,7 @@ class Editor(QtGui.QMainWindow):
 			
 	def createObject(self, objectType):
 		selectedRoom = self.left_scene.selectedItems()[0]
+		placeholderImage = "object_placeholder.png"
 		
 		if (objectType == "object"):
 			newObject = selectedRoom.room.addObject()
@@ -277,10 +281,13 @@ class Editor(QtGui.QMainWindow):
 			newObject = selectedRoom.room.addContainer()
 		elif (objectType == "obstacle"):
 			newObject = selectedRoom.room.addObstacle()
+		elif (objectType == "sequenceimage"):
+			newObject = selectedRoom.room.addImage()
+			placeholderImage = "sequence_placeholder.png"
 		else:
 			return
 			
-		newObject.getRepresentingImage().setSource(self.editorImagePath+"object_placeholder.png")
+		newObject.getRepresentingImage().setSource(self.editorImagePath+placeholderImage)
 		widgetItem = ItemWidget(newObject)
 		self.middle_scene.addItem(widgetItem)
 		

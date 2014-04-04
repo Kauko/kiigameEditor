@@ -777,7 +777,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Update parent tab elements
 	def updateParent(self):
-		if (self.currentObject.__class__.__name__ == "Room"):
+		if (self.currentObject.__class__.__name__ in ("Room", "Sequence")):
 			self.parent.drawRooms()
 		else:
 			self.parent.drawRoomItems()
