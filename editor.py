@@ -3,12 +3,14 @@
 from PySide import QtGui, QtCore
 import SettingsWidget, ScenarioData
 from ImageCache import ImageCache
+from os.path import dirname, abspath
 
 class Editor(QtGui.QMainWindow):
 	def __init__(self, parent=None):
 		super(Editor, self).__init__(parent)
 		
-		self.scenarioData = ScenarioData.ScenarioData()
+		self.editorImagePath = "%s/images/" %(dirname(abspath(__file__)))
+		self.scenarioData = ScenarioData.ScenarioData("latkazombit")
 		self.scenarioData.loadScenario()
 		
 		self.imageCache = ImageCache()
@@ -56,7 +58,7 @@ class Editor(QtGui.QMainWindow):
 		self.addViewsCombo.addItem("Lisää tila")
 		self.addViewsCombo.addItem("Huone", userData="room")
 		self.addViewsCombo.addItem("Välianimaatio", userData="sequence")
-		self.addViewsCombo.addItem("Loppukuva", userData="end")
+		#self.addViewsCombo.addItem("Loppukuva", userData="end")
 		self.addViewsCombo.currentIndexChanged.connect(self.addViewsComboChanged)
 		layout.addWidget(self.addViewsCombo, 0, 0)
 		
@@ -225,7 +227,7 @@ class Editor(QtGui.QMainWindow):
 		self.spaceSettingsWidget.displayOptions(selectedRoom.room)
 		
 		# Display room image
-		pixmap = self.imageCache.createPixmap(self.scenarioData.dataDir + "/" + selectedRoom.room.getRepresentingImage().getSource())
+		pixmap = self.imageCache.createPixmap(selectedRoom.room.getRepresentingImage().absoluteImagePath)
 		self.spaceScene.addPixmap(pixmap)
 		
 		# Display objects
@@ -239,7 +241,7 @@ class Editor(QtGui.QMainWindow):
 				continue
 			#print(self.scenarioData.dataDir + "/" + img.getSource())
 			
-			pixmap = self.imageCache.createPixmap(self.scenarioData.dataDir + "/" + img.getSource())
+			pixmap = self.imageCache.createPixmap(img.absoluteImagePath)
 			pixItem = QtGui.QGraphicsPixmapItem(pixmap)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
 			
@@ -269,9 +271,11 @@ class Editor(QtGui.QMainWindow):
 		self.middle_scene.addItem(widgetItem)
 		
 	def createView(self, objectType):
+		
 		if (objectType == "room"):
 			newObject = self.scenarioData.addRoom(None, None, None)
-			newObject.getRepresentingImage().setSource("airfreshener.png")
+			#newObject.getRepresentingImage().setSource("airfreshener.png")
+			newObject.createPlaceholderImage(self.editorImagePath+"room_placeholder.png")
 		elif (objectType == "sequence"):
 			newObject = self.scenarioData.addSequence(None, None, None)
 		elif (objectType == "end"):
@@ -486,7 +490,7 @@ class ViewWidget(QtGui.QListWidgetItem):
 			roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
 		self.setText(roomName)
 		
-		imagePath = imageDir+"/"+room.getRepresentingImage().getSource()
+		imagePath = room.getRepresentingImage().absoluteImagePath
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
 		
@@ -506,7 +510,7 @@ class ItemWidget(QtGui.QListWidgetItem):
 			itemName = "%s ei ole nimeä" %(item.generalNameAdessive)
 		self.setText(itemName)
 		
-		imagePath = imageDir+"/"+imageObject.getSource()
+		imagePath = imageObject.absoluteImagePath
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
 
