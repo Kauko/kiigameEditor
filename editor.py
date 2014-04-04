@@ -5,6 +5,9 @@ import SettingsWidget, ScenarioData
 from ImageCache import ImageCache
 from os.path import dirname, abspath
 
+# TODO: Keeping mouse down and moving it around in item combo shows items
+#		one step behind
+
 class Editor(QtGui.QMainWindow):
 	def __init__(self, parent=None):
 		super(Editor, self).__init__(parent)
@@ -170,7 +173,7 @@ class Editor(QtGui.QMainWindow):
 		
 	def addObjectsComboChanged(self):
 		selected = self.addObjectsCombo.itemData(self.addObjectsCombo.currentIndex())
-		if not (selected in ("object", "item", "door", "container", "obstacle", )):
+		if not (selected in ("object", "item", "door", "container", "obstacle", "sequenceimage")):
 			return
 		self.createObject(selected)
 		
@@ -276,6 +279,7 @@ class Editor(QtGui.QMainWindow):
 			
 	def createObject(self, objectType):
 		selectedRoom = self.left_scene.selectedItems()[0]
+		placeholderImage = "object_placeholder.png"
 		
 		if (objectType == "object"):
 			newObject = selectedRoom.room.addObject()
@@ -287,11 +291,14 @@ class Editor(QtGui.QMainWindow):
 			newObject = selectedRoom.room.addContainer()
 		elif (objectType == "obstacle"):
 			newObject = selectedRoom.room.addObstacle()
+		elif (objectType == "sequenceimage"):
+			newObject = selectedRoom.room.addImage()
+			placeholderImage = "sequence_placeholder.png"
 		else:
 			return
 			
-		newObject.getRepresentingImage().setSource(self.editorImagePath+"object_placeholder.png")
-		widgetItem = ItemWidget(newObject, self.scenarioData.dataDir)
+		newObject.getRepresentingImage().setSource(self.editorImagePath+placeholderImage)
+		widgetItem = ItemWidget(newObject)
 		self.middle_scene.addItem(widgetItem)
 		
 	def createView(self, objectType):
@@ -476,7 +483,10 @@ class Editor(QtGui.QMainWindow):
 			return
 			
 		for item in roomItems:
-			widgetItem = ItemWidget(item, self.scenarioData.dataDir)
+			imagePath = None
+			if (item.__class__.__name__ == "Text"):
+				imagePath = self.editorImagePath+"text_placeholder.png"
+			widgetItem = ItemWidget(item, imagePath)
 			
 			self.middle_scene.addItem(widgetItem)
 			
@@ -517,7 +527,7 @@ class ViewWidget(QtGui.QListWidgetItem):
 		
 # Item widget that represents items in game views
 class ItemWidget(QtGui.QListWidgetItem):
-	def __init__(self, item, imageDir, parent=None):
+	def __init__(self, item, imagePath=None, parent=None):
 		super(ItemWidget, self).__init__(parent)
 		
 		# Row size, especially height
@@ -531,7 +541,10 @@ class ItemWidget(QtGui.QListWidgetItem):
 			itemName = "%s ei ole nimeä" %(item.generalNameAdessive)
 		self.setText(itemName)
 		
-		imagePath = imageObject.absoluteImagePath
+		# imagePath can be overriden
+		if not (imagePath):
+			imagePath = imageObject.absoluteImagePath
+			
 		icon = QtGui.QIcon(imagePath)
 		self.setIcon(icon)
 

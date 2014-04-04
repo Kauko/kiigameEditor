@@ -42,6 +42,8 @@ class SettingsWidget(QtGui.QWidget):
 			self.setStartOptions(gameObject)
 		elif (objectType == "End"):
 			self.setEndOptions(gameObject)
+		elif (objectType == "Text"):	
+			self.setTextOptions(gameObject)
 		elif (objectType == "Item"):
 			self.setItemOptions(gameObject)
 		elif (objectType == "Object"):
@@ -184,6 +186,14 @@ class SettingsWidget(QtGui.QWidget):
 			self.sequenceFadeCombo.addItem(self.fadeTypes[i])
 		self.sequenceFadeCombo.currentIndexChanged.connect(self.changeSequenceFadeCombo)
 		
+		# End
+		self.textObjectTextLabel = QtGui.QLabel("Teksti")
+		self.textObjectTextEdit = QtGui.QLineEdit()
+		self.textObjectTextEdit.focusOutEvent = lambda s: self.changeTextObjectText()
+		
+		self.layout.addWidget(self.textObjectTextLabel)
+		self.layout.addWidget(self.textObjectTextEdit)
+		
 		self.layout.addWidget(self.nameLabel)
 		self.layout.addWidget(self.objectNameEdit)
 		self.layout.addWidget(self.imgTextLabel)
@@ -285,6 +295,8 @@ class SettingsWidget(QtGui.QWidget):
 				self.musicClear,
 			],
 			"Text": [
+				self.textObjectTextLabel,
+				self.textObjectTextEdit
 			],
 			"BeginingImage": [
 				self.imgTextLabel,
@@ -376,6 +388,9 @@ class SettingsWidget(QtGui.QWidget):
 		doFade = (self.sequenceFadeCombo.currentIndex() == True)
 		self.currentObject.setDoFade(doFade)
 		
+	def changeTextObjectText(self):
+		self.currentObject.setText(self.textObjectTextEdit.text())
+		
 	# Start menu
 	def setStartOptions(self, startObject):
 		# Start music
@@ -388,6 +403,10 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# End image
 		self.setObjectImage(endObject.getRepresentingImage().absoluteImagePath)
+		
+	# Text object
+	def setTextOptions(self, textObject):
+		self.textObjectTextEdit.setText(textObject.getText())
 		
 	# Set either currentObject or the given object's music
 	def setObjectMusic(self, gameObject=None):
@@ -758,7 +777,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Update parent tab elements
 	def updateParent(self):
-		if (self.currentObject.__class__.__name__ == "Room"):
+		if (self.currentObject.__class__.__name__ in ("Room", "Sequence")):
 			self.parent.drawRooms()
 		else:
 			self.parent.drawRoomItems()
@@ -790,7 +809,6 @@ class SettingsWidget(QtGui.QWidget):
 				if (self.useTargetCombo.itemData(index).key):
 					self.useTargetCombo.itemData(index).key.clearTarget()
 					
-				# TODO: Get imagePath for door too from some better place
 				# Set the object to be locked with new key
 				imagePath = "images/container_placeholder.png"
 				selectedObject.setLocked(True, imagePath, self.currentObject)

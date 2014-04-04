@@ -175,6 +175,13 @@ class Sequence(View):
 			if (self.object["images"][i]["id"] == imageId):
 				self.object["images"][i]["do_fade"] = doFade
 				
+	# Create new item
+	def addImage(self, objectAttributes=None, imageAttributes=None):
+		imageId = self.id + "_image"
+		newObject = Object.JSONImage(self, objectAttributes, imageAttributes)
+		self.sequenceImages.append(newObject)
+		return newObject
+		
 # Start menu
 class Start(View):
 	generalName = "Alkukuva"
@@ -382,7 +389,7 @@ class Custom(View):
 			imageAttributes = viewImages[imageId]
 			
 			if (imageAttributes["className"] == "Text"):
-				newObject = Object.Text(self, images, imageAttributes, imageId)
+				newObject = Object.Text(self, images[0], imageAttributes, imageId)
 			else:
 				newObject = Object.Object(self, imageId, images, imageAttributes)
 			self.objectList.append(newObject)
@@ -399,5 +406,4 @@ class Custom(View):
 		return self.objectList[0]#.getRepresentingImage()
 		
 	def getItems(self):
-		print("JELLO")
 		return self.objectList

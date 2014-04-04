@@ -66,9 +66,14 @@ class ObjectImageSettings(QtGui.QWidget):
 		
 	def changeLocked(self):
 		if (self.lockedCheckbox.isChecked()):
-			# TODO: Get imagePath better way (and clear airfreshener.png)
-			self.gameObject.setLocked(True, "images/airfreshener.png")
-			self.gameImageObject = self.gameObject.lockedImage
+			self.gameObject.setLocked(True)
+			
+			if (self.objectType == "Door"):
+				placeholder = "door_placeholder.png"
+			elif (self.objectType == "Container"):
+				placeholder = "container_placeholder.png"
+			
+			self.gameImageObject = self.gameObject.lockedImage.setPlaceholderSource(self.parent.parent.editorImagePath+placeholder)
 		else:
 			self.gameObject.setLocked(False)
 			self.gameImageObject = None
