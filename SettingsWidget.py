@@ -387,7 +387,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(endObject, endObject.generalNameAdessive)
 		
 		# End image
-		self.setObjectImage(self.parent.getImageDir()+"/"+endObject.getRepresentingImage().getSource())
+		self.setObjectImage(endObject.getRepresentingImage().absoluteImagePath)
 		
 	# Set either currentObject or the given object's music
 	def setObjectMusic(self, gameObject=None):
@@ -404,7 +404,7 @@ class SettingsWidget(QtGui.QWidget):
 	# Generic JSON images
 	def setJSONImageOptions(self, imageObject):
 		# Image
-		self.setObjectImage(self.parent.getImageDir()+"/"+imageObject.getRepresentingImage().getSource())
+		self.setObjectImage(imageObject.getRepresentingImage().absoluteImagePath)
 		
 	# Set the input field values for rooms
 	def setRoomOptions(self, room):
@@ -412,7 +412,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(room, room.generalNameAdessive)
 		
 		# Room background
-		self.setObjectImage(self.parent.getImageDir()+"/"+room.getRepresentingImage().getSource())
+		self.setObjectImage(room.getRepresentingImage().absoluteImagePath)
 		
 		# Room music
 		self.setObjectMusic(room)
@@ -422,14 +422,14 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(sequence, sequence.generalNameAdessive)
 		
 		# Sequence background
-		self.setObjectImage(self.parent.getImageDir()+"/"+sequence.getRepresentingImage().getSource())
+		self.setObjectImage(sequence.getRepresentingImage().absoluteImagePath)
 		
 		# Sequence music
 		self.setObjectMusic(sequence)
 	
 	def setSequenceImageOptions(self, sequenceImage):
 		# Image
-		self.setObjectImage(self.parent.getImageDir()+"/"+sequenceImage.getRepresentingImage().getSource())
+		self.setObjectImage(sequenceImage.getRepresentingImage().absoluteImagePath)
 		
 		# Set image display time. It needs to be converted into str and dots replaced
 		time = str(self.currentObject.getShowTime()/1000).replace(".", ",")
@@ -446,7 +446,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectName(imageObject, item.generalNameAdessive)
 		
 		# Item image
-		self.setObjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
+		self.setObjectImage(imageObject.absoluteImagePath)
 		
 		# Examine text
 		self.setExamineText(self.currentObject)
@@ -492,10 +492,12 @@ class SettingsWidget(QtGui.QWidget):
 			
 	# Set the input field values for generic objects
 	def setGenericOptions(self, genericObject):
+		# Object name
 		self.setObjectName(genericObject, genericObject.generalNameAdessive)
 		
+		# Object image
 		imageObject = genericObject.getRepresentingImage()
-		self.setObjectImage(self.parent.getImageDir()+"/"+imageObject.getSource())
+		self.setObjectImage(imageObject.absoluteImagePath)
 		
 		# Examine text
 		self.setExamineText(self.currentObject)
@@ -851,7 +853,7 @@ class SettingsWidget(QtGui.QWidget):
 			roomName = room.getName()
 			if not (roomName):
 				roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
-			imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+room.getRepresentingImage().getSource())
+			imgPixmap = self.imageCache.createPixmap(room.getRepresentingImage().absoluteImagePath)
 			
 			roomIcon = QtGui.QIcon(imgPixmap)
 			combobox.addItem(roomIcon, roomName, userData=room)
@@ -916,7 +918,7 @@ class SettingsWidget(QtGui.QWidget):
 				roomName = roomObject.getName()
 				if not (roomName):
 					roomName = "%s ei ole nimeä" %(roomObject.generalNameAdessive)
-				imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+roomObject.getRepresentingImage().getSource())
+				imgPixmap = self.imageCache.createPixmap(roomObject.getRepresentingImage().absoluteImagePath)
 				
 				roomIcon = QtGui.QIcon(imgPixmap)
 				
@@ -935,7 +937,7 @@ class SettingsWidget(QtGui.QWidget):
 						continue
 					
 					imageObject = obj.getRepresentingImage()
-					imgPixmap = self.imageCache.createPixmap(self.parent.getImageDir()+"/"+imageObject.getSource())
+					imgPixmap = self.imageCache.createPixmap(imageObject.absoluteImagePath)
 					targetIcon = QtGui.QIcon(imgPixmap)
 					combobox.addItem(targetIcon, imageObject.getName(), userData=obj)
 					itemCounter += 1

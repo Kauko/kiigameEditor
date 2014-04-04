@@ -5,7 +5,7 @@ from collections import OrderedDict
 from os.path import dirname, abspath
 
 class ScenarioData(object):
-	def __init__(self):
+	def __init__(self, scenarioName):
 		self.texts = OrderedDict()
 		self.roomList = []
 		self.sequenceList = []
@@ -15,7 +15,7 @@ class ScenarioData(object):
 		self.endViewList = []
 		self.menuList = []
 		
-		self.dataDir = dirname(abspath(__file__))+"/gamedata/latkazombit"
+		self.dataDir = "%s/%s/%s/" %(dirname(abspath(__file__)), "gamedata", scenarioName)
 		
 	# Load and parse game data files
 	def loadScenario(self):
@@ -24,16 +24,16 @@ class ScenarioData(object):
 		#self.createInteractions()
 		
 	def parseTexts(self):
-		with open(self.dataDir + "/texts.json", encoding='utf-8') as f:
+		with open(self.dataDir + "texts.json", encoding='utf-8') as f:
 			self.texts = json.load(f)
 			f.close()
 				
 	def parseImages(self):
-		with open(self.dataDir + "/images.json", encoding='utf-8') as f:
+		with open(self.dataDir + "images.json", encoding='utf-8') as f:
 			images = json.load(f)
 			f.close()
 			
-		with open(self.dataDir + "/objects.json", encoding='utf-8') as f:
+		with open(self.dataDir + "objects.json", encoding='utf-8') as f:
 			objects = json.load(f)
 			f.close()
 			
@@ -194,15 +194,15 @@ class ScenarioData(object):
 		#print(objectsJSON)
 		
 		# Save into file
-		#f = open(self.dataDir + "/texts_lol.json", "w", encoding='utf-8')
+		#f = open(self.dataDir + "texts_lol.json", "w", encoding='utf-8')
 		#f.write(textsJSON)
 		#f.close()
 
-		#f = open(self.dataDir + "/images.json", "w")
+		#f = open(self.dataDir + "images.json", "w")
 		#f.write(imagesJSON)
 		#f.close()
 		
-		#f = open(self.dataDir + "/objects.json", "w")
+		#f = open(self.dataDir + "objects.json", "w")
 		#f.write(objectsJSON)
 		#f.close()
 		
@@ -224,7 +224,7 @@ class ScenarioData(object):
 	
 	def getRoomBackLoc(self, i):
 		room = self.roomList[i]
-		loc = self.dataDir + '/' + room.background.imageAttributes['src']
+		loc = self.dataDir + room.background.imageAttributes['src']
 		return loc
 
 	def getSequence(self, sequenceId):
@@ -323,32 +323,32 @@ class ScenarioData(object):
 				room.deleteObject(objectId)
 				
 	def addEnd(self, endId, endAttributes, endImages):
-		newView = View.End(self.texts, endId, endAttributes, endImages)
+		newView = View.End(self, endId, endAttributes, endImages)
 		self.endViewList.append(newView)
 		return newView
 		
 	def addStart(self, startAttributes, startImages):
-		newView = View.Start(self.texts, startAttributes, startImages)
+		newView = View.Start(self, startAttributes, startImages)
 		self.startView = newView
 		return newView
 		
 	def addSequence(self, sequenceId, sequenceAttributes, sequenceImages):
-		newView = View.Sequence(self.texts, sequenceId, sequenceAttributes, sequenceImages)
+		newView = View.Sequence(self, sequenceId, sequenceAttributes, sequenceImages)
 		self.sequenceList.append(newView)
 		return newView
 		
 	def addRoom(self, roomId, roomAttributes, roomImages):
-		newView = View.Room(self.texts, roomId, roomAttributes, roomImages)
+		newView = View.Room(self, roomId, roomAttributes, roomImages)
 		self.roomList.append(newView)
 		return newView
 		
 	def addCustomView(self, viewId, viewAttributes, viewImages):
-		newView = View.Custom(self.texts, viewId, viewAttributes, viewImages)
+		newView = View.Custom(self, viewId, viewAttributes, viewImages)
 		self.customObjectList.append(newView)
 		return newView
 		
 	def addMenu(self, menuId, menuAttributes, menuImages):
-		newView = View.Menu(self.texts, menuId, menuAttributes, menuImages)
+		newView = View.Menu(self, menuId, menuAttributes, menuImages)
 		self.menuList.append(newView)
 		return newView
 		
