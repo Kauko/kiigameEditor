@@ -437,7 +437,7 @@ class Container(Object):
 			imageObject = JSONImage(self.parentView, None, self.objectAttributes, imageId=self.id)
 			if (imagePath):
 				imageObject.setSource(imagePath)
-			# TODO: Put other attributes here too	
+			# TODO: Put other attributes here too (?)
 			self.images.append(imageObject)
 			self.lockedImage = imageObject
 			
@@ -744,10 +744,11 @@ class JSONImage(Object):
 		super(JSONImage, self).__init__(parentView, imageId, None, objectAttributes)
 		
 		self.imageAttributes = imageAttributes
+		self.placeholderSource = None
 		
 		if (imageAttributes):
 			self.absoluteImagePath = "%simages/%s" %(parentView.scenarioData.dataDir, self.getFileName())
-		
+			
 	def getRepresentingImage(self):
 		return self
 		
@@ -764,10 +765,17 @@ class JSONImage(Object):
 		# TODO: self.getSource() returns None?
 		return self.imageAttributes["src"].split("/")[-1]
 		
+	def setPlaceholderSource(self, absoluteImagePath):
+		self.placeholderSource = absoluteImagePath
+		
 	def getSource(self):
+		if (self.placeholderSource):
+			return self.placeholderSource
 		return self.imageAttributes["src"]
 		
 	def setSource(self, absoluteImagePath):
+		self.placeholderSource = None
+		
 		# Cut the plain filename out of the name
 		self.imageAttributes["src"] = "images/"+absoluteImagePath.split("/")[-1]
 		
@@ -840,8 +848,6 @@ class Text(JSONImage):
 	def __init__(self, parentView, imageAttributes, objectAttributes, imageId=None):
 		super(Text, self).__init__(parentView, imageAttributes, objectAttributes, imageId)
 		
-	# Always return a placeholder image
-	# TODO: Absolute source
 	def getSource(self):
 		return
 		
@@ -857,4 +863,3 @@ class Text(JSONImage):
 		
 	def setText(self, text):
 		self.imageAttributes["text"] = text
-		print("SETTO", self.imageAttributes["text"])

@@ -178,7 +178,6 @@ class Sequence(View):
 	# Create new item
 	def addImage(self, objectAttributes=None, imageAttributes=None):
 		imageId = self.id + "_image"
-		#newObject = Object.JSONImage(self, imageId, imageAttributes, objectAttributes)
 		newObject = Object.JSONImage(self, objectAttributes, imageAttributes)
 		self.sequenceImages.append(newObject)
 		return newObject
