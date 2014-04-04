@@ -40,6 +40,8 @@ class View(object):
 		else:
 			self.texts = {}
 		
+		self.placeholderImage = None # If no representingImage, use this
+		
 	# Should be overriden by other view classes
 	def getChildren(self):
 		return
@@ -82,6 +84,11 @@ class View(object):
 	def removeObject(self, childObject):
 		return
 
+	def createPlaceholderImage(self, imagePath, texts):
+		self.placeholderImage = Object.JSONImage(texts, self, None, None, self.id)
+		self.placeholderImage.setSource(imagePath)
+		return
+
 class Menu(View):
 	def __init__(self, texts, menuId, menuAttributes, menuImages):
 		super(Menu, self).__init__(texts, menuAttributes, menuId)
@@ -103,11 +110,25 @@ class Menu(View):
 
 # Game cutscenes
 class Sequence(View):
+	# Generic attributes for sequences
+	sequenceAttributes = {'attrs': {'id': '', 'object_name': '', 'visible': False, 'category': 'sequence'}, 'object': {'music': '', 'images': {}, 'category': 'sequence'}, 'className': 'Layer'}
+	
+	generalName = "Välianimaatio"
+	generalNameAdessive = "Välianimaatiolla"
+	
 	def __init__(self, texts, sequenceId, sequenceAttributes, sequenceImages):
+		if not (sequenceAttributes):
+			sequenceAttributes = Sequence.sequenceAttributes
+			
 		super(Sequence, self).__init__(texts, sequenceAttributes, sequenceId)
 		
-		# Create sequence image objects
 		self.sequenceImages = []
+		self.createPlaceholderImage("airfreshener.png", texts)
+		
+		if not (sequenceImages):
+			return
+		
+		# Create sequence image objects
 		for image in sequenceImages:
 			images = sequenceImages[image].pop("image")[0]
 			imageAttributes = sequenceImages[image]
@@ -123,7 +144,10 @@ class Sequence(View):
 		return self.sequenceImages
 		
 	def getRepresentingImage(self):
+		if (len(self.sequenceImages) == 0):
+			return self.placeholderImage
 		return self.sequenceImages[0]
+			
 		
 	def getItems(self):
 		return self.getChildren()
@@ -154,6 +178,9 @@ class Sequence(View):
 				
 # Start menu
 class Start(View):
+	generalName = "Alkukuva"
+	generalNameAdessive = "Alkukuvalla"
+	
 	def __init__(self, texts, startAttributes, startImages):
 		super(Start, self).__init__(texts, startAttributes, "start")
 		
@@ -164,11 +191,9 @@ class Start(View):
 			
 			# Create objects according to its category
 			if (imageId == "begining"):
-				self.beginingImage = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
+				self.beginingImage = Object.BeginingImage(texts, self, imageAttributes, objectAttributes)
 			if (imageId == "start"):
 				self.background = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
-			#if (imageId == "start_empty"):
-			#	self.emptyButton = Object.JSONImage(texts, self, imageAttributes, objectAttributes)
 				
 	def postInit(self, getGameObject):
 		# Create menu items
@@ -178,9 +203,11 @@ class Start(View):
 				self.startButton = menu.getItemById(imageId)
 			elif (action == "credits"):
 				self.creditsButton = menu.getItemById(imageId)
-
+			elif (action == "none"):
+				self.emptyButton = menu.getItemById(imageId)
+				
 	def getChildren(self):
-		return [self.background, self.startButton, self.creditsButton, self.beginingImage]
+		return [self.background, self.startButton, self.creditsButton, self.emptyButton, self.beginingImage]
 
 	def getRepresentingImage(self):
 		return self.background
@@ -190,10 +217,25 @@ class Start(View):
 		
 # End menu
 class End(View):
-	def __init__(self, texts, endAttributes, endImages):
-		super(End, self).__init__(texts, endAttributes, "end")
+	# Generic attributes for ends
+	endAttributes = {'object': {'music': '', 'sequence': '', 'category': 'end', 'menu': ''}, 'className': 'Layer', 'attrs': {'category': 'end', 'id': '', 'visible': False, 'object_name': ''}}
+	
+	generalName = "Loppu"
+	generalNameAdessive = "Lopulla"
+	
+	def __init__(self, texts, endId, endAttributes, endImages):
+		if not (endAttributes):
+			endAttributes = End.endAttributes
+			
+		super(End, self).__init__(texts, endAttributes, endId)
 		
 		self.endImages = []
+		self.createPlaceholderImage("airfreshener.png", texts)
+		self.endText = None
+		
+		if not (endImages):
+			return
+		
 		for imageId in endImages:
 			imageAttributes = endImages[imageId].pop("image")[0]
 			objectAttributes = endImages[imageId]
@@ -215,27 +257,46 @@ class End(View):
 		return self.endImages
 		
 	def getItems(self):
-		return self.endText,
+		if (self.endText):
+			return self.endText,
+		return ()
 		
 	def getRepresentingImage(self):
+		if (len(self.endImages) == 0):
+			return self.placeholderImage
 		return self.endImages[0]
-		
+			
 # Any game room
 class Room(View):
+	# Generic attributes for rooms
+	roomAttributes = {'className': 'Layer', 'attrs': {'object_name': '', 'id': '', 'visible': False, 'category': 'room', 'start': False}, 'object': {'music': ''}}
+	
+	generalName = "Huone"
+	generalNameAdessive = "Huoneella"
+	
 	def __init__(self, texts, roomId, roomAttributes, roomImages):
+		if not (roomAttributes):
+			roomAttributes = Room.roomAttributes
+			
 		super(Room, self).__init__(texts, roomAttributes, roomId)
 		
-		# Create objects inside the room including the background
-		# TODO: This could be done in super
 		self.objectList = []
+		self.background = None
+		self.createPlaceholderImage("airfreshener.png", texts)
+		
+		if not (roomImages):
+			return
+			
+		# Create objects inside the room including the background
+		# TODO: Parsing objects could as well be done in View?
+		self.background = None
 		for imageId in roomImages:
 			images = roomImages[imageId].pop("image")
 			imageAttributes = roomImages[imageId]
 			imageCategory = images[0]["category"]
 			
-			# Create objects according to its category
+			# Create objects according to their category
 			if (imageAttributes["className"] == "Text"):
-				print("WWWWTAIOSDUOASDUISIO\n\n", imageCategory)
 				self.objectList.append(Object.Text(texts, self, images, imageAttributes, imageId))
 			elif (imageCategory == "room_background"):
 				self.background = Object.JSONImage(texts, self, images[0], imageAttributes)
@@ -263,8 +324,10 @@ class Room(View):
 		return self.objectList
 		
 	def getRepresentingImage(self):
-		return self.background
-		
+		if (self.background):
+			return self.background
+		return self.placeholderImage
+			
 	def postInit(self, getGameObject):
 		for obj in self.objectList:
 			obj.postInit(getGameObject)
@@ -309,6 +372,9 @@ class Room(View):
 		
 # Custom view for custom layers
 class Custom(View):
+	generalName = "Erikoisnäkymä"
+	generalNameAdessive = "Erikoisnäkymällä"
+	
 	def __init__(self, texts, viewId, viewAttributes, viewImages):
 		super(Custom, self).__init__(texts, viewAttributes, viewId)
 		

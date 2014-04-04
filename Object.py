@@ -49,7 +49,6 @@ class Object(object):
 		# JSONImage doesn't need an image or an ID check
 		else:
 			self.id = objectId
-			
 		#self.whatBlocks = None # TODO: In interaction instead?
 		self.location = location
 		self.objectAttributes = objectAttributes
@@ -730,12 +729,16 @@ class Obstacle(Object):
 class JSONImage(Object):
 	imageAttributes = {'category': '', 'id': '', 'object_name': '', 'src': '', 'visible': False, 'x': 0, 'y': 0}
 	
+	generalName = "Kuva"
+	generalNameAdessive = "Kuvalla"
+	
+	
 	# imageAttributes has to be dict, not a list as with other objects
 	# objectAttributes is a dict with object, attrs and className keys
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		if not (texts):
 			texts = {}
-	
+			
 		if not (imageAttributes):
 			imageAttributes = JSONImage.imageAttributes
 			
@@ -776,6 +779,9 @@ class JSONImage(Object):
 		
 # Differentiate sequence images from normal images
 class SequenceImage(JSONImage):
+	generalName = "Kuva"
+	generalNameAdessive = "Kuvalla"
+	
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(SequenceImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
 		
@@ -797,13 +803,34 @@ class SequenceImage(JSONImage):
 		
 # Differentiate menu images from normal images
 class MenuImage(JSONImage):
+	generalName = "Valikkokuva"
+	generalNameAdessive = "Valikkokuvalla"
+	
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(MenuImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
 
+# Differentiate begining image from normal images
+# This is here mostly for the general name and adessive
+class BeginingImage(JSONImage):
+	generalName = "Alkuruutu"
+	generalNameAdessive = "Alkuruudulla"
+	
+	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
+		super(BeginingImage, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
+
 class Text(JSONImage):
+	generalName = "Teksti"
+	generalNameAdessive = "Tekstillä"
+	
 	def __init__(self, texts, location, imageAttributes, objectAttributes, imageId=None):
 		super(Text, self).__init__(texts, location, imageAttributes, objectAttributes, imageId)
 		
+	# Always return a placeholder image
+	# TODO: Absolute source
 	def getSource(self):
 		return "images/airfreshener.png"
+		
+	# No setting source for a text
+	def setSource(self):
+		return
 		
