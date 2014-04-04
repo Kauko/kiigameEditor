@@ -189,14 +189,14 @@ class ScenarioData(object):
 		imagesJSON = json.dumps(scenarioChildren, sort_keys=True, indent=4, separators=(',', ': '))
 		objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
 		
-		print(textsJSON)
+		#print(textsJSON)
 		#print(imagesJSON)
 		#print(objectsJSON)
 		
 		# Save into file
-		f = open(self.dataDir + "texts_lol.json", "w", encoding='utf-8')
-		f.write(textsJSON)
-		f.close()
+		#f = open(self.dataDir + "texts_lol.json", "w", encoding='utf-8')
+		#f.write(textsJSON)
+		#f.close()
 
 		#f = open(self.dataDir + "images.json", "w")
 		#f.write(imagesJSON)

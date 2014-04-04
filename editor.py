@@ -334,7 +334,6 @@ class Editor(QtGui.QMainWindow):
 			self.texts_frame.setTitle("Tekstit - %s" %(selected.text()))
 		
 	def drawTextItems(self):
-		print("DRAW")
 		textItems = self.scenarioData.getAllObjects()
 		secretCount = textItems.pop()
 		imgCount = textItems.pop()
@@ -385,8 +384,6 @@ class Editor(QtGui.QMainWindow):
 					
 				# Add a progressbar to the second column
 				#progressBarItem = ProgressBarItemWidget(item, maxAmount)
-				if (itemImage.imageAttributes["category"] == "secret"):
-					print (itemImage.id, maxAmount, textCount)
 				progressBar = QtGui.QProgressBar()
 				progressBar.setMinimum(0)
 				progressBar.setMaximum(maxAmount)
@@ -635,23 +632,25 @@ class TextsWidget(QtGui.QWidget):
 		self.separator = QtGui.QLabel("")
 		self.separator.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		
-		# Display options for interaction texts
-		self.displayOptionGroupBox = QtGui.QGroupBox("Näytä")
-		self.displayOptionLayout = QtGui.QVBoxLayout()
-		self.displayOptionGroupBox.setLayout(self.displayOptionLayout)
-		self.displayAll = QtGui.QRadioButton("Kaikki")
-		self.displayMissing = QtGui.QRadioButton("Puuttuvat")
-		self.displayDone = QtGui.QRadioButton("Tehdyt")
-		
 		# Interaction texts
 		self.interactionTextGroupBox = QtGui.QGroupBox("Tekstit muiden esineiden kanssa")
 		self.interactionTextLayout = QtGui.QVBoxLayout()
 		self.text_scene = QtGui.QTableWidget(self)
 		self.interactionTextGroupBox.setLayout(self.interactionTextLayout)
 		self.text_scene.cellChanged.connect(self.changeInteractionText)
+		
+		# Display options for interaction texts
+		self.displayOptionGroupBox = QtGui.QGroupBox("Näytä")
+		self.displayOptionLayout = QtGui.QVBoxLayout()
+		self.displayOptionGroupBox.setLayout(self.displayOptionLayout)
+		self.displayAllButton = QtGui.QRadioButton("Kaikki")
+		self.displayAllButton.clicked.connect(lambda: self.displayAllInteractions("all"))
+		self.displayMissingButton = QtGui.QRadioButton("Puuttuvat")
+		self.displayMissingButton.clicked.connect(lambda: self.displayAllInteractions("missing"))
+		self.displayDoneButton = QtGui.QRadioButton("Tehdyt")
+		self.displayDoneButton.clicked.connect(lambda: self.displayAllInteractions("done"))
 
 	def displayTexts(self, item):
-		print ("DISPLAY")
 		self.currentItem = item
 		# TODO: InteractionTextGroupBox should take 3/4 of the width
 		self.layout.addWidget(self.clickTextLabel, 0, 0)
@@ -667,15 +666,15 @@ class TextsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.separator, 4, 0, 1, 0)
 		self.layout.addWidget(self.interactionTextGroupBox, 5, 0, 4, 1)
 		self.layout.addWidget(self.displayOptionGroupBox, 5, 1)
-		self.layout.addWidget(self.displayAll, 6, 1)
-		self.layout.addWidget(self.displayMissing, 7, 1)
-		self.layout.addWidget(self.displayDone, 8, 1)
+		self.layout.addWidget(self.displayAllButton, 6, 1)
+		self.layout.addWidget(self.displayMissingButton, 7, 1)
+		self.layout.addWidget(self.displayDoneButton, 8, 1)
 		
 		# Display option buttons
-		self.displayAll.setChecked(True)
-		self.displayOptionLayout.addWidget(self.displayAll)
-		self.displayOptionLayout.addWidget(self.displayMissing)
-		self.displayOptionLayout.addWidget(self.displayDone)
+		self.displayAllButton.setChecked(True)
+		self.displayOptionLayout.addWidget(self.displayAllButton)
+		self.displayOptionLayout.addWidget(self.displayMissingButton)
+		self.displayOptionLayout.addWidget(self.displayDoneButton)
 		
 		# Interaction texts
 		self.interactionTextLayout.addWidget(self.text_scene)
@@ -693,9 +692,9 @@ class TextsWidget(QtGui.QWidget):
 			self.defaultTextLabel2,
 			self.defaultTextEdit2,
 			self.displayOptionGroupBox,
-			self.displayAll,
-			self.displayMissing,
-			self.displayDone,
+			self.displayAllButton,
+			self.displayMissingButton,
+			self.displayDoneButton,
 			self.interactionTextGroupBox,
 		]
 		
@@ -707,8 +706,6 @@ class TextsWidget(QtGui.QWidget):
 		
 		# Item
 		if (self.currentItem.objectType == "Item" and "src2" not in self.currentItem.textItem.imageAttributes):
-			targets = self.scenarioData.getAllObjects()[0]
-			row = 0
 			for setting in self.itemSettings:
 				setting.show()
 			
@@ -716,6 +713,9 @@ class TextsWidget(QtGui.QWidget):
 				self.pickupTextEdit.setText(self.currentItem.texts["pickup"])
 			except:
 				pass
+				
+			# Display interactions
+			self.displayAllInteractions("all")
 				
 			try:
 				if (self.currentItem.target):
@@ -738,33 +738,6 @@ class TextsWidget(QtGui.QWidget):
 				self.defaultTextEdit2.setText(self.currentItem.texts["default"])
 			except:
 				pass
-			
-			# Interaction texts
-			self.text_scene.setSortingEnabled(False)
-			for target in targets:
-				for targetImage in target.getImages():
-					# Target image
-					if (targetImage.id == self.currentItem.id or targetImage.imageAttributes["category"] == "secret"):
-						continue
-					self.text_scene.insertRow(self.text_scene.rowCount())
-					imageObject = self.scenarioData.getJSONObject(targetImage.id)
-					# TODO: cell size doesn't work!
-					targetItem = TextItemWidget(imageObject, self.scenarioData.getObject(target.id), self.scenarioData.dataDir, 100)
-					self.text_scene.setItem(row, 0, targetItem)
-
-					# Interaction text with the target
-					try:
-						interactionText = self.currentItem.texts[targetImage.id]
-					except:
-						interactionText = ""
-					 
-					interactionTextItem = QtGui.QTableWidgetItem()
-					interactionTextItem.setText(interactionText)
-					self.text_scene.setItem(row, 1, interactionTextItem)
-					
-					row += 1
-			self.text_scene.resizeRowsToContents()
-			self.text_scene.setSortingEnabled(True)
 		
 		# Everyone else
 		else:
@@ -782,16 +755,16 @@ class TextsWidget(QtGui.QWidget):
 		elif (textType == "pickup"):
 			if not (textEdit):
 				textEdit = self.pickupTextEdit
-			gameObject.textItem.setPickupText(textEdit.toPlainText())
+			gameObject.parentItem.setPickupText(textEdit.toPlainText())
 		elif (textType == "use"):
 			if not (textEdit):
 				textEdit = self.useTextEdit
-			gameObject.textItem.setUseText(textEdit.toPlainText())
+			gameObject.parentItem.setUseText(textEdit.toPlainText())
 			gameObject.useText = textEdit.toPlainText()
 		elif (textType == "default"):
 			if not (textEdit):
 				textEdit = self.defaultTextEdit
-			gameObject.textItem.setDefaultText(textEdit.toPlainText())
+			gameObject.parentItem.setDefaultText(textEdit.toPlainText())
 		
 		self.parent.drawTextItems()
 
@@ -805,7 +778,41 @@ class TextsWidget(QtGui.QWidget):
 				self.parent.drawTextItems()
 			except:
 				pass
-							
+
+	def displayAllInteractions(self, displayOption):
+		self.text_scene.clear()
+		targets = self.scenarioData.getAllObjects()[0]
+		self.text_scene.setSortingEnabled(False)
+		row = 0
+		self.text_scene.setRowCount(0)
+		for target in targets:
+			for targetImage in target.getImages():
+				# Interaction text with the target
+				try:
+					interactionText = self.currentItem.texts[targetImage.id]
+				except:
+					interactionText = ""
+				
+				if (targetImage.id == self.currentItem.id or
+					targetImage.imageAttributes["category"] == "secret" or
+					(displayOption == "missing" and interactionText != "") or
+					(displayOption == "done" and interactionText == "")):
+					continue
+					
+				self.text_scene.insertRow(self.text_scene.rowCount())
+				imageObject = self.scenarioData.getJSONObject(targetImage.id)
+				# TODO: cell size doesn't work!
+				targetItem = TextItemWidget(imageObject, self.scenarioData.getObject(target.id), self.scenarioData.dataDir, 100)
+				self.text_scene.setItem(row, 0, targetItem)
+				  
+				interactionTextItem = QtGui.QTableWidgetItem()
+				interactionTextItem.setText(interactionText)
+				self.text_scene.setItem(row, 1, interactionTextItem)
+				
+				row += 1
+		self.text_scene.resizeRowsToContents()
+		self.text_scene.setSortingEnabled(True)
+
 if __name__ == '__main__':
 	from sys import argv, exit
 
