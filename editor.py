@@ -239,9 +239,10 @@ class Editor(QtGui.QMainWindow):
 	def updateSpaceTab(self):
 		selectedRoom = self.left_scene.selectedItems()[0]
 		self.spaceSettingsWidget.displayOptions(selectedRoom.room)
+		self.spaceScene.clear()
 		
-		# Display room image
-		pixmap = self.imageCache.createPixmap(selectedRoom.room.getRepresentingImage().absoluteImagePath)
+		# Display room image and set the same scale than in the game
+		pixmap = self.imageCache.createPixmap(selectedRoom.room.getRepresentingImage().absoluteImagePath).scaled(981, 543)
 		self.spaceScene.addPixmap(pixmap)
 		
 		# Display objects
@@ -255,14 +256,23 @@ class Editor(QtGui.QMainWindow):
 				continue
 			#print(self.scenarioData.dataDir + "/" + img.getSource())
 			
+			try:
+				scale = img.imageAttributes["scale"]
+			except:
+				scale = 1
 			pixmap = self.imageCache.createPixmap(img.absoluteImagePath)
+			pixmap = pixmap.scaledToHeight(pixmap.height()*scale)
 			pixItem = QtGui.QGraphicsPixmapItem(pixmap)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
 			
+			print(item.id)
 			#TODO: Game crops some amount from the borders, insert that amount into items offset value
 			pos = item.getPosition()
-			pixItem.setPos(pos[0],pos[1])
-			self.spaceScene.addItem(pixItem)
+			if not (pos):
+				print ("Add to empty room")
+			else:
+				pixItem.setPos(pos[0],pos[1])
+				self.spaceScene.addItem(pixItem)
 			
 	def createObject(self, objectType):
 		selectedRoom = self.left_scene.selectedItems()[0]

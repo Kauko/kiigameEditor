@@ -781,6 +781,7 @@ class JSONImage(Object):
 		self.imageAttributes["y"] = y
 		
 	def getCoordinates(self):
+		print(self.id, self.imageAttributes)
 		try:
 			return (self.imageAttributes["x"], self.imageAttributes["y"])
 		except KeyError:
