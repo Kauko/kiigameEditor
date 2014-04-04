@@ -15,12 +15,11 @@ class Editor(QtGui.QMainWindow):
 		
 		self.setWindowTitle("Kiigame - Pelieditori")
 		
-		# TODO: Menubar
-		menubar = self.menuBar()
-		
 		self.tabWidget = QtGui.QTabWidget()
 		self.setCentralWidget(self.tabWidget)
 		
+		self.createMenuActions()
+		self.createMenus()
 		self.createMainTab()
 		self.createSpaceTab()
 		self.createTextsTab()
@@ -28,6 +27,21 @@ class Editor(QtGui.QMainWindow):
 		self.tabWidget.addTab(self.mainTab, "Päänäkymä")
 		self.tabWidget.addTab(self.spaceTab, "Tila")
 		self.tabWidget.addTab(self.textsTab, "Tekstit")
+		
+	def createMenuActions(self):
+		self.newAct = QtGui.QAction("Uusi", self)
+		self.openAct = QtGui.QAction("Avaa…", self)
+		self.saveAct = QtGui.QAction("Tallenna", self)
+		self.saveAct.triggered.connect(self.scenarioData.saveScenario)
+		self.exitAct = QtGui.QAction("Lopeta", self)
+	
+	def createMenus(self):
+		fileMenu = self.menuBar().addMenu("&Tiedosto")
+		fileMenu.addAction(self.newAct)
+		fileMenu.addAction(self.openAct)
+		fileMenu.addAction(self.saveAct)
+		fileMenu.addSeparator()
+		fileMenu.addAction(self.exitAct)
 		
 	def createMainTab(self):
 		self.mainTab = QtGui.QWidget()
