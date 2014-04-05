@@ -39,6 +39,8 @@ class Editor(QtGui.QMainWindow):
 		self.saveAct = QtGui.QAction("Tallenna", self)
 		self.saveAct.triggered.connect(self.scenarioData.saveScenario)
 		self.exitAct = QtGui.QAction("Lopeta", self)
+		#TODO: Nice-to-have, ask for confirmation before quitting?
+		self.exitAct.triggered.connect(self.close)
 	
 	def createMenus(self):
 		fileMenu = self.menuBar().addMenu("&Tiedosto")
