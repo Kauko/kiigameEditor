@@ -236,9 +236,9 @@ class Editor(QtGui.QMainWindow):
 		
 		right_frame_layout.addWidget(scrollArea)
 		self.spaceScene = QtGui.QGraphicsScene(self)
-		view = QtGui.QGraphicsView(self.spaceScene)
-		view.setDragMode(QtGui.QGraphicsView.ScrollHandDrag)
-		left_frame_layout.addWidget(view)
+		self.spaceView = QtGui.QGraphicsView(self.spaceScene)
+		#self.spaceView.setDragMode(QtGui.QGraphicsView.ScrollHandDrag)
+		left_frame_layout.addWidget(self.spaceView)
 		
 		self.updateSpaceTab()
 	
@@ -268,8 +268,11 @@ class Editor(QtGui.QMainWindow):
 				scale = 1
 			pixmap = self.imageCache.createPixmap(img.absoluteImagePath)
 			pixmap = pixmap.scaledToHeight(pixmap.height()*scale)
-			pixItem = QtGui.QGraphicsPixmapItem(pixmap)
+			pixItem = SpaceViewItem(pixmap, item.id, self)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
+			
+			#pixItem = QtGui.QGraphicsPixmapItem(pixmap)
+			#pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
 			
 			print(item.id)
 			#TODO: Game crops some amount from the borders, insert that amount into items offset value
@@ -856,6 +859,27 @@ class TextsWidget(QtGui.QWidget):
 				row += 1
 		self.text_scene.resizeRowsToContents()
 		self.text_scene.setSortingEnabled(True)
+		
+class SpaceViewItem(QtGui.QGraphicsPixmapItem):
+	def __init__(self, pixmap, name, parent=None):
+		super(SpaceViewItem, self).__init__(pixmap)
+		self.name = name
+		self.parent = parent
+
+	def MousePressEvent(self, event):
+		try:
+			roomItems = parent.left_scene.currentItem().room.getItems()
+		except IndexError:
+			return
+			
+		for item in roomItems:
+			print(item)
+			if (item.__class__.__id__ == self.name):
+				selectedItem = item
+		
+		print("yritys on kova")
+		parent.settingsWidget.displayOptions(selectedItem)
+		QtGui.QGraphicsItem.mousePressEvent(self, event)
 
 if __name__ == '__main__':
 	from sys import argv, exit
