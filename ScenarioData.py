@@ -99,7 +99,7 @@ class ScenarioData(object):
 				
 				createdObjects[itemId]["image"].append(jsonImage)
 
-            # Compose the final dict key and values				
+			# Compose the final dict key and values				
 			objectsByCat[objectCategory][objectId] = {}
 			objectsByCat[objectCategory][objectId]["image"] = createdObjects
 			objectsByCat[objectCategory][objectId]["object"] = layerObject

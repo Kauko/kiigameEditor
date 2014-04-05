@@ -846,7 +846,7 @@ class TextsWidget(QtGui.QWidget):
 				# TODO: cell size doesn't work!
 				targetItem = TextItemWidget(imageObject, self.scenarioData.getObject(target.id), self.scenarioData.dataDir, 100)
 				self.text_scene.setItem(row, 0, targetItem)
-				  
+				
 				interactionTextItem = QtGui.QTableWidgetItem()
 				interactionTextItem.setText(interactionText)
 				self.text_scene.setItem(row, 1, interactionTextItem)

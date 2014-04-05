@@ -6,7 +6,7 @@ class View(object):
 
 	# Static method to create unique view ID
 	usedIds = []
-	def createUniqueId(newId=None):
+	def createUniqueId(self, newId=None):
 		if not (newId):
 			newId = str(randint(0, 1000000000))
 			
@@ -204,14 +204,17 @@ class Start(View):
 	def postInit(self, getGameObject):
 		# Create menu items
 		menu = getGameObject("menu", self.object["menu"])
-		for imageId,action in menu.object["items"].items():
-			print("post", menu.object["items"].items())
-			if (action == "start_game"):
-				self.startButton = menu.getItemById(imageId)
-			elif (action == "credits"):
-				self.creditsButton = menu.getItemById(imageId)
-			elif (action == "none"):
-				self.emptyButton = menu.getItemById(imageId)
+		try:
+			for imageId,action in menu.object["items"].items():
+				print("post", menu.object["items"].items())
+				if (action == "start_game"):
+					self.startButton = menu.getItemById(imageId)
+				elif (action == "credits"):
+					self.creditsButton = menu.getItemById(imageId)
+				elif (action == "none"):
+					self.emptyButton = menu.getItemById(imageId)
+		except:
+			print("NoneType-error")
 				
 	def getChildren(self):
 		return [self.background, self.startButton, self.creditsButton, self.emptyButton, self.beginingImage]
@@ -252,7 +255,10 @@ class End(View):
 	def postInit(self, getGameObject):
 		# Create text item
 		# TODO: Connect texts and ends in kiigame to get rid of hard coded ID
-		self.endText = getGameObject("custom", "end_texts").getRepresentingImage()
+		try:
+			self.endText = getGameObject("custom", "end_texts").getRepresentingImage()
+		except:
+			print("NoneType-error")
 		
 	def deleteChild(self, imageId):
 		for image in self.endImages:
