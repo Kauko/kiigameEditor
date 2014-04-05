@@ -866,19 +866,19 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		self.name = name
 		self.parent = parent
 
-	def MousePressEvent(self, event):
+	def mousePressEvent(self, event):
 		try:
-			roomItems = parent.left_scene.currentItem().room.getItems()
+			roomItems = self.parent.left_scene.currentItem().room.getItems()
 		except IndexError:
 			return
 			
 		for item in roomItems:
-			print(item)
-			if (item.__class__.__id__ == self.name):
+			if (item.getRepresentingImage().id == self.name):
 				selectedItem = item
+				
+		print(selectedItem)
 		
-		print("yritys on kova")
-		parent.settingsWidget.displayOptions(selectedItem)
+		self.parent.settingsWidget.displayOptions(selectedItem)
 		QtGui.QGraphicsItem.mousePressEvent(self, event)
 
 if __name__ == '__main__':
