@@ -378,6 +378,8 @@ class Editor(QtGui.QMainWindow):
 		
 		self.text_scene.setRowCount(0)
 		self.text_scene.setColumnCount(2)
+		self.text_scene.setColumnWidth(0, 250)
+		self.text_scene.setColumnWidth(1, 200)
 		
 		# Disable sorting for row count, enable it after adding items
 		self.text_scene.setSortingEnabled(False)
@@ -685,7 +687,7 @@ class TextsWidget(QtGui.QWidget):
 		
 		# Display options for interaction texts
 		self.displayOptionGroupBox = QtGui.QGroupBox("Näytä")
-		self.displayOptionLayout = QtGui.QVBoxLayout()
+		self.displayOptionLayout = QtGui.QHBoxLayout()
 		self.displayOptionGroupBox.setLayout(self.displayOptionLayout)
 		self.displayAllButton = QtGui.QRadioButton("Kaikki")
 		self.displayAllButton.clicked.connect(lambda: self.displayAllInteractions("all"))
@@ -696,7 +698,6 @@ class TextsWidget(QtGui.QWidget):
 
 	def displayTexts(self, item):
 		self.currentItem = item
-		# TODO: InteractionTextGroupBox should take 3/4 of the width
 		self.layout.addWidget(self.clickTextLabel, 0, 0)
 		self.layout.addWidget(self.clickTextEdit, 1, 0)
 		self.layout.addWidget(self.pickupTextLabel, 0, 1)
@@ -707,12 +708,9 @@ class TextsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.defaultTextEdit2, 3, 0)
 		self.layout.addWidget(self.defaultTextLabel, 2, 1)
 		self.layout.addWidget(self.defaultTextEdit, 3, 1)
-		self.layout.addWidget(self.separator, 4, 0, 1, 0)
-		self.layout.addWidget(self.interactionTextGroupBox, 5, 0, 4, 1)
-		self.layout.addWidget(self.displayOptionGroupBox, 5, 1)
-		self.layout.addWidget(self.displayAllButton, 6, 1)
-		self.layout.addWidget(self.displayMissingButton, 7, 1)
-		self.layout.addWidget(self.displayDoneButton, 8, 1)
+		self.layout.addWidget(self.separator, 4, 0, 1, 4)
+		self.layout.addWidget(self.interactionTextGroupBox, 5, 0, 3, 3)
+		self.layout.addWidget(self.displayOptionGroupBox, 8, 0)
 		
 		# Display option buttons
 		self.displayAllButton.setChecked(True)
@@ -721,9 +719,14 @@ class TextsWidget(QtGui.QWidget):
 		self.displayOptionLayout.addWidget(self.displayDoneButton)
 		
 		# Interaction texts
+		# TODO: The rows shouldn't be so high, would be better to see more items at a time
+		# TODO: Also this text_scene should always stretch more than the other widgets, same reason as above TODO
 		self.interactionTextLayout.addWidget(self.text_scene)
 		self.text_scene.setRowCount(0)
 		self.text_scene.setColumnCount(2)
+		self.text_scene.setColumnWidth(0, 250)
+		self.text_scene.setColumnWidth(1, 250)
+		self.text_scene
 		
 		# TODO: Texts for open, closed, empty, full, etc.
 		self.itemSettings = [
@@ -857,7 +860,7 @@ class TextsWidget(QtGui.QWidget):
 				self.text_scene.setItem(row, 1, interactionTextItem)
 				
 				row += 1
-		self.text_scene.resizeRowsToContents()
+		#self.text_scene.resizeRowsToContents()
 		self.text_scene.setSortingEnabled(True)
 		
 class SpaceViewItem(QtGui.QGraphicsPixmapItem):
