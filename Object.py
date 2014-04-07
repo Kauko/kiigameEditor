@@ -98,13 +98,13 @@ class Object(object):
 		
 	def getExamineText(self):
 		try:
-			return self.texts["examine"]
+			return self.getRepresentingImage().texts["examine"]
 		except:
 			return
 
 	# Set item's examine (click) text
 	def setExamineText(self, examineText):
-		self.texts["examine"] = examineText
+		self.getRepresentingImage().texts["examine"] = examineText
 		
 	# TODO: Should remove all texts referring to this object
 	# Remove this object
