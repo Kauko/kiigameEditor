@@ -1,4 +1,5 @@
 from random import randint
+from copy import deepcopy
 
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
@@ -515,7 +516,7 @@ class Door(Object):
 			self.blockedImage = self.getImage(objectAttributes["object"]["blocked_image"])
 		except KeyError:
 			self.blockedImage = None
-		
+			
 		self.texts = {}
 		
 		try:
@@ -749,7 +750,7 @@ class JSONImage(Object):
 	def __init__(self, parentView, imageAttributes, objectAttributes, imageId=None):
 
 		if not (imageAttributes):
-			imageAttributes = JSONImage.imageAttributes
+			imageAttributes = deepcopy(JSONImage.imageAttributes)
 			self.absoluteImagePath = None
 			
 		if not (imageId):
@@ -758,14 +759,17 @@ class JSONImage(Object):
 		super(JSONImage, self).__init__(parentView, imageId, None, objectAttributes)
 		
 		self.imageAttributes = imageAttributes
-		self.placeholderSource = None
+		self.placeholderImage = PlaceholderImage(self)
 		
 		if (imageAttributes):
 			self.absoluteImagePath = "%simages/%s" %(parentView.scenarioData.dataDir, self.getFileName())
 			
 	def getRepresentingImage(self):
-		return self
-		
+		if (len(self.imageAttributes["src"]) == 0):
+			return self.placeholderImage
+		else:
+			return self
+			
 	def getName(self):
 		try:
 			return self.texts["name"]
@@ -779,22 +783,17 @@ class JSONImage(Object):
 		# TODO: self.getSource() returns None?
 		return self.imageAttributes["src"].split("/")[-1]
 		
-	def setPlaceholderSource(self, absoluteImagePath):
-		self.placeholderSource = absoluteImagePath
-		
 	def getSource(self):
-		if (self.placeholderSource):
-			return self.placeholderSource
+		if (len(self.imageAttributes["src"]) == 0):
+			return self.placeholderImage.getSource()
 		return self.imageAttributes["src"]
 		
 	def setSource(self, absoluteImagePath):
-		self.placeholderSource = None
-		
 		# Cut the plain filename out of the name
 		self.imageAttributes["src"] = "images/"+absoluteImagePath.split("/")[-1]
 		
 		self.absoluteImagePath = absoluteImagePath
-		print("SETSOURCE", absoluteImagePath)
+		
 	def setObjectName(self, objectName):
 		self.imageAttributes["object_name"] = objectName
 		
@@ -878,3 +877,26 @@ class Text(JSONImage):
 		
 	def setText(self, text):
 		self.imageAttributes["text"] = text
+		
+	def getRepresentingImage(self):
+		return self
+		
+# Placeholder image to be used by other images
+class PlaceholderImage(JSONImage):
+	def __init__(self, parent):
+		self.parent = parent
+		self.imageAttributes = deepcopy(JSONImage.imageAttributes)
+		self.absoluteImagePath = None
+		
+	def setSource(self, absoluteImagePath):
+		
+		# Cut the plain filename out of the name
+		self.imageAttributes["src"] = "images/"+absoluteImagePath.split("/")[-1]
+		
+		self.absoluteImagePath = absoluteImagePath
+		
+	def getName(self):
+		return self.parent.getName()
+			
+	def setName(self, name):
+		return self.parent.setName(name)

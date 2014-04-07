@@ -113,11 +113,12 @@ class ObjectImageSettings(QtGui.QWidget):
 	def setImage(self):
 		# Given gameImageObject may be None (no lockedImage, for example)
 		if (self.gameImageObject):
-			imagePath = self.parent.parent.getImageDir()+"/"+self.gameImageObject.getSource()
+			imagePath = self.gameImageObject.getRepresentingImage().absoluteImagePath
+			self.parent.setObjectImage(imagePath, self.image)
 		elif self.objectType == "Door":
-			imagePath = "images/door_placeholder.png"
+			imagePath = self.parent.parent.editorImagePath + "door_placeholder.png"
 		elif self.objectType == "Container":
-			imagePath = "images/container_placeholder.png"
+			imagePath = self.parent.parent.editorImagePath + "container_placeholder.png"
 			
 		# Ask parent to actually draw the image
 		self.parent.setObjectImage(imagePath, self.image)
@@ -147,7 +148,7 @@ class ObjectImageSettings(QtGui.QWidget):
 			except:
 				pass
 						
-		self.parent.setObjectName(self.gameImageObject, "Kulkureitillä", self.nameEdit)
+		self.parent.setObjectName(self.gameImageObject, self.gameObject.generalNameAdessive, self.nameEdit)
 		self.parent.setExamineText(self.gameImageObject, self.clickEdit)
 		
 	# Set the correct key item in keyCombo
