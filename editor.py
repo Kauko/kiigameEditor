@@ -274,7 +274,7 @@ class Editor(QtGui.QMainWindow):
 			#pixItem = QtGui.QGraphicsPixmapItem(pixmap)
 			#pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
 			
-			print(item.id)
+			#print(item.id)
 			#TODO: Game crops some amount from the borders, insert that amount into items offset value
 			pos = item.getPosition()
 			if not (pos):
@@ -879,7 +879,7 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 			if (item.getRepresentingImage().id == self.name):
 				selectedItem = item
 				
-		print(selectedItem)
+		#print(selectedItem)
 		
 		self.parent.settingsWidget.displayOptions(selectedItem)
 		QtGui.QGraphicsItem.mousePressEvent(self, event)

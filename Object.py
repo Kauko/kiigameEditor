@@ -256,7 +256,6 @@ class Item(Object):
 			
 		triggerType = targetObject.__class__.__name__
 		
-		#self.clearTarget()
 		self.target = targetObject
 		
 		if (triggerType in ("Object", "Item")):
@@ -364,7 +363,7 @@ class Container(Object):
 			if (self.objectAttributes["object"]["locked"] == True):
 				return True
 		except KeyError:
-			print("Warning: Attribute 'locked' not defined for door object '%s'" %(self.id))
+			print("Warning: Attribute 'locked' not defined for container object '%s'" %(self.id))
 		return False
 
 	def setIsLocked(self, isLocked):
@@ -430,7 +429,6 @@ class Container(Object):
 	# When setting locked=True, other parameters are mandatory
 	def setLocked(self, setLocked, imagePath=None, keyObject=None):
 		if (self.key):
-			#self.key.clearTarget()
 			self.key = None
 			
 		if (setLocked):
@@ -442,7 +440,6 @@ class Container(Object):
 			self.lockedImage = imageObject
 			
 			self.objectAttributes["object"]["locked_image"] = imageObject.id
-			
 			self.setIsLocked(True)
 			
 			if (keyObject):
@@ -462,6 +459,7 @@ class Container(Object):
 				
 			self.lockedImage = None
 			self.setIsLocked(False)
+			self.clearKey()
 			
 	# Nullify current key
 	def clearKey(self):
@@ -538,7 +536,6 @@ class Door(Object):
 	# When setting locked=True, other parameters can be given
 	def setLocked(self, setLocked, imagePath=None, keyObject=None):
 		if (self.key):
-			#self.key.clearTarget()
 			self.key = None
 			
 		if (setLocked):
@@ -570,6 +567,7 @@ class Door(Object):
 				
 			self.lockedImage = None
 			self.setIsLocked(False)
+			self.clearKey()
 			
 	def setClosed(self, setClosed):
 		if (setClosed):
@@ -780,7 +778,7 @@ class JSONImage(Object):
 		self.imageAttributes["src"] = "images/"+absoluteImagePath.split("/")[-1]
 		
 		self.absoluteImagePath = absoluteImagePath
-		
+		print("SETSOURCE", absoluteImagePath)
 	def setObjectName(self, objectName):
 		self.imageAttributes["object_name"] = objectName
 		

@@ -2,8 +2,8 @@ from PySide import QtGui, QtCore
 from ObjectImageSettings import ObjectImageSettings
 from ImageCache import ImageCache
 
-# TODO: remove useTypes[4], set it only in container instead
-# TODO: locked container is unfinished/buggy (Legendan kaappi)
+# # TODO: remove useTypes[4], set it only in container instead
+# # TODO: locked container is unfinished/buggy (Legendan kaappi)
 # TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2)
 # TODO: Add ending checkbox to generic objects
 # TODO: Duplicate images when changing newly added image (copy generic attribute dict instead of using it as is)
@@ -23,7 +23,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.lastObjectType = None
 		
 		self.useTypes = {0: "Ei käyttöä", 1: "Käytä toiseen esineeseen",
-			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Ota jostakin", 5: "Poista este"}
+			2: "Avaa jotakin", 3: "Laita johonkin", 4: "Poista este"}
 			
 		self.fadeTypes = {0: "Välittömästi", 1: "Häivytys"}
 		
@@ -509,12 +509,6 @@ class SettingsWidget(QtGui.QWidget):
 				except AttributeError:
 					pass
 					
-				try:
-					if (itemTarget.outItem == item):
-						useType = 4
-				except AttributeError:
-					pass
-					
 		self.setUseConsume()
 		
 		self.setItemUseType(useType)
@@ -536,10 +530,9 @@ class SettingsWidget(QtGui.QWidget):
 			
 	# Set the input field values for containers
 	def setContainerOptions(self, container):
-	
 		# Set image settings for each image
-		self.lockedContainerImage.setSettings(container, container.lockedImage)
 		self.fullContainerImage.setSettings(container, container.fullImage)
+		self.lockedContainerImage.setSettings(container, container.lockedImage)
 		self.emptyContainerImage.setSettings(container, container.emptyImage)
 		
 		# Set what goes, what comes from the container
@@ -797,7 +790,6 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Change object use type
 	def changeItemUseType(self, index):
-		#  typeIndex, useItem) setItemUseType
 		self.setItemUseType(index)
 		self.setItemUseTarget(None)
 		self.setItemOutcome(None)
@@ -831,8 +823,8 @@ class SettingsWidget(QtGui.QWidget):
 				objectRole = 1
 				
 			# Get from container
-			elif (useType == 4):
-				objectRole = 2
+			#elif (useType == 4):
+			#	objectRole = 2
 				
 		self.currentObject.setTargetObject(selectedObject, objectRole)
 		self.setUseText()
@@ -869,7 +861,7 @@ class SettingsWidget(QtGui.QWidget):
 			self.populateRoomCombobox(combobox, addChoices)
 		else:
 			self.populateCombobox(objectTypes, combobox, noChoiceText, addChoices, noChoiceMethod)
-		combobox.currentIndexChanged.connect(lambda s: self.objectComboboxHandler(combobox, connectTo))
+		combobox.activated.connect(lambda s: self.objectComboboxHandler(combobox, connectTo))
 		
 		return combobox
 		
@@ -897,17 +889,15 @@ class SettingsWidget(QtGui.QWidget):
 			objectTypes = ("item", "object")
 		elif (useType == 2):
 			objectTypes = ("door", "container")
-		elif (useType == 3 or useType == 4):
+		elif (useType == 3):
 			objectTypes = ("container",)
-		elif (useType == 5):
+		elif (useType == 4):
 			objectTypes = ("obstacle",)
 			
 		self.populateCombobox(objectTypes, combobox, "Ei valittu", objectTypes, self.clearUseTarget)
 		
-	# Handle item combobox
+	# Handle item combobox item choosing callback
 	def objectComboboxHandler(self, combobox, callback):
-		
-		#print("Choice handler", combobox, callback, combobox.itemData(combobox.currentIndex()))
 		target = combobox.itemData(combobox.currentIndex())
 		targetType = target.__class__.__name__
 		

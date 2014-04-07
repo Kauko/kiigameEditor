@@ -31,7 +31,7 @@ class ObjectImageSettings(QtGui.QWidget):
 		if (self.canBeLocked):
 			# TODO: Texts need to be set from outside
 			self.lockedCheckbox = QtGui.QCheckBox(lockedText)
-			self.lockedCheckbox.stateChanged.connect(self.changeLocked)
+			self.lockedCheckbox.clicked.connect(self.changeLocked)
 			self.keyLabel = QtGui.QLabel("Mikä avaa?")
 			self.keyCombo = self.parent.createItemCombobox("Avainta ei valittu!", ("item",), ("item",), self.clearKey, self.changeKey)
 			
@@ -76,15 +76,16 @@ class ObjectImageSettings(QtGui.QWidget):
 			self.gameImageObject = self.gameObject.lockedImage.setPlaceholderSource(self.parent.parent.editorImagePath+placeholder)
 		else:
 			self.gameObject.setLocked(False)
+			self.keyCombo.setCurrentIndex(0)
 			self.gameImageObject = None
 			self.nameEdit.setText("")
 			self.clickEdit.setText("")
 			
 		self.setImage()
-		self.setLocked()
+		self.setLockedDisabled()
 		
 	# Disable widget parts if checkbox says so
-	def setLocked(self):
+	def setLockedDisabled(self):
 		notLocked = not self.lockedCheckbox.isChecked()
 		self.nameLabel.setDisabled(notLocked)
 		self.nameEdit.setDisabled(notLocked)
@@ -96,7 +97,6 @@ class ObjectImageSettings(QtGui.QWidget):
 		
 	def changeImage(self, imagePath):
 		self.parent.setObjectImage(imagePath, self.image)
-		# TODO: Create image if doesn't exist!
 		self.gameImageObject.setSource(imagePath)
 		
 	# Set the whole widget's enabled status
@@ -136,7 +136,7 @@ class ObjectImageSettings(QtGui.QWidget):
 				self.lockedCheckbox.setCheckState(QtCore.Qt.CheckState.Checked)
 			else:
 				self.lockedCheckbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
-			self.setLocked()
+			self.setLockedDisabled()
 			self.setKey()
 			
 		# Delete checkbox if obstacle
