@@ -86,6 +86,10 @@ class Object(object):
 	def getPosition(self):
 		return self.getRepresentingImage().getCoordinates()
 		
+	def setPosition(self, position):
+		print ("posiii", position.x(), position.y())
+		self.getRepresentingImage().setCoordinates(position.x(), position.y())
+		
 	# Returns of the most "representing" image for an item such as open door
 	# instead closed door image
 	# Every item needs to override this to act properly

@@ -380,6 +380,9 @@ class Room(View):
 		
 	def removeObject(self, childObject):
 		self.objectList.remove(childObject)
+
+	def setItems(self, items):
+		self.objectList = items
 		
 # Custom view for custom layers
 class Custom(View):
