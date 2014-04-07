@@ -32,6 +32,8 @@ class Editor(QtGui.QMainWindow):
 		self.tabWidget.addTab(self.mainTab, "Päänäkymä")
 		self.tabWidget.addTab(self.spaceTab, "Tila")
 		self.tabWidget.addTab(self.textsTab, "Tekstit")
+		# TODO: Can this be done any other way? Now this draws textsTab every time tab changes
+		self.tabWidget.currentChanged.connect(self.drawTextItems)
 		
 	def createMenuActions(self):
 		self.newAct = QtGui.QAction("Uusi", self)
@@ -278,7 +280,7 @@ class Editor(QtGui.QMainWindow):
 			#TODO: Game crops some amount from the borders, insert that amount into items offset value
 			pos = item.getPosition()
 			if not (pos):
-				print ("Add to empty room")
+				print ("In empty room")
 			else:
 				pixItem.setPos(pos[0],pos[1])
 				self.spaceScene.addItem(pixItem)
@@ -375,6 +377,7 @@ class Editor(QtGui.QMainWindow):
 			self.texts_frame.setTitle("Tekstit - %s" %(selected.text()))
 		
 	def drawTextItems(self):
+		#print ("DRAWING")
 		textItems = self.scenarioData.getAllObjects()
 		secretCount = textItems.pop()
 		imgCount = textItems.pop()
@@ -390,7 +393,7 @@ class Editor(QtGui.QMainWindow):
 		row = 0
 		for item in textItems:
 			for itemImage in item.getImages():
-				textCount = len(item.texts)
+				textCount = len(itemImage.texts)
 				
 				# Add a row
 				self.text_scene.insertRow(self.text_scene.rowCount())
@@ -427,6 +430,9 @@ class Editor(QtGui.QMainWindow):
 					
 				# Add a progressbar to the second column
 				#progressBarItem = ProgressBarItemWidget(item, maxAmount)
+				print (item.id, textCount, maxAmount)
+				if (textCount == 0):
+					print ("HERE", len(item.texts), item.id, itemImage.texts)
 				progressBar = QtGui.QProgressBar()
 				progressBar.setMinimum(0)
 				progressBar.setMaximum(maxAmount)
