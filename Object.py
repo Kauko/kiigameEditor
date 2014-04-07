@@ -110,6 +110,22 @@ class Object(object):
 	# Remove this object
 	def remove(self):
 		self.parentView.removeObject(self)
+	
+	# Set whether clicking the object game will end
+	# TODO: Set end layer too instead of having it hardcoded
+	def setIsEnding(self, isEnding):
+		if (isEnding):
+			self.objectAttributes["object"]["ending"] = "end_layer"
+		else:
+			try:
+				del self.objectAttributes["object"]["ending"]
+			except KeyError:
+				return
+				
+	def getIsEnding(self):
+		if ("ending" in self.objectAttributes["object"]):
+			return True
+		return False
 		
 # Pickable item
 class Item(Object):

@@ -4,7 +4,7 @@ from ImageCache import ImageCache
 
 # # TODO: remove useTypes[4], set it only in container instead
 # # TODO: locked container is unfinished/buggy (Legendan kaappi)
-# TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2)
+# TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2) (?)
 # TODO: Add ending checkbox to generic objects
 # TODO: Duplicate images when changing newly added image (copy generic attribute dict instead of using it as is)
 # TODO: Door state is initially closed even though should be open (Vessan ovi wc2)
@@ -99,6 +99,11 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTextEdit.setMaximumHeight(50)
 		self.useTextEdit.focusOutEvent = lambda s: self.changeUseText()
 		
+		# Ending checkbox
+		self.endingCheckbox = QtGui.QCheckBox() # Set text afterwards
+		self.endingCheckbox.setText("Peli loppuu klikatessa?")
+		self.endingCheckbox.stateChanged.connect(self.changeEndingCheckbox)
+		
 		# Music
 		self.musicLabel = QtGui.QLabel("Musiikki")
 		
@@ -153,7 +158,6 @@ class SettingsWidget(QtGui.QWidget):
 		# Door widgets
 		self.doorTransitionLabel = QtGui.QLabel("Mihin pääsee?")
 		self.doorTransitionCombo = self.createItemCombobox("Ei mihinkään", "room", connectTo=self.changeDoorTransition)
-		#self.doorTransitionLabelLine = self.createSeparator()
 		
 		self.doorInitialStateLabel = QtGui.QLabel("Tila alussa")
 		self.doorInitialStateCombo = QtGui.QComboBox(self)
@@ -217,6 +221,8 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.musicBtn)
 		self.layout.addWidget(self.musicClear)
 		self.layout.addWidget(self.whereFromLabel)
+		
+		self.layout.addWidget(self.endingCheckbox)
 		
 		self.layout.addWidget(self.examineTextLabel)
 		self.layout.addWidget(self.examineTextEdit)
@@ -356,6 +362,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.objectNameEdit,
 				self.imgTextLabel,
 				self.objectImage,
+				self.endingCheckbox,
 				self.examineTextLabel,
 				self.examineTextEdit,
 			],
@@ -403,6 +410,10 @@ class SettingsWidget(QtGui.QWidget):
 		
 	def changeTextObjectText(self):
 		self.currentObject.setText(self.textObjectTextEdit.text())
+		
+	def changeEndingCheckbox(self):
+		print("changeu", self.endingCheckbox)
+		self.currentObject.setIsEnding(self.endingCheckbox.isChecked())
 		
 	# Start menu
 	def setStartOptions(self, startObject):
@@ -463,7 +474,7 @@ class SettingsWidget(QtGui.QWidget):
 		# Image
 		self.setObjectImage(sequenceImage.getRepresentingImage().absoluteImagePath)
 		
-		# Set image display time. It needs to be converted into str and dots replaced
+		# Set image display time. Convert into str and replace dots
 		time = str(self.currentObject.getShowTime()/1000).replace(".", ",")
 		self.sequenceTimeEdit.setText(time)
 		
@@ -525,6 +536,12 @@ class SettingsWidget(QtGui.QWidget):
 		imageObject = genericObject.getRepresentingImage()
 		self.setObjectImage(imageObject.absoluteImagePath)
 		
+		# Ending
+		if (self.currentObject.getIsEnding()):
+			self.endingCheckbox.setCheckState(QtCore.Qt.CheckState.Checked)
+		else:
+			self.endingCheckbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
+			
 		# Examine text
 		self.setExamineText(self.currentObject)
 			
