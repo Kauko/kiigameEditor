@@ -32,8 +32,7 @@ class Editor(QtGui.QMainWindow):
 		self.tabWidget.addTab(self.mainTab, "Päänäkymä")
 		self.tabWidget.addTab(self.spaceTab, "Tila")
 		self.tabWidget.addTab(self.textsTab, "Tekstit")
-		# TODO: Can this be done any other way? Now this draws textsTab every time tab changes
-		self.tabWidget.currentChanged.connect(self.drawTextItems)
+		self.tabWidget.currentChanged.connect(self.onTabChanged)
 		
 	def createMenuActions(self):
 		self.newAct = QtGui.QAction("Uusi", self)
@@ -120,18 +119,19 @@ class Editor(QtGui.QMainWindow):
 		
 		# Settings for items and rooms
 		right_frame = QtGui.QGroupBox("Asetukset")
-		right_frame_layout = QtGui.QVBoxLayout()
-		right_frame.setLayout(right_frame_layout)
+		self.right_frame_layout_main = QtGui.QVBoxLayout()
+		right_frame.setLayout(self.right_frame_layout_main)
 		layout.addWidget(right_frame, 1, 4)
 		
 		self.settingsWidget = SettingsWidget.SettingsWidget(self)
 		self.settingsWidget.displayOptions(selectedRoom.room)
 		
 		# Set settings widget scrollable instead resizing main window
-		scrollArea = QtGui.QScrollArea()
-		scrollArea.setWidgetResizable(True)
-		scrollArea.setWidget(self.settingsWidget)
-		right_frame_layout.addWidget(scrollArea)
+		self.scrollAreaMain = QtGui.QScrollArea()
+		self.scrollAreaMain.setWidgetResizable(True)
+		self.scrollAreaMain.setWidget(self.settingsWidget)
+		
+		self.right_frame_layout_main.addWidget(self.scrollAreaMain)
 		
 	def roomDoubleClicked(self):
 		self.tabWidget.setCurrentIndex(1)
@@ -216,9 +216,9 @@ class Editor(QtGui.QMainWindow):
 		self.spaceTab.setLayout(layout)
 		
 		# Another settings widget for room view
-		self.spaceSettingsWidget = SettingsWidget.SettingsWidget(self)
+		#self.spaceSettingsWidget = SettingsWidget.SettingsWidget(self)
 		selectedRoom = self.left_scene.selectedItems()[0]
-		self.spaceSettingsWidget.displayOptions(selectedRoom.room)
+		self.settingsWidget.displayOptions(selectedRoom.room)
 
 		# Room
 		left_frame = QtGui.QGroupBox("Tila")
@@ -228,15 +228,16 @@ class Editor(QtGui.QMainWindow):
 
 		# Settings
 		right_frame = QtGui.QGroupBox("Asetukset")
-		right_frame_layout = QtGui.QVBoxLayout()
-		right_frame.setLayout(right_frame_layout)
+		self.right_frame_layout_space = QtGui.QVBoxLayout()
+		right_frame.setLayout(self.right_frame_layout_space)
 		layout.addWidget(right_frame)
 		
-		scrollArea = QtGui.QScrollArea()
-		scrollArea.setWidgetResizable(True)
-		scrollArea.setWidget(self.spaceSettingsWidget)
+		self.scrollAreaSpace = QtGui.QScrollArea()
+		self.scrollAreaSpace.setWidgetResizable(True)
+		#self.scrollAreaSpace.setWidget(self.settingsWidget)
 		
-		right_frame_layout.addWidget(scrollArea)
+		self.right_frame_layout_space.addWidget(self.scrollAreaSpace)
+		
 		self.spaceScene = QtGui.QGraphicsScene(self)
 		self.spaceView = QtGui.QGraphicsView(self.spaceScene)
 		#self.spaceView.setDragMode(QtGui.QGraphicsView.ScrollHandDrag)
@@ -246,7 +247,7 @@ class Editor(QtGui.QMainWindow):
 	
 	def updateSpaceTab(self):
 		selectedRoom = self.left_scene.selectedItems()[0]
-		self.spaceSettingsWidget.displayOptions(selectedRoom.room)
+		self.settingsWidget.displayOptions(selectedRoom.room)
 		self.spaceScene.clear()
 		
 		# Display room image and set the same scale than in the game
@@ -270,7 +271,7 @@ class Editor(QtGui.QMainWindow):
 				scale = 1
 			pixmap = self.imageCache.createPixmap(img.absoluteImagePath)
 			pixmap = pixmap.scaledToHeight(pixmap.height()*scale)
-			pixItem = SpaceViewItem(pixmap, item.id, self)
+			pixItem = SpaceViewItem(pixmap, item.getRepresentingImage().id, self)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
 			
 			#pixItem = QtGui.QGraphicsPixmapItem(pixmap)
@@ -284,6 +285,23 @@ class Editor(QtGui.QMainWindow):
 			else:
 				pixItem.setPos(pos[0],pos[1])
 				self.spaceScene.addItem(pixItem)
+
+	def onTabChanged(self, index):
+		# Main tab
+		if (index == 0):
+			print ("MAIN TAB")
+			#self.right_frame_layout_main.addWidget(self.scrollAreaMain)
+			self.scrollAreaMain.takeWidget()
+			self.scrollAreaMain.setWidget(self.settingsWidget)
+		# Space tab
+		elif (index == 1):
+			print ("SPACE TAB")
+			#self.right_frame_layout_space.addWidget(self.scrollAreaSpace)
+			self.scrollAreaSpace.takeWidget()
+			self.scrollAreaSpace.setWidget(self.settingsWidget)
+		# Texts tab
+		elif (index == 2):
+			self.drawTextItems
 			
 	def createObject(self, objectType):
 		selectedRoom = self.left_scene.selectedItems()[0]
@@ -877,6 +895,7 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 
 	def mousePressEvent(self, event):
 		try:
+			print("NAMEEEEEO", self.name)
 			roomItems = self.parent.left_scene.currentItem().room.getItems()
 		except IndexError:
 			return
@@ -884,8 +903,9 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		for item in roomItems:
 			if (item.getRepresentingImage().id == self.name):
 				selectedItem = item
+			print ("id", item.getRepresentingImage().id, self.name)
 				
-		#print(selectedItem)
+		print(selectedItem)
 		
 		self.parent.settingsWidget.displayOptions(selectedItem)
 		QtGui.QGraphicsItem.mousePressEvent(self, event)

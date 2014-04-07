@@ -40,6 +40,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	def displayOptions(self, gameObject):
 		self.currentObject = gameObject
+		print ("DISPLAYAA", self.currentObject.id)
 		
 		objectType = gameObject.__class__.__name__
 		self.showWidgets(objectType)
