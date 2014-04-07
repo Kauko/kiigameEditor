@@ -70,7 +70,7 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setFlow(QtGui.QListView.LeftToRight)
 		self.left_scene.setMovement(QtGui.QListView.Static)
 		self.left_scene.itemSelectionChanged.connect(self.roomClicked)
-		self.left_scene.doubleClicked.connect(self.roomDoubleClicked)
+		self.left_scene.doubleClicked.connect(self.comboDoubleClicked)
 		self.left_scene.clicked.connect(self.roomClicked)
 		left_frame_layout.addWidget(self.left_scene)
 		
@@ -104,6 +104,7 @@ class Editor(QtGui.QMainWindow):
 		self.middle_scene.setMovement(QtGui.QListView.Static)
 		self.middle_scene.itemSelectionChanged.connect(self.roomItemClicked)
 		middle_frame_layout.addWidget(self.middle_scene)
+		self.middle_scene.doubleClicked.connect(self.comboDoubleClicked)
 		
 		self.addObjectsCombo = QtGui.QComboBox(self)
 		layout.addWidget(self.addObjectsCombo, 0, 2)
@@ -133,7 +134,7 @@ class Editor(QtGui.QMainWindow):
 		
 		self.right_frame_layout_main.addWidget(self.scrollAreaMain)
 		
-	def roomDoubleClicked(self):
+	def comboDoubleClicked(self):
 		self.tabWidget.setCurrentIndex(1)
 		
 	def populateAddObjectsCombo(self):
@@ -186,8 +187,11 @@ class Editor(QtGui.QMainWindow):
 		self.drawTextItems()
 		
 	def removeObjectsButtonClicked(self):
+		# Remove from the room
 		selected = self.middle_scene.currentItem()
+		selected.item.parentView.removeItem(selected.item)
 		
+		# Remove from combobox
 		row = self.middle_scene.currentRow()
 		self.middle_scene.takeItem(row)
 		
@@ -327,9 +331,12 @@ class Editor(QtGui.QMainWindow):
 		else:
 			return
 			
+		# Set placeholder image source
 		newObject.getRepresentingImage().placeholderImage.setSource(self.editorImagePath + placeholderImage)
-		widgetItem = ItemWidget(newObject)
-		self.middle_scene.addItem(widgetItem)
+		
+		# Create new combobox item
+		itemWidget = ItemWidget(newObject)
+		self.middle_scene.addItem(itemWidget)
 		
 	def createView(self, objectType):
 		
@@ -448,9 +455,9 @@ class Editor(QtGui.QMainWindow):
 					
 				# Add a progressbar to the second column
 				#progressBarItem = ProgressBarItemWidget(item, maxAmount)
-				print (item.id, textCount, maxAmount)
-				if (textCount == 0):
-					print ("HERE", len(item.texts), item.id, itemImage.texts)
+				#print (item.id, textCount, maxAmount)
+				#if (textCount == 0):
+				#	print ("HERE", len(item.texts), item.id, itemImage.texts)
 				progressBar = QtGui.QProgressBar()
 				progressBar.setMinimum(0)
 				progressBar.setMaximum(maxAmount)

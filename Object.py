@@ -47,10 +47,12 @@ class Object(object):
 				self.id = Object.createUniqueId(objectId)
 			else:
 				self.id = Object.createUniqueId()
-		# JSONImage doesn't need an image or an ID check
+
+		# JSONImage doesn't need an image or an ID check because
+		# images can have same ID as their owners
 		else:
 			self.id = objectId
-		#self.whatBlocks = None # TODO: In interaction instead?
+			
 		self.parentView = parentView
 		self.objectAttributes = objectAttributes
 		
@@ -887,6 +889,8 @@ class PlaceholderImage(JSONImage):
 		self.parent = parent
 		self.imageAttributes = deepcopy(JSONImage.imageAttributes)
 		self.absoluteImagePath = None
+		self.placeholderImage = self
+		self.id = parent.id
 		
 	def setSource(self, absoluteImagePath):
 		

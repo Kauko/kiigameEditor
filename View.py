@@ -88,6 +88,10 @@ class View(object):
 	def createPlaceholderImage(self, imagePath):
 		self.placeholderImage = Object.JSONImage(self, None, None, self.id)
 		self.placeholderImage.setSource(imagePath)
+	
+	# Should be overriden by other view classes
+	def removeItem(self, item):
+		return
 		
 class Menu(View):
 	def __init__(self, scenarioData, menuId, menuAttributes, menuImages):
@@ -147,7 +151,6 @@ class Sequence(View):
 			return self.placeholderImage
 		return self.sequenceImages[0]
 			
-		
 	def getItems(self):
 		return self.getChildren()
 		
@@ -178,9 +181,40 @@ class Sequence(View):
 	# Create new item
 	def addImage(self, objectAttributes=None, imageAttributes=None):
 		imageId = self.id + "_image"
-		newObject = Object.SequenceImage(self, objectAttributes, imageAttributes)
+		newObject = Object.SequenceImage(self, objectAttributes, imageAttributes, imageId)
 		self.sequenceImages.append(newObject)
+		
+		self.createImageEntry(newObject.id)
+		
 		return newObject
+		
+	# Create a new image entry to object
+	def createImageEntry(self, imageId):
+		images = self.object["images"]
+		images[str(len(images) + 1)] = {'show_time': 0, 'do_fade': False, 'id': imageId}
+		
+	# Remove an image entry from objects
+	def removeImageEntry(self, index):
+		images = self.object["images"]
+		del images[str(index)]
+		
+		# Move index of other images one index backwards
+		for i in range(index+1, len(images)+2):
+			entry = images.pop(str(i))
+			images[str(i-1)] = entry
+			
+	# Remove a image from the sequence
+	def removeItem(self, item):
+		images = self.object["images"]
+		
+		# Remove from the entry
+		for i in images:
+			if (images[i]["id"] == item.id):
+				self.removeImageEntry(int(i))
+				break
+				
+		# Remove from actualy sequence images list
+		self.sequenceImages.remove(item)
 		
 # Start menu
 class Start(View):

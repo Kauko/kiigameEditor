@@ -40,7 +40,6 @@ class SettingsWidget(QtGui.QWidget):
 		
 	def displayOptions(self, gameObject):
 		self.currentObject = gameObject
-		print ("DISPLAYAA", self.currentObject.id)
 		
 		objectType = gameObject.__class__.__name__
 		self.showWidgets(objectType)
@@ -476,11 +475,18 @@ class SettingsWidget(QtGui.QWidget):
 		self.setObjectImage(sequenceImage.getRepresentingImage().getRepresentingImage().absoluteImagePath)
 		
 		# Set image display time. Convert into str and replace dots
-		time = str(self.currentObject.getShowTime()/1000).replace(".", ",")
+		showTime = self.currentObject.getShowTime()
+		if (showTime):
+			time = str(showTime/1000).replace(".", ",")
+		else:
+			time = "0,0"
 		self.sequenceTimeEdit.setText(time)
 		
 		# Image fade type
-		self.sequenceFadeCombo.setCurrentIndex(self.currentObject.getDoFade())
+		doFade = self.currentObject.getDoFade()
+		if not (doFade):
+			doFade = False
+		self.sequenceFadeCombo.setCurrentIndex(doFade)
 		
 	# Set the input field values for items
 	def setItemOptions(self, item):
