@@ -305,25 +305,29 @@ class Editor(QtGui.QMainWindow):
 			
 	def createObject(self, objectType):
 		selectedRoom = self.left_scene.selectedItems()[0]
-		placeholderImage = "object_placeholder.png"
 		
 		if (objectType == "object"):
 			newObject = selectedRoom.room.addObject()
+			placeholderImage = "object_placeholder.png"
 		elif (objectType == "item"):
 			newObject = selectedRoom.room.addItem()
+			placeholderImage = "object_placeholder.png"
 		elif (objectType == "door"):
 			newObject = selectedRoom.room.addDoor()
+			placeholderImage = "door_placeholder.png"
 		elif (objectType == "container"):
 			newObject = selectedRoom.room.addContainer()
+			placeholderImage = "container_placeholder.png"
 		elif (objectType == "obstacle"):
 			newObject = selectedRoom.room.addObstacle()
+			placeholderImage = "obstacle_placeholder.png"
 		elif (objectType == "sequenceimage"):
 			newObject = selectedRoom.room.addImage()
 			placeholderImage = "sequence_placeholder.png"
 		else:
 			return
 			
-		newObject.getRepresentingImage().setSource(self.editorImagePath+placeholderImage)
+		newObject.getRepresentingImage().placeholderImage.setSource(self.editorImagePath + placeholderImage)
 		widgetItem = ItemWidget(newObject)
 		self.middle_scene.addItem(widgetItem)
 		
@@ -567,7 +571,7 @@ class ItemWidget(QtGui.QListWidgetItem):
 		self.setSizeHint(QtCore.QSize(100,100))
 		
 		self.item = item
-		imageObject = item.getRepresentingImage()
+		imageObject = item.getRepresentingImage().getRepresentingImage()
 		
 		itemName = imageObject.getName()
 		if not (itemName):
