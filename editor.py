@@ -242,6 +242,15 @@ class Editor(QtGui.QMainWindow):
 		
 		self.right_frame_layout_space.addWidget(self.scrollAreaSpace)
 		
+		# Z-index buttons
+		# TODO: Move somewhere nice
+		increaseButton = QtGui.QPushButton("+")
+		increaseButton.clicked.connect(lambda: self.changeItemZIndex(1, self.settingsWidget.currentObject))
+		decreaseButton = QtGui.QPushButton("-")
+		decreaseButton.clicked.connect(lambda: self.changeItemZIndex(-1, self.settingsWidget.currentObject))
+		left_frame_layout.addWidget(increaseButton)
+		left_frame_layout.addWidget(decreaseButton)
+		
 		self.spaceScene = QtGui.QGraphicsScene(self)
 		self.spaceView = QtGui.QGraphicsView(self.spaceScene)
 		#self.spaceView.setDragMode(QtGui.QGraphicsView.ScrollHandDrag)
@@ -251,15 +260,16 @@ class Editor(QtGui.QMainWindow):
 	
 	def updateSpaceTab(self):
 		selectedRoom = self.left_scene.selectedItems()[0]
-		self.settingsWidget.displayOptions(selectedRoom.room)
+		#self.settingsWidget.displayOptions(selectedRoom.room)
 		self.spaceScene.clear()
 		
 		# Display room image and set the same scale than in the game
 		pixmap = self.imageCache.createPixmap(selectedRoom.room.getRepresentingImage().absoluteImagePath).scaled(981, 543)
 		self.spaceScene.addPixmap(pixmap)
+		self.spaceItems = selectedRoom.room.getItems()
 		
 		# Display objects
-		for item in selectedRoom.room.getItems():
+		for item in self.spaceItems:
 			# TODO: Resolve handling text objects (issue #8)
 			#if (item.getClassname() == "Text"):
 			#	continue
@@ -282,24 +292,37 @@ class Editor(QtGui.QMainWindow):
 			#pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
 			
 			#print(item.id)
-			#TODO: Game crops some amount from the borders, insert that amount into items offset value
 			pos = item.getPosition()
 			if not (pos):
 				print ("In empty room")
 			else:
 				pixItem.setPos(pos[0],pos[1])
 				self.spaceScene.addItem(pixItem)
+				
+		selectedRoom.room.setItems(self.spaceItems)
+
+	def changeItemZIndex(self, change, item):
+		if not (item in self.spaceItems):
+			return
+	
+		index = self.spaceItems.index(item)
+		if (change == -1):
+			if (index != 0):
+				self.spaceItems.insert(index-1, self.spaceItems.pop(index))
+		elif (change == 1):
+			if (index != len(self.spaceItems)-1):
+				self.spaceItems.insert(index+1, self.spaceItems.pop(index))
+
+		self.updateSpaceTab()
 
 	def onTabChanged(self, index):
 		# Main tab
 		if (index == 0):
-			print ("MAIN TAB")
 			#self.right_frame_layout_main.addWidget(self.scrollAreaMain)
 			self.scrollAreaMain.takeWidget()
 			self.scrollAreaMain.setWidget(self.settingsWidget)
 		# Space tab
 		elif (index == 1):
-			print ("SPACE TAB")
 			#self.right_frame_layout_space.addWidget(self.scrollAreaSpace)
 			self.scrollAreaSpace.takeWidget()
 			self.scrollAreaSpace.setWidget(self.settingsWidget)
@@ -905,8 +928,8 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		self.parent = parent
 
 	def mousePressEvent(self, event):
+		print ("posiotio", self.pos().x())
 		try:
-			print("NAMEEEEEO", self.name)
 			roomItems = self.parent.left_scene.currentItem().room.getItems()
 		except IndexError:
 			return
@@ -914,12 +937,15 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		for item in roomItems:
 			if (item.getRepresentingImage().id == self.name):
 				selectedItem = item
-			print ("id", item.getRepresentingImage().id, self.name)
-				
-		print(selectedItem)
 		
 		self.parent.settingsWidget.displayOptions(selectedItem)
 		QtGui.QGraphicsItem.mousePressEvent(self, event)
+
+	def mouseReleaseEvent(self, event):
+		try:
+			self.parent.settingsWidget.currentObject.setPosition(self.pos())
+		except:
+			return
 
 if __name__ == '__main__':
 	from sys import argv, exit
