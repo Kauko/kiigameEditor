@@ -6,7 +6,7 @@ from ImageCache import ImageCache
 # # TODO: locked container is unfinished/buggy (Legendan kaappi)
 # # TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2) (?)
 # # TODO: Add ending checkbox to generic objects
-# TODO: Duplicate images when changing newly added image (copy generic attribute dict instead of using it as is)
+# # TODO: Duplicate images when changing newly added image (copy generic attribute dict instead of using it as is)
 # TODO: Door state is initially closed even though should be open (Vessan ovi wc2)
 # TODO: Fix names in unnameable objects (start menu images)
 # TODO: Adding new sequence images is buggy (doesn't create new sequence entry in the object despite the image)
@@ -255,9 +255,9 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.doorInitialStateLabel)
 		self.layout.addWidget(self.doorInitialStateCombo)
 		
-		self.layout.addWidget(self.closedDoorImage)
-		self.layout.addWidget(self.lockedDoorImage)
 		self.layout.addWidget(self.openDoorImage)
+		self.layout.addWidget(self.lockedDoorImage)
+		self.layout.addWidget(self.closedDoorImage)
 		
 		self.layout.addWidget(self.whatGoesLabel)
 		self.layout.addWidget(self.whatGoesCombo)
