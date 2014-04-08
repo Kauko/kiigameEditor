@@ -113,11 +113,10 @@ class Object(object):
 	def setExamineText(self, examineText):
 		self.getRepresentingImage().texts["examine"] = examineText
 		
-	# TODO: Should remove all texts referring to this object
 	# Remove this object
-	def remove(self):
+	def removeObject(self):
 		self.parentView.removeObject(self)
-	
+			
 	# Set whether clicking the object game will end
 	# TODO: Set end layer too instead of having it hardcoded
 	def setIsEnding(self, isEnding):
@@ -133,6 +132,15 @@ class Object(object):
 		if ("ending" in self.objectAttributes["object"]):
 			return True
 		return False
+		
+	# Remove text with the given text key
+	def removeText(self, textKey):
+		newTexts = dict(self.texts)
+		try:
+			del newTexts[textKey]
+		except KeyError:
+			return
+		self.texts = newTexts
 		
 # Pickable item
 class Item(Object):
@@ -229,8 +237,11 @@ class Item(Object):
 		if (pickupText == ""):
 			self.removeText("pickup")
 		else:
-			self.texts["pickup"] = pickupText
-		
+			try:
+				self.texts["pickup"] = pickupText
+			except KeyError:
+				return
+					
 	# Set item's default text
 	def setDefaultText(self, defaultText):
 		if (defaultText == ""):
@@ -243,12 +254,7 @@ class Item(Object):
 			self.removeText(targetId)
 		else:
 			self.texts[targetId] = interactionText
-		
-	def removeText(self, textKey):
-		newTexts = dict(self.texts)
-		del newTexts[textKey]
-		self.texts = newTexts
-		
+			
 	def setOutcome(self, outcomeObject):
 		self.outcome = outcomeObject
 		
@@ -449,7 +455,7 @@ class Container(Object):
 			return
 			
 	# Set or remove locked state with images etc.
-	# When setting locked=True, other parameters are mandatory
+	# When setting locked=True, other parameters can be given
 	def setLocked(self, setLocked, imagePath=None, keyObject=None):
 		if (self.key):
 			self.key = None
@@ -562,10 +568,12 @@ class Door(Object):
 			self.key = None
 			
 		if (setLocked):
+			# Create locked image
 			imageObject = JSONImage(self.parentView, None, self.objectAttributes, imageId=self.id)
 			if (imagePath):
 				imageObject.setSource(imagePath)
 			# TODO: Put other attributes here too	
+			
 			self.images.append(imageObject)
 			self.lockedImage = imageObject
 			
@@ -585,18 +593,19 @@ class Door(Object):
 				
 			try:
 				self.objectAttributes["object"]["locked_image"]
-			except KeyError:
+			except KeyError: 
 				pass
 				
 			self.lockedImage = None
 			self.setIsLocked(False)
 			self.clearKey()
 			
+	# If closed, add closed image. If not closed, remove closed image
 	def setClosed(self, setClosed):
 		if (setClosed):
 			imageObject = JSONImage(self.parentView, None, self.objectAttributes, imageId=self.id)
 			self.images.append(imageObject)
-			self.lockedImage = imageObject
+			self.closedImage = imageObject
 			
 			self.objectAttributes["object"]["closed_image"] = imageObject.id
 		else:
@@ -638,10 +647,6 @@ class Door(Object):
 
 	def setIsLocked(self, isLocked):
 		self.objectAttributes["object"]["locked"] = isLocked
-		
-	# Returns what unlocks the door
-	#def getKey(self):
-	#	return self.key
 		
 	def setKey(self, keyObject):
 		self.key = keyObject
@@ -742,14 +747,13 @@ class Obstacle(Object):
 			del self.objectAttributes["object"]["target"]
 		except KeyError:
 			pass
-				
+			
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
 	imageAttributes = {'category': '', 'id': '', 'object_name': '', 'src': '', 'visible': False, 'x': 0, 'y': 0}
 	
 	generalName = "Kuva"
 	generalNameAdessive = "Kuvalla"
-	
 	
 	# imageAttributes has to be dict, not a list as with other objects
 	# objectAttributes is a dict with object, attrs and className keys
@@ -879,8 +883,11 @@ class Text(JSONImage):
 		return
 		
 	def getText(self):
-		return self.imageAttributes["text"]
-		
+		try:
+			return self.imageAttributes["text"]
+		except KeyError:
+			return
+				
 	def setText(self, text):
 		self.imageAttributes["text"] = text
 		

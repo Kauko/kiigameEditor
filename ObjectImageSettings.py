@@ -33,7 +33,8 @@ class ObjectImageSettings(QtGui.QWidget):
 			self.lockedCheckbox = QtGui.QCheckBox(lockedText)
 			self.lockedCheckbox.clicked.connect(self.changeLocked)
 			self.keyLabel = QtGui.QLabel("Mikä avaa?")
-			self.keyCombo = self.parent.createItemCombobox("Avainta ei valittu!", ("item",), ("item",), self.clearKey, self.changeKey)
+			self.keyCombo = self.parent.createCombobox()
+			
 			
 			self.layout.addWidget(self.lockedCheckbox)
 			self.layout.addWidget(self.keyLabel)
@@ -45,6 +46,11 @@ class ObjectImageSettings(QtGui.QWidget):
 		self.layout.addWidget(self.clickLabel)
 		self.layout.addWidget(self.clickEdit)
 		
+	def updateComboboxes(self, objectType):
+		objectType = objectType.lower()
+		if (objectType == "item"):
+			self.parent.updateItemCombobox(self.keyCombo, "Avainta ei valittu!", ("item",), ("item",), self.clearKey, self.changeKey)
+			
 	def changeNameEdit(self):
 		self.parent.changeName(self.nameEdit, self.gameImageObject)
 		
@@ -68,12 +74,9 @@ class ObjectImageSettings(QtGui.QWidget):
 		if (self.lockedCheckbox.isChecked()):
 			self.gameObject.setLocked(True)
 			
-			if (self.objectType == "Door"):
-				placeholder = "door_placeholder.png"
-			elif (self.objectType == "Container"):
-				placeholder = "container_placeholder.png"
+			placeholder = self.parent.editor.getPlaceholderImagePath(self.objectType)
 			
-			self.gameImageObject = self.gameObject.lockedImage.setPlaceholderSource(self.parent.parent.editorImagePath+placeholder)
+			self.gameImageObject = self.gameObject.lockedImage.placeholderImage.setSource(self.parent.editor.editorImagePath+placeholder)
 		else:
 			self.gameObject.setLocked(False)
 			self.keyCombo.setCurrentIndex(0)
@@ -111,14 +114,12 @@ class ObjectImageSettings(QtGui.QWidget):
 			self.clickEdit.setText("")
 			
 	def setImage(self):
-		# Given gameImageObject may be None (no lockedImage, for example)
 		if (self.gameImageObject):
 			imagePath = self.gameImageObject.getRepresentingImage().absoluteImagePath
 			self.parent.setObjectImage(imagePath, self.image)
-		elif self.objectType == "Door":
-			imagePath = self.parent.parent.editorImagePath + "door_placeholder.png"
-		elif self.objectType == "Container":
-			imagePath = self.parent.parent.editorImagePath + "container_placeholder.png"
+		# Given gameImageObject may be None (no lockedImage, for example)
+		elif self.objectType in ("Door", "Container"):
+			imagePath = self.parent.editor.getPlaceholderImagePath(self.objectType)
 			
 		# Ask parent to actually draw the image
 		self.parent.setObjectImage(imagePath, self.image)
@@ -133,10 +134,12 @@ class ObjectImageSettings(QtGui.QWidget):
 		
 		# Change locked state
 		if (self.canBeLocked):
-			if (self.objectType == "Obstacle" or gameObject.isLocked()):
-				self.lockedCheckbox.setCheckState(QtCore.Qt.CheckState.Checked)
+			if (gameObject.isLocked() or self.objectType == "Obstacle"):
+				checked = QtCore.Qt.CheckState.Checked
 			else:
-				self.lockedCheckbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
+				checked = QtCore.Qt.CheckState.Unchecked
+				
+			self.lockedCheckbox.setCheckState(checked)
 			self.setLockedDisabled()
 			self.setKey()
 			

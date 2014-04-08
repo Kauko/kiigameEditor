@@ -6,7 +6,7 @@ class View(object):
 
 	# Static method to create unique view ID
 	usedIds = []
-	def createUniqueId(self, newId=None):
+	def createUniqueId(newId=None):
 		if not (newId):
 			newId = str(randint(0, 1000000000))
 			
@@ -42,6 +42,8 @@ class View(object):
 			self.texts = {}
 		
 		self.placeholderImage = None # If no representingImage, use this
+		
+		self.nameable = True
 		
 	# Should be overriden by other view classes
 	def getChildren(self):
@@ -88,10 +90,6 @@ class View(object):
 	def createPlaceholderImage(self, imagePath):
 		self.placeholderImage = Object.JSONImage(self, None, None, self.id)
 		self.placeholderImage.setSource(imagePath)
-	
-	# Should be overriden by other view classes
-	def removeItem(self, item):
-		return
 		
 class Menu(View):
 	def __init__(self, scenarioData, menuId, menuAttributes, menuImages):
@@ -204,7 +202,7 @@ class Sequence(View):
 			images[str(i-1)] = entry
 			
 	# Remove a image from the sequence
-	def removeItem(self, item):
+	def removeObject(self, item):
 		images = self.object["images"]
 		
 		# Remove from the entry
@@ -216,6 +214,8 @@ class Sequence(View):
 		# Remove from actualy sequence images list
 		self.sequenceImages.remove(item)
 		
+		self.scenarioData.removeObject(childObject)
+		
 # Start menu
 class Start(View):
 	generalName = "Alkukuva"
@@ -223,6 +223,8 @@ class Start(View):
 	
 	def __init__(self, scenarioData, startAttributes, startImages):
 		super(Start, self).__init__(scenarioData, startAttributes, "start")
+		
+		self.nameable = False
 		
 		for imageId in startImages:
 			imageAttributes = startImages[imageId].pop("image")[0]
@@ -264,8 +266,8 @@ class End(View):
 	# Generic attributes for ends
 	endAttributes = {'object': {'music': '', 'sequence': '', 'category': 'end', 'menu': ''}, 'className': 'Layer', 'attrs': {'category': 'end', 'id': '', 'visible': False, 'object_name': ''}}
 	
-	generalName = "Loppu"
-	generalNameAdessive = "Lopulla"
+	generalName = "Pelin loppukuva"
+	generalNameAdessive = "Loppukuvalla"
 	
 	def __init__(self, scenarioData, endId, endAttributes, endImages):
 		if not (endAttributes):
@@ -275,6 +277,8 @@ class End(View):
 		
 		self.endImages = []
 		self.endText = None
+		
+		self.nameable = False
 		
 		if not (endImages):
 			return
@@ -414,6 +418,7 @@ class Room(View):
 		
 	def removeObject(self, childObject):
 		self.objectList.remove(childObject)
+		self.scenarioData.removeObject(childObject)
 
 	def setItems(self, items):
 		self.objectList = items

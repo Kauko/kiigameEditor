@@ -18,6 +18,20 @@ class Editor(QtGui.QMainWindow):
 		
 		self.imageCache = ImageCache()
 		
+		self.placeholderImages = {
+			"Room": "room_placeholder.png",
+			"Sequence": "sequence_placeholder.png",
+			"Sequenceimage": "sequence_placeholder.png",
+			"Object": "object_placeholder.png",
+			"Item": "object_placeholder.png",
+			"Door": "door_placeholder.png",
+			"Container": "container_placeholder.png",
+			"Obstacle": "obstacle_placeholder.png",
+			"Text": "text_placeholder.png"
+		}
+		self.newIconPath = self.editorImagePath + "add_new_icon.png"
+		self.noChoiceIconPath = self.editorImagePath + "no_choice_icon.png"
+		
 		self.setWindowTitle("Kiigame - Pelieditori")
 		
 		self.tabWidget = QtGui.QTabWidget()
@@ -159,18 +173,21 @@ class Editor(QtGui.QMainWindow):
 		elif (selectedType == "Sequence"):
 			self.addObjectsCombo.addItem("Kuva", userData="sequenceimage")
 			
+	def getPlaceholderImagePath(self, objectType):
+		return self.editorImagePath + self.placeholderImages[objectType.capitalize()]
+		
 	def addViewsComboChanged(self):
 		selected = self.addViewsCombo.itemData(self.addViewsCombo.currentIndex())
 		if not (selected in ("room", "sequence", "end")):
 			return
 		self.createView(selected)
 		
-		self.addObjectsCombo.setCurrentIndex(0)
-		self.left_scene.setCurrentRow(self.left_scene.count()-1)
-		
 	def removeViewsButtonClicked(self):
+		# Remove from game data
 		selected = self.left_scene.currentItem()
+		self.scenarioData.removeView(selected.room)
 		
+		# Remove from combobox
 		row = self.left_scene.currentRow()
 		self.left_scene.takeItem(row)
 		
@@ -182,14 +199,10 @@ class Editor(QtGui.QMainWindow):
 			return
 		self.createObject(selected)
 		
-		self.addObjectsCombo.setCurrentIndex(0)
-		self.middle_scene.setCurrentRow(self.middle_scene.count()-1)
-		self.drawTextItems()
-		
 	def removeObjectsButtonClicked(self):
 		# Remove from the room
 		selected = self.middle_scene.currentItem()
-		selected.item.parentView.removeItem(selected.item)
+		selected.item.parentView.removeObject(selected.item)
 		
 		# Remove from combobox
 		row = self.middle_scene.currentRow()
@@ -390,48 +403,58 @@ class Editor(QtGui.QMainWindow):
 		
 		if (objectType == "object"):
 			newObject = selectedRoom.room.addObject()
-			placeholderImage = "object_placeholder.png"
 		elif (objectType == "item"):
 			newObject = selectedRoom.room.addItem()
-			placeholderImage = "object_placeholder.png"
 		elif (objectType == "door"):
 			newObject = selectedRoom.room.addDoor()
-			placeholderImage = "door_placeholder.png"
 		elif (objectType == "container"):
 			newObject = selectedRoom.room.addContainer()
-			placeholderImage = "container_placeholder.png"
 		elif (objectType == "obstacle"):
 			newObject = selectedRoom.room.addObstacle()
-			placeholderImage = "obstacle_placeholder.png"
 		elif (objectType == "sequenceimage"):
 			newObject = selectedRoom.room.addImage()
-			placeholderImage = "sequence_placeholder.png"
 		else:
 			return
 			
+		placeholderImage = self.getPlaceholderImagePath(objectType)
+		
 		# Set placeholder image source
-		newObject.getRepresentingImage().placeholderImage.setSource(self.editorImagePath + placeholderImage)
+		newObject.getRepresentingImage().placeholderImage.setSource(placeholderImage)
 		
 		# Create new combobox item
 		itemWidget = ItemWidget(newObject)
 		self.middle_scene.addItem(itemWidget)
 		
+		# Focus on the new item
+		self.addObjectsCombo.setCurrentIndex(0)
+		self.middle_scene.setCurrentRow(self.middle_scene.count()-1)
+		self.drawTextItems()
+		
+		# Update settingsWidget comboboxes
+		self.settingsWidget.updateComboboxes(objectType)
+		
 	def createView(self, objectType):
 		
+		# Create the new view and the placeholder image
 		if (objectType == "room"):
 			newObject = self.scenarioData.addRoom(None, None, None)
-			newObject.createPlaceholderImage(self.editorImagePath+"room_placeholder.png")
 		elif (objectType == "sequence"):
 			newObject = self.scenarioData.addSequence(None, None, None)
-			newObject.createPlaceholderImage(self.editorImagePath+"sequence_placeholder.png")
-		elif (objectType == "end"):
-			newObject = self.scenarioData.addEnd(None, None, None)
-			newObject.createPlaceholderImage(self.editorImagePath+"end_placeholder.png")
 		else:
 			return
 			
+		newObject.createPlaceholderImage(self.getPlaceholderImagePath(objectType))
+		
+		# Create combobox item
 		widgetItem = ViewWidget(newObject, self.scenarioData.dataDir)
 		self.left_scene.addItem(widgetItem)
+		
+		# Focus on the created image
+		self.addObjectsCombo.setCurrentIndex(0)
+		self.left_scene.setCurrentRow(self.left_scene.count()-1)
+		
+		# Update settingsWidget comboboxes
+		self.settingsWidget.updateComboboxes(objectType)
 		
 	def createTextsTab(self):
 		self.textsTab = QtGui.QWidget()
@@ -607,7 +630,7 @@ class Editor(QtGui.QMainWindow):
 		for item in roomItems:
 			imagePath = None
 			if (item.__class__.__name__ == "Text"):
-				imagePath = self.editorImagePath+"text_placeholder.png"
+				imagePath = self.getPlaceholderImagePath("Text")
 			widgetItem = ItemWidget(item, imagePath)
 			
 			self.middle_scene.addItem(widgetItem)
@@ -637,10 +660,13 @@ class ViewWidget(QtGui.QListWidgetItem):
 		
 		self.room = room
 		
-		roomName = room.getName()
-		if not (roomName):
-			# TODO: Some common delegate for these namings
-			roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
+		if (room.nameable):
+			roomName = room.getName()
+			if not (roomName):
+				roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
+		else:
+			roomName = room.generalName
+			
 		self.setText(roomName)
 		
 		imagePath = room.getRepresentingImage().absoluteImagePath

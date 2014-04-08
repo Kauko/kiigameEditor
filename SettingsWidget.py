@@ -4,15 +4,25 @@ from ImageCache import ImageCache
 
 # # TODO: remove useTypes[4], set it only in container instead
 # # TODO: locked container is unfinished/buggy (Legendan kaappi)
-# TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2) (?)
+# # TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2) (?)
 # # TODO: Add ending checkbox to generic objects
-# TODO: Duplicate images when changing newly added image (copy generic attribute dict instead of using it as is)
-# TODO: Door state is initially closed even though should be open (Vessan ovi wc2)
-# TODO: Fix names in unnameable objects (start menu images)
-# TODO: Adding new sequence images is buggy (doesn't create new sequence entry in the object despite the image)
-# TODO: When removing sequence images remove the entry too
-# TODO: Hiuskeepperi has correct use target but no outcome
+# # TODO: Duplicate images when changing newly added image (copy generic attribute dict instead of using it as is)
+# # TODO: Door state is initially closed even though should be open (Vessan ovi wc2)
+# # TODO: Fix names in unnameable objects (start menu images)
+# # TODO: Adding new sequence images is buggy (doesn't create new sequence entry in the object despite the image)
+# # TODO: When removing sequence images remove the entry too
+# # TODO: Hiuskeepperi has correct use target but no outcome
 #		the poster_withglue is not listed in the outcome combobox
+# # TODO: Old images/xxx_plceholder.png sources
+# # TODO: Are new items added to comboboxes?
+# # TODO: Removing view
+# TODO: Save view texts too in addition to their objects
+# # TODO: Adding new item from combo should focus on the new item?
+# TODO: Click "All texts" button
+# # TODO: Useless text in rooms (there should be combo too)
+# TODO: Glow for different views
+# TODO: Object types should be exactly as they are in the object!
+# TODO: "X ei ole nimeä" common delegate
 
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
@@ -33,7 +43,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setSizePolicy(QtGui.QSizePolicy(
 		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
 		
-		self.parent = parent
+		self.editor = parent
 		self.imageCache = ImageCache()
 			
 		self.createOtionFields()
@@ -119,7 +129,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.musicClear.clicked.connect(self.clearMusic)
 		
 		# Where from dropdown box
-		self.whereFromLabel = QtGui.QLabel("Mistä kulkureiteistä tänne pääsee?")
+		#self.whereFromLabel = QtGui.QLabel("Mistä kulkureiteistä tänne pääsee?")
 		# TODO: whereFromCombo
 		
 		self.examineTextLabel = QtGui.QLabel("Teksti klikatessa:")
@@ -145,25 +155,27 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTypeCombo = QtGui.QComboBox(self)
 		for i in self.useTypes:
 			self.useTypeCombo.addItem(self.useTypes[i])
-		self.useTypeCombo.currentIndexChanged.connect(self.changeItemUseType)
+		self.useTypeCombo.activated.connect(self.changeItemUseType)
 		
 		self.useTextLabel = QtGui.QLabel("Teksti käytettäessä:")
 		
 		# Use target
-		self.useTargetCombo = self.createItemCombobox("Ei valittu", connectTo=self.changeUseTarget)
+		self.useTargetCombo = self.createCombobox()
+		self.updateUseTargetCombo()
 		
 		self.allTextsButton = QtGui.QPushButton("Nämä ja muut tekstit")
 		self.allTextsButton.clicked.connect(self.showAllTexts)
 		
 		# Door widgets
 		self.doorTransitionLabel = QtGui.QLabel("Mihin pääsee?")
-		self.doorTransitionCombo = self.createItemCombobox("Ei mihinkään", "room", connectTo=self.changeDoorTransition)
+		self.doorTransitionCombo = self.createCombobox()
+		self.updateDoorTransitionCombo()
 		
 		self.doorInitialStateLabel = QtGui.QLabel("Tila alussa")
 		self.doorInitialStateCombo = QtGui.QComboBox(self)
 		self.doorInitialStateCombo.addItem("Kiinni")
 		self.doorInitialStateCombo.addItem("Auki")
-		self.doorInitialStateCombo.currentIndexChanged.connect(lambda s: self.objectComboboxHandler(self.doorInitialStateCombo, self.changeDoorInitialState))
+		self.doorInitialStateCombo.activated.connect(lambda s: self.objectComboboxHandler(self.doorInitialStateCombo, self.changeDoorInitialState))
 		
 		self.openDoorImage = ObjectImageSettings("Avoin kulkureitti", "Avoimen kulkureitin nimi", parent=self)
 		self.closedDoorImage = ObjectImageSettings("Suljettu kulkureitti", "Suljetun kulkureitin nimi", parent=self)
@@ -177,19 +189,23 @@ class SettingsWidget(QtGui.QWidget):
 		# Obstacle widgets
 		self.obstacleImage = ObjectImageSettings(None, "Esteen nimi", False, parent=self)
 		self.obstacleBlocksLabel = QtGui.QLabel("Mitä estää?")
-		self.obstacleBlocksCombo = self.createItemCombobox("Ei mitään", ("door",), ("door",), noChoiceMethod=self.clearObstacleBlock, connectTo=self.changeObstacleBlock)
+		self.obstacleBlocksCombo = self.createCombobox()
+		self.updateObstacleBlocksCombo()
 		
 		self.whatGoesLabel = QtGui.QLabel("Mikä menee säiliöön?")
-		self.whatGoesCombo = self.createItemCombobox("Ei mikään", ("item",), ("item",), connectTo=self.changeWhatGoes)
+		self.whatGoesCombo = self.createCombobox()
+		self.updateWhatGoesCombo()
 		
 		self.whatComesLabel = QtGui.QLabel("Mitä tulee säiliöstä?")
-		self.whatComesCombo = self.createItemCombobox("Ei mitään", ("item",), ("item",), connectTo=self.changeWhatComes)
+		self.whatComesCombo = self.createCombobox()
+		self.updateWhatComesCombo()
 		
 		self.useConsumeCheckbox = QtGui.QCheckBox() # Set text afterwards
 		self.useConsumeCheckbox.stateChanged.connect(self.changeUseConsume)
 		
 		self.outcomeLabel = QtGui.QLabel("Lopputulos")
-		self.outcomeCombobox = self.createItemCombobox("Ei valittu", ("object",), ("object",), noChoiceMethod=self.clearOutcome, connectTo=self.changeOutcome)
+		self.outcomeCombobox = self.createCombobox()
+		self.updateOutcomeCombobox()
 		
 		# Sequence
 		self.sequenceTimeLabel = QtGui.QLabel("Kuvan näyttöaika (0-10 sekuntia)")
@@ -201,7 +217,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.sequenceFadeCombo = QtGui.QComboBox(self)
 		for i in self.fadeTypes:
 			self.sequenceFadeCombo.addItem(self.fadeTypes[i])
-		self.sequenceFadeCombo.currentIndexChanged.connect(self.changeSequenceFadeCombo)
+		self.sequenceFadeCombo.activated.connect(self.changeSequenceFadeCombo)
 		
 		# End
 		self.textObjectTextLabel = QtGui.QLabel("Teksti")
@@ -220,7 +236,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.musicTextEdit)
 		self.layout.addWidget(self.musicBtn)
 		self.layout.addWidget(self.musicClear)
-		self.layout.addWidget(self.whereFromLabel)
+		#self.layout.addWidget(self.whereFromLabel)
 		
 		self.layout.addWidget(self.endingCheckbox)
 		
@@ -251,9 +267,9 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.doorInitialStateLabel)
 		self.layout.addWidget(self.doorInitialStateCombo)
 		
-		self.layout.addWidget(self.closedDoorImage)
-		self.layout.addWidget(self.lockedDoorImage)
 		self.layout.addWidget(self.openDoorImage)
+		self.layout.addWidget(self.lockedDoorImage)
+		self.layout.addWidget(self.closedDoorImage)
 		
 		self.layout.addWidget(self.whatGoesLabel)
 		self.layout.addWidget(self.whatGoesCombo)
@@ -284,7 +300,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.musicTextEdit,
 				self.musicBtn,
 				self.musicClear,
-				self.whereFromLabel
+				#self.whereFromLabel
 				# TODO: doorCombo for "where from" values
 			],
 			"Sequence": [
@@ -400,6 +416,45 @@ class SettingsWidget(QtGui.QWidget):
 			for item in self.itemSettings[key]:
 				item.hide()
 				
+	# Update comboboxes having objectType objects
+	def updateComboboxes(self, objectType):
+		objectType = objectType.lower()
+		if (objectType == "room"):
+			self.updateDoorTransitionCombo()
+		elif (objectType == "door"):
+			self.updateObstacleBlocksCombo()
+		elif (objectType == "item"):
+			self.updateWhatGoesCombo()
+			self.updateWhatComesCombo()
+			self.updateOutcomeCombobox()
+		elif (objectType == "object"):
+			self.updateOutcomeCombobox()
+			
+		# Update every time
+		self.updateUseTargetCombo()
+		
+		# Update other widgets
+		self.lockedDoorImage.updateComboboxes(objectType)
+		self.lockedContainerImage.updateComboboxes(objectType)
+		
+	def updateUseTargetCombo(self):
+		self.updateItemCombobox(self.useTargetCombo, "Ei valittu", connectTo=self.changeUseTarget)
+	
+	def updateDoorTransitionCombo(self):
+		self.updateItemCombobox(self.doorTransitionCombo, "Ei mihinkään", "room", connectTo=self.changeDoorTransition)
+	
+	def updateObstacleBlocksCombo(self):
+		self.updateItemCombobox(self.obstacleBlocksCombo, "Ei mitään", ("door",), ("door",), noChoiceMethod=self.clearObstacleBlock, connectTo=self.changeObstacleBlock)
+	
+	def updateWhatGoesCombo(self):
+		self.updateItemCombobox(self.whatGoesCombo, "Ei mikään", ("item",), ("item",), connectTo=self.changeWhatGoes)
+	
+	def updateWhatComesCombo(self):
+		self.updateItemCombobox(self.whatComesCombo, "Ei mitään", ("item",), ("item",), connectTo=self.changeWhatComes)
+	
+	def updateOutcomeCombobox(self):
+		self.updateItemCombobox(self.outcomeCombobox, "Ei valittu", ("object", "item"), ("object", "item"), noChoiceMethod=self.clearOutcome, connectTo=self.changeOutcome)
+	
 	def changeSequenceTime(self):
 		time = int(float(self.sequenceTimeEdit.text().replace(",", "."))*1000)
 		self.currentObject.setShowTime(time)
@@ -412,7 +467,6 @@ class SettingsWidget(QtGui.QWidget):
 		self.currentObject.setText(self.textObjectTextEdit.text())
 		
 	def changeEndingCheckbox(self):
-		print("changeu", self.endingCheckbox)
 		self.currentObject.setIsEnding(self.endingCheckbox.isChecked())
 		
 	# Start menu
@@ -423,7 +477,7 @@ class SettingsWidget(QtGui.QWidget):
 	# End view
 	def setEndOptions(self, endObject):
 		# End name
-		self.setObjectName(endObject, endObject.generalNameAdessive)
+		self.setObjectName(overrideText=endObject.generalName)
 		
 		# End image
 		self.setObjectImage(endObject.getRepresentingImage().getRepresentingImage().absoluteImagePath)
@@ -508,7 +562,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.pickupTextEdit.setText(pickupText)
 		
 		# Use type of the item
-		itemTarget = self.parent.getItemUse(item)
+		itemTarget = self.editor.getItemUse(item)
 		itemTargetType = itemTarget.__class__.__name__
 		useType = 0
 		
@@ -632,6 +686,16 @@ class SettingsWidget(QtGui.QWidget):
 					
 		self.outcomeCombobox.setCurrentIndex(0)
 		
+	def setDoorInitialState(self):
+		# Door open
+		if (self.currentObject.closedImage or self.currentObject.lockedImage):
+			self.doorInitialStateCombo.setCurrentIndex(0)
+		# Door closed
+		else:
+			self.doorInitialStateCombo.setCurrentIndex(1)
+			
+		self.changeDoorInitialState()
+			
 	def setDoorOptions(self, doorObject):
 		# Set each image's settings
 		self.closedDoorImage.setSettings(doorObject, doorObject.closedImage)
@@ -640,6 +704,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Door transition room
 		self.setComboboxIndex(doorObject.transition, self.doorTransitionCombo)
+		
+		# Set door open or closed in the beginning
+		self.setDoorInitialState()
 		
 	# Set use item for items
 	def setUseText(self, textEdit=None, item=None):
@@ -671,16 +738,22 @@ class SettingsWidget(QtGui.QWidget):
 			self.examineTextEdit.setText(text)
 			
 	# Set any game object name
-	def setObjectName(self, gameObject, textStart, textEdit=None):
-		# Given image may be None
-		try:
-			name = gameObject.getName()
-		except AttributeError:
-			name = ""
+	def setObjectName(self, gameObject=None, textStart="Objektilla", textEdit=None, overrideText=None):
+		if not (gameObject):
+			gameObject = self.currentObject
 			
-		if (name == None):
-			name = "%s ei ole nimeä" %(textStart)
+		if (overrideText):
+			name = overrideText
+		else:
+			# Given image may be None
+			try:
+				name = gameObject.getName()
+			except AttributeError:
+				name = ""
 			
+			if (name == None):
+				name = "%s ei ole nimeä" %(textStart)
+				
 		# If textEdit is defined, set its text instead
 		if (textEdit):
 			textEdit.setText(name)
@@ -716,16 +789,18 @@ class SettingsWidget(QtGui.QWidget):
 			
 		gameObject.setExamineText(textEdit.toPlainText())
 		
-	# TODO: Need setDoorInitialState()
 	def changeDoorInitialState(self):
-		print("Change door initial state", self.doorInitialStateCombo.currentIndex())
-		
-		# Initially closed, all states are possible
+		# Initially closed, all states (closed, locked, open) are possible
 		if (self.doorInitialStateCombo.currentIndex() == 0):
 			self.closedDoorImage.setDisabled(False)
 			self.lockedDoorImage.setDisabled(False)
 			self.openDoorImage.setDisabled(False)
-		# Initially open, only possible state is open
+			
+			# Add door's closed image
+			self.currentObject.setClosed(True)
+			self.currentObject.closedImage.placeholderImage.setSource(self.editor.getPlaceholderImagePath("Door"))
+			
+		# Initially open, only "open" state is possible
 		else:
 			self.closedDoorImage.setDisabled(True)
 			self.lockedDoorImage.setDisabled(True)
@@ -795,7 +870,6 @@ class SettingsWidget(QtGui.QWidget):
 		else:
 			text = self.objectNameEdit.text()
 			
-		# TODO: Get all other adessives like this too
 		if (len(text) == 0):
 			text = "%s ei ole nimeä" %(gameObject.generalNameAdessive)
 			
@@ -805,9 +879,9 @@ class SettingsWidget(QtGui.QWidget):
 	# Update parent tab elements
 	def updateParent(self):
 		if (self.currentObject.__class__.__name__ in ("Room", "Sequence")):
-			self.parent.drawRooms()
+			self.editor.drawRooms()
 		else:
-			self.parent.drawRoomItems()
+			self.editor.drawRoomItems()
 		
 	# Change object use type
 	def changeItemUseType(self, index):
@@ -836,7 +910,7 @@ class SettingsWidget(QtGui.QWidget):
 					self.useTargetCombo.itemData(index).key.clearTarget()
 					
 				# Set the object to be locked with new key
-				imagePath = "images/container_placeholder.png"
+				imagePath = self.editor.getPlaceholderImagePath(objectType)
 				selectedObject.setLocked(True, imagePath, self.currentObject)
 				
 			# Put into container
@@ -852,8 +926,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Create new game object
 	def createObject(self, objectType):
-		self.parent.createObject(objectType)
-	
+		self.editor.createObject(objectType)
+		self.updateComboboxes(objectType)
+		
 	def showAllTexts(self):
 		print("Clicked show all texts")
 		
@@ -870,14 +945,17 @@ class SettingsWidget(QtGui.QWidget):
 				return
 		combobox.setCurrentIndex(0)
 		
+	# Create and return a plain combobox
+	def createCombobox(self):
+		combobox = QtGui.QComboBox(self)
+		combobox.setIconSize(QtCore.QSize(50,50))
+		return combobox
+		
 	# Create combobox from given items with default of all item types
-	def createItemCombobox(self, noChoiceText, objectTypes=None, addChoices=None, noChoiceMethod=None, connectTo=None):
+	def updateItemCombobox(self, combobox, noChoiceText, objectTypes=None, addChoices=None, noChoiceMethod=None, connectTo=None):
 		if not (objectTypes):
 			objectTypes = ("object", "item", "door", "container", "obstacle")
 			
-		combobox = QtGui.QComboBox(self)
-		combobox.setIconSize(QtCore.QSize(50,50))
-		
 		if (objectTypes == "room"):
 			self.populateRoomCombobox(combobox, addChoices)
 		else:
@@ -889,10 +967,10 @@ class SettingsWidget(QtGui.QWidget):
 	# Populate a given combobox with game rooms
 	def populateRoomCombobox(self, combobox, addChoice=True):
 		if (addChoice):
-			imgPixmap = self.imageCache.createPixmap("images/add_new_icon.png")
+			imgPixmap = self.imageCache.createPixmap(self.editor.newIconPath)
 			combobox.addItem(imgPixmap, "Lisää uusi huone")
 			
-		for room in self.parent.getRoomObjects():
+		for room in self.editor.getRoomObjects():
 			# TODO: Some model to eliminate redundancy from getName/roomName patterns
 			roomName = room.getName()
 			if not (roomName):
@@ -933,26 +1011,25 @@ class SettingsWidget(QtGui.QWidget):
 	# Populate a given combobox with given types of objects
 	# categorized by game rooms
 	def populateCombobox(self, objectTypes, combobox, noChoiceText=None, addChoices=None, noChoiceMethod=None):
-		# TODO: Disconnect combobox from events when populating it
 		combobox.clear()
 		
 		itemCounter = 0
 		
 		# Add the given string as the first item
 		if (noChoiceText):
-			imgPixmap = self.imageCache.createPixmap("images/no_choice_icon.png")
+			imgPixmap = self.imageCache.createPixmap(self.editor.noChoiceIconPath)
 			combobox.addItem(imgPixmap, noChoiceText, userData=noChoiceMethod)
 			itemCounter = 1
 			
 		# Add items to add given types of objects
 		if (addChoices):
-			imgPixmap = self.imageCache.createPixmap("images/add_new_icon.png")
+			imgPixmap = self.imageCache.createPixmap(self.editor.newIconPath)
 			for choice in addChoices:
-				combobox.addItem(imgPixmap, "Lisää uusi %s" %(self.parent.getGeneralName(choice).lower()), userData=choice)
+				combobox.addItem(imgPixmap, "Lisää uusi %s" %(self.editor.getGeneralName(choice).lower()), userData=choice)
 				itemCounter += 1
 			
 		for objType in objectTypes:
-			objRooms = self.parent.getObjectsByType(objType)
+			objRooms = self.editor.getObjectsByType(objType)
 			
 			# Combobox has rooms with their obstacles under them
 			for room in objRooms:
@@ -981,13 +1058,17 @@ class SettingsWidget(QtGui.QWidget):
 					imageObject = obj.getRepresentingImage().getRepresentingImage()
 					imgPixmap = self.imageCache.createPixmap(imageObject.absoluteImagePath)
 					targetIcon = QtGui.QIcon(imgPixmap)
-					combobox.addItem(targetIcon, imageObject.getName(), userData=obj)
+					
+					objectName = obj.getName()
+					if not (objectName):
+						objectName = "%s ei ole nimeä" %(obj.generalNameAdessive)
+					combobox.addItem(targetIcon, objectName, userData=obj)
 					itemCounter += 1
 					
 	def showMusicDialog(self, callBack):
 		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
 		'Valitse musiikkitiedosto','~', "Musiikkitiedostot (*.mp3 *.ogg)")
-		# TODO: Modified object requires filename in format "audio/filename.xxx"
+		
 		if (len(fname) != 0):
 			self.musicTextEdit.setText(fname.split("/")[-1])
 			callBack(fname)
@@ -995,7 +1076,6 @@ class SettingsWidget(QtGui.QWidget):
 	def showImageDialog(self, callBack):
 		fname, _ = QtGui.QFileDialog.getOpenFileName(self,
 		'Valitse taustakuva','~', "Taustakuvat (*.png)")
-		# TODO: Modified object requires filename in format "images/filename.png"
 		
 		if (len(fname) != 0):
 			callBack(fname)
