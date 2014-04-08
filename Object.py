@@ -113,11 +113,10 @@ class Object(object):
 	def setExamineText(self, examineText):
 		self.getRepresentingImage().texts["examine"] = examineText
 		
-	# TODO: Should remove all texts referring to this object
 	# Remove this object
-	def remove(self):
+	def removeObject(self):
 		self.parentView.removeObject(self)
-	
+			
 	# Set whether clicking the object game will end
 	# TODO: Set end layer too instead of having it hardcoded
 	def setIsEnding(self, isEnding):
@@ -133,6 +132,15 @@ class Object(object):
 		if ("ending" in self.objectAttributes["object"]):
 			return True
 		return False
+		
+	# Remove text with the given text key
+	def removeText(self, textKey):
+		newTexts = dict(self.texts)
+		try:
+			del newTexts[textKey]
+		except KeyError:
+			return
+		self.texts = newTexts
 		
 # Pickable item
 class Item(Object):
@@ -229,8 +237,11 @@ class Item(Object):
 		if (pickupText == ""):
 			self.removeText("pickup")
 		else:
-			self.texts["pickup"] = pickupText
-		
+			try:
+				self.texts["pickup"] = pickupText
+			except KeyError:
+				return
+					
 	# Set item's default text
 	def setDefaultText(self, defaultText):
 		if (defaultText == ""):
@@ -243,12 +254,7 @@ class Item(Object):
 			self.removeText(targetId)
 		else:
 			self.texts[targetId] = interactionText
-		
-	def removeText(self, textKey):
-		newTexts = dict(self.texts)
-		del newTexts[textKey]
-		self.texts = newTexts
-		
+			
 	def setOutcome(self, outcomeObject):
 		self.outcome = outcomeObject
 		

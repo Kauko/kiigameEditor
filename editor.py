@@ -169,8 +169,11 @@ class Editor(QtGui.QMainWindow):
 		self.left_scene.setCurrentRow(self.left_scene.count()-1)
 		
 	def removeViewsButtonClicked(self):
+		# Remove from game data
 		selected = self.left_scene.currentItem()
+		self.scenarioData.removeView(selected.room)
 		
+		# Remove from combobox
 		row = self.left_scene.currentRow()
 		self.left_scene.takeItem(row)
 		
@@ -189,7 +192,7 @@ class Editor(QtGui.QMainWindow):
 	def removeObjectsButtonClicked(self):
 		# Remove from the room
 		selected = self.middle_scene.currentItem()
-		selected.item.parentView.removeItem(selected.item)
+		selected.item.parentView.removeObject(selected.item)
 		
 		# Remove from combobox
 		row = self.middle_scene.currentRow()

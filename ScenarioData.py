@@ -250,17 +250,21 @@ class ScenarioData(object):
 		for obj in self.customObjectList:
 			if (obj.id == objectId):
 				return obj
+				
 	# Get given types of objects found in rooms
-	def getObjectsByType(self, objectType):
+	def getObjectsByType(self, objectTypes):
 		retObjects = []
+		if (type(objectTypes) != list or type(objectTypes) != tuple):
+			objectTypes = (objectTypes)
+			
 		for room in self.roomList:
 			roomObjects = {"room": room, "objects": []}
 			for item in room.getItems():
-				if (item.__class__.__name__.lower() == objectType):
+				if (item.__class__.__name__.lower() in objectTypes):
 					roomObjects["objects"].append(item)
 			if (len(roomObjects["objects"]) != 0):
 				retObjects.append(roomObjects)
-		return retObjects		
+		return retObjects
 		
 	def getGeneralName(self, objectType):
 		objectType = objectType.lower()
@@ -352,15 +356,30 @@ class ScenarioData(object):
 		self.menuList.append(newView)
 		return newView
 		
-	def deleteView(self):
-		return
-
-	def editObject(self):
-		return
-
-	def editUse(self):
-		return
-
+	def removeObject(self, gameObject):
+		# Remove object text references in other objects
+		# Objects include secrets
+		if (gameObject.__class__.__name__ in ("Item", "Object")):
+			for room in self.getObjectsByType(("item", "object")):
+				for obj in room["objects"]:
+					print("WTF",obj.id)
+					l = len(obj.texts)
+					obj.removeText(gameObject.id)
+					
+	# TODO: Remove menu, ends, starts, custom objects
+	def removeView(self, viewObject):
+		viewType = viewObject.__class__.__name__
+		
+		if (viewType == "Room"):
+			# Remove text references
+			self.roomList.remove(viewObject)
+			
+			for roomObject in viewObject.getItems():
+				self.removeObject(roomObject)
+				
+		elif (viewType == "Sequence"):
+			self.sequenceList.remove(viewObject)
+		
 if (__name__ == "__main__"):
 	sc = ScenarioData()
 	sc.loadScenario()

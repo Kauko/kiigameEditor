@@ -88,10 +88,6 @@ class View(object):
 	def createPlaceholderImage(self, imagePath):
 		self.placeholderImage = Object.JSONImage(self, None, None, self.id)
 		self.placeholderImage.setSource(imagePath)
-	
-	# Should be overriden by other view classes
-	def removeItem(self, item):
-		return
 		
 class Menu(View):
 	def __init__(self, scenarioData, menuId, menuAttributes, menuImages):
@@ -204,7 +200,7 @@ class Sequence(View):
 			images[str(i-1)] = entry
 			
 	# Remove a image from the sequence
-	def removeItem(self, item):
+	def removeObject(self, item):
 		images = self.object["images"]
 		
 		# Remove from the entry
@@ -215,6 +211,8 @@ class Sequence(View):
 				
 		# Remove from actualy sequence images list
 		self.sequenceImages.remove(item)
+		
+		self.scenarioData.removeObject(childObject)
 		
 # Start menu
 class Start(View):
@@ -414,6 +412,7 @@ class Room(View):
 		
 	def removeObject(self, childObject):
 		self.objectList.remove(childObject)
+		self.scenarioData.removeObject(childObject)
 
 	def setItems(self, items):
 		self.objectList = items

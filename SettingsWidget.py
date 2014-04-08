@@ -4,7 +4,7 @@ from ImageCache import ImageCache
 
 # # TODO: remove useTypes[4], set it only in container instead
 # # TODO: locked container is unfinished/buggy (Legendan kaappi)
-# TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2) (?)
+# # TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2) (?)
 # # TODO: Add ending checkbox to generic objects
 # TODO: Duplicate images when changing newly added image (copy generic attribute dict instead of using it as is)
 # TODO: Door state is initially closed even though should be open (Vessan ovi wc2)
@@ -15,6 +15,8 @@ from ImageCache import ImageCache
 #		the poster_withglue is not listed in the outcome combobox
 # TODO: Old images/xxx_plceholder.png sources
 # TODO: Are new items added to comboboxes?
+# TODO: Removing view
+# TODO: Save view texts too in addition to their objects
 
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
