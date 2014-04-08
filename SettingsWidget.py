@@ -14,12 +14,12 @@ from ImageCache import ImageCache
 # TODO: Hiuskeepperi has correct use target but no outcome
 #		the poster_withglue is not listed in the outcome combobox
 # # TODO: Old images/xxx_plceholder.png sources
-# TODO: Are new items added to comboboxes?
+# # TODO: Are new items added to comboboxes?
 # # TODO: Removing view
 # TODO: Save view texts too in addition to their objects
 # # TODO: Adding new item from combo should focus on the new item?
 # TODO: Click "All texts" button
-# TODO: Useless text in rooms (there should be combo too)
+# # TODO: Useless text in rooms (there should be combo too)
 # TODO: Glow for different views
 # TODO: Object types should be exactly as they are in the object!
 # TODO: "X ei ole nimeä" common delegate
@@ -129,7 +129,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.musicClear.clicked.connect(self.clearMusic)
 		
 		# Where from dropdown box
-		self.whereFromLabel = QtGui.QLabel("Mistä kulkureiteistä tänne pääsee?")
+		#self.whereFromLabel = QtGui.QLabel("Mistä kulkureiteistä tänne pääsee?")
 		# TODO: whereFromCombo
 		
 		self.examineTextLabel = QtGui.QLabel("Teksti klikatessa:")
@@ -236,7 +236,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.musicTextEdit)
 		self.layout.addWidget(self.musicBtn)
 		self.layout.addWidget(self.musicClear)
-		self.layout.addWidget(self.whereFromLabel)
+		#self.layout.addWidget(self.whereFromLabel)
 		
 		self.layout.addWidget(self.endingCheckbox)
 		
@@ -300,7 +300,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.musicTextEdit,
 				self.musicBtn,
 				self.musicClear,
-				self.whereFromLabel
+				#self.whereFromLabel
 				# TODO: doorCombo for "where from" values
 			],
 			"Sequence": [

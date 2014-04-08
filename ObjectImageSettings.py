@@ -50,7 +50,7 @@ class ObjectImageSettings(QtGui.QWidget):
 		objectType = objectType.lower()
 		if (objectType == "item"):
 			self.parent.updateItemCombobox(self.keyCombo, "Avainta ei valittu!", ("item",), ("item",), self.clearKey, self.changeKey)
-		
+			
 	def changeNameEdit(self):
 		self.parent.changeName(self.nameEdit, self.gameImageObject)
 		
