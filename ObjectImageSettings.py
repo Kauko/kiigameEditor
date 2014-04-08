@@ -73,7 +73,7 @@ class ObjectImageSettings(QtGui.QWidget):
 			elif (self.objectType == "Container"):
 				placeholder = "container_placeholder.png"
 			
-			self.gameImageObject = self.gameObject.lockedImage.setPlaceholderSource(self.parent.parent.editorImagePath+placeholder)
+			self.gameImageObject = self.gameObject.lockedImage.placeholderImage.setSource(self.parent.parent.editorImagePath+placeholder)
 		else:
 			self.gameObject.setLocked(False)
 			self.keyCombo.setCurrentIndex(0)
@@ -133,10 +133,12 @@ class ObjectImageSettings(QtGui.QWidget):
 		
 		# Change locked state
 		if (self.canBeLocked):
-			if (self.objectType == "Obstacle" or gameObject.isLocked()):
-				self.lockedCheckbox.setCheckState(QtCore.Qt.CheckState.Checked)
+			if (gameObject.isLocked() or self.objectType == "Obstacle"):
+				checked = QtCore.Qt.CheckState.Checked
 			else:
-				self.lockedCheckbox.setCheckState(QtCore.Qt.CheckState.Unchecked)
+				checked = QtCore.Qt.CheckState.Unchecked
+				
+			self.lockedCheckbox.setCheckState(checked)
 			self.setLockedDisabled()
 			self.setKey()
 			

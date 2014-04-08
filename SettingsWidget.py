@@ -13,6 +13,8 @@ from ImageCache import ImageCache
 # TODO: When removing sequence images remove the entry too
 # TODO: Hiuskeepperi has correct use target but no outcome
 #		the poster_withglue is not listed in the outcome combobox
+# TODO: Old images/xxx_plceholder.png sources
+# TODO: Are new items added to comboboxes?
 
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
@@ -145,7 +147,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.useTypeCombo = QtGui.QComboBox(self)
 		for i in self.useTypes:
 			self.useTypeCombo.addItem(self.useTypes[i])
-		self.useTypeCombo.currentIndexChanged.connect(self.changeItemUseType)
+		self.useTypeCombo.activated.connect(self.changeItemUseType)
 		
 		self.useTextLabel = QtGui.QLabel("Teksti käytettäessä:")
 		
@@ -163,7 +165,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.doorInitialStateCombo = QtGui.QComboBox(self)
 		self.doorInitialStateCombo.addItem("Kiinni")
 		self.doorInitialStateCombo.addItem("Auki")
-		self.doorInitialStateCombo.currentIndexChanged.connect(lambda s: self.objectComboboxHandler(self.doorInitialStateCombo, self.changeDoorInitialState))
+		self.doorInitialStateCombo.activated.connect(lambda s: self.objectComboboxHandler(self.doorInitialStateCombo, self.changeDoorInitialState))
 		
 		self.openDoorImage = ObjectImageSettings("Avoin kulkureitti", "Avoimen kulkureitin nimi", parent=self)
 		self.closedDoorImage = ObjectImageSettings("Suljettu kulkureitti", "Suljetun kulkureitin nimi", parent=self)
@@ -201,7 +203,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.sequenceFadeCombo = QtGui.QComboBox(self)
 		for i in self.fadeTypes:
 			self.sequenceFadeCombo.addItem(self.fadeTypes[i])
-		self.sequenceFadeCombo.currentIndexChanged.connect(self.changeSequenceFadeCombo)
+		self.sequenceFadeCombo.activated.connect(self.changeSequenceFadeCombo)
 		
 		# End
 		self.textObjectTextLabel = QtGui.QLabel("Teksti")
@@ -632,6 +634,16 @@ class SettingsWidget(QtGui.QWidget):
 					
 		self.outcomeCombobox.setCurrentIndex(0)
 		
+	def setDoorInitialState(self):
+		# Door open
+		if (self.currentObject.closedImage or self.currentObject.lockedImage):
+			self.doorInitialStateCombo.setCurrentIndex(0)
+		# Door closed
+		else:
+			self.doorInitialStateCombo.setCurrentIndex(1)
+			
+		self.changeDoorInitialState()
+			
 	def setDoorOptions(self, doorObject):
 		# Set each image's settings
 		self.closedDoorImage.setSettings(doorObject, doorObject.closedImage)
@@ -640,6 +652,9 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Door transition room
 		self.setComboboxIndex(doorObject.transition, self.doorTransitionCombo)
+		
+		# Set door open or closed in the beginning
+		self.setDoorInitialState()
 		
 	# Set use item for items
 	def setUseText(self, textEdit=None, item=None):
@@ -716,16 +731,18 @@ class SettingsWidget(QtGui.QWidget):
 			
 		gameObject.setExamineText(textEdit.toPlainText())
 		
-	# TODO: Need setDoorInitialState()
 	def changeDoorInitialState(self):
-		print("Change door initial state", self.doorInitialStateCombo.currentIndex())
-		
-		# Initially closed, all states are possible
+		# Initially closed, all states (closed, locked, open) are possible
 		if (self.doorInitialStateCombo.currentIndex() == 0):
 			self.closedDoorImage.setDisabled(False)
 			self.lockedDoorImage.setDisabled(False)
 			self.openDoorImage.setDisabled(False)
-		# Initially open, only possible state is open
+			
+			# Add door's closed image
+			self.currentObject.setClosed(True)
+			self.currentObject.closedImage.placeholderImage.setSource(self.parent.editorImagePath+"door_placeholder.png")
+			
+		# Initially open, only "open" state is possible
 		else:
 			self.closedDoorImage.setDisabled(True)
 			self.lockedDoorImage.setDisabled(True)
