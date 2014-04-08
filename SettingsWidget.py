@@ -11,7 +11,7 @@ from ImageCache import ImageCache
 # # TODO: Fix names in unnameable objects (start menu images)
 # # TODO: Adding new sequence images is buggy (doesn't create new sequence entry in the object despite the image)
 # # TODO: When removing sequence images remove the entry too
-# TODO: Hiuskeepperi has correct use target but no outcome
+# # TODO: Hiuskeepperi has correct use target but no outcome
 #		the poster_withglue is not listed in the outcome combobox
 # # TODO: Old images/xxx_plceholder.png sources
 # # TODO: Are new items added to comboboxes?
@@ -426,6 +426,7 @@ class SettingsWidget(QtGui.QWidget):
 		elif (objectType == "item"):
 			self.updateWhatGoesCombo()
 			self.updateWhatComesCombo()
+			self.updateOutcomeCombobox()
 		elif (objectType == "object"):
 			self.updateOutcomeCombobox()
 			
@@ -452,7 +453,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.updateItemCombobox(self.whatComesCombo, "Ei mitään", ("item",), ("item",), connectTo=self.changeWhatComes)
 	
 	def updateOutcomeCombobox(self):
-		self.updateItemCombobox(self.outcomeCombobox, "Ei valittu", ("object",), ("object",), noChoiceMethod=self.clearOutcome, connectTo=self.changeOutcome)
+		self.updateItemCombobox(self.outcomeCombobox, "Ei valittu", ("object", "item"), ("object", "item"), noChoiceMethod=self.clearOutcome, connectTo=self.changeOutcome)
 	
 	def changeSequenceTime(self):
 		time = int(float(self.sequenceTimeEdit.text().replace(",", "."))*1000)
