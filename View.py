@@ -43,6 +43,8 @@ class View(object):
 		
 		self.placeholderImage = None # If no representingImage, use this
 		
+		self.nameable = True
+		
 	# Should be overriden by other view classes
 	def getChildren(self):
 		return
@@ -222,6 +224,8 @@ class Start(View):
 	def __init__(self, scenarioData, startAttributes, startImages):
 		super(Start, self).__init__(scenarioData, startAttributes, "start")
 		
+		self.nameable = False
+		
 		for imageId in startImages:
 			imageAttributes = startImages[imageId].pop("image")[0]
 			objectAttributes = startImages[imageId]
@@ -262,8 +266,8 @@ class End(View):
 	# Generic attributes for ends
 	endAttributes = {'object': {'music': '', 'sequence': '', 'category': 'end', 'menu': ''}, 'className': 'Layer', 'attrs': {'category': 'end', 'id': '', 'visible': False, 'object_name': ''}}
 	
-	generalName = "Loppu"
-	generalNameAdessive = "Lopulla"
+	generalName = "Pelin loppukuva"
+	generalNameAdessive = "Loppukuvalla"
 	
 	def __init__(self, scenarioData, endId, endAttributes, endImages):
 		if not (endAttributes):
@@ -273,6 +277,8 @@ class End(View):
 		
 		self.endImages = []
 		self.endText = None
+		
+		self.nameable = False
 		
 		if not (endImages):
 			return

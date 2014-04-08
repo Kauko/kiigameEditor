@@ -33,7 +33,8 @@ class ObjectImageSettings(QtGui.QWidget):
 			self.lockedCheckbox = QtGui.QCheckBox(lockedText)
 			self.lockedCheckbox.clicked.connect(self.changeLocked)
 			self.keyLabel = QtGui.QLabel("Mikä avaa?")
-			self.keyCombo = self.parent.createItemCombobox("Avainta ei valittu!", ("item",), ("item",), self.clearKey, self.changeKey)
+			self.keyCombo = self.parent.createCombobox()
+			
 			
 			self.layout.addWidget(self.lockedCheckbox)
 			self.layout.addWidget(self.keyLabel)
@@ -44,6 +45,11 @@ class ObjectImageSettings(QtGui.QWidget):
 		self.layout.addWidget(self.image)
 		self.layout.addWidget(self.clickLabel)
 		self.layout.addWidget(self.clickEdit)
+		
+	def updateComboboxes(self, objectType):
+		objectType = objectType.lower()
+		if (objectType == "item"):
+			self.parent.updateItemCombobox(self.keyCombo, "Avainta ei valittu!", ("item",), ("item",), self.clearKey, self.changeKey)
 		
 	def changeNameEdit(self):
 		self.parent.changeName(self.nameEdit, self.gameImageObject)

@@ -182,9 +182,6 @@ class Editor(QtGui.QMainWindow):
 			return
 		self.createView(selected)
 		
-		self.addObjectsCombo.setCurrentIndex(0)
-		self.left_scene.setCurrentRow(self.left_scene.count()-1)
-		
 	def removeViewsButtonClicked(self):
 		# Remove from game data
 		selected = self.left_scene.currentItem()
@@ -201,10 +198,6 @@ class Editor(QtGui.QMainWindow):
 		if not (selected in ("object", "item", "door", "container", "obstacle", "sequenceimage")):
 			return
 		self.createObject(selected)
-		
-		self.addObjectsCombo.setCurrentIndex(0)
-		self.middle_scene.setCurrentRow(self.middle_scene.count()-1)
-		self.drawTextItems()
 		
 	def removeObjectsButtonClicked(self):
 		# Remove from the room
@@ -377,8 +370,17 @@ class Editor(QtGui.QMainWindow):
 		itemWidget = ItemWidget(newObject)
 		self.middle_scene.addItem(itemWidget)
 		
+		# Focus on the new item
+		self.addObjectsCombo.setCurrentIndex(0)
+		self.middle_scene.setCurrentRow(self.middle_scene.count()-1)
+		self.drawTextItems()
+		
+		# Update settingsWidget comboboxes
+		self.settingsWidget.updateComboboxes(objectType)
+		
 	def createView(self, objectType):
 		
+		# Create the new view and the placeholder image
 		if (objectType == "room"):
 			newObject = self.scenarioData.addRoom(None, None, None)
 		elif (objectType == "sequence"):
@@ -388,8 +390,16 @@ class Editor(QtGui.QMainWindow):
 			
 		newObject.createPlaceholderImage(self.getPlaceholderImagePath(objectType))
 		
+		# Create combobox item
 		widgetItem = ViewWidget(newObject, self.scenarioData.dataDir)
 		self.left_scene.addItem(widgetItem)
+		
+		# Focus on the created image
+		self.addObjectsCombo.setCurrentIndex(0)
+		self.left_scene.setCurrentRow(self.left_scene.count()-1)
+		
+		# Update settingsWidget comboboxes
+		self.settingsWidget.updateComboboxes(objectType)
 		
 	def createTextsTab(self):
 		self.textsTab = QtGui.QWidget()
@@ -595,10 +605,13 @@ class ViewWidget(QtGui.QListWidgetItem):
 		
 		self.room = room
 		
-		roomName = room.getName()
-		if not (roomName):
-			# TODO: Some common delegate for these namings
-			roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
+		if (room.nameable):
+			roomName = room.getName()
+			if not (roomName):
+				roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
+		else:
+			roomName = room.generalName
+			
 		self.setText(roomName)
 		
 		imagePath = room.getRepresentingImage().absoluteImagePath
