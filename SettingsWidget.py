@@ -7,16 +7,17 @@ from ImageCache import ImageCache
 # # TODO: Closed door image is buggy (Suihkun ovi, vessan ovi room2) (?)
 # # TODO: Add ending checkbox to generic objects
 # # TODO: Duplicate images when changing newly added image (copy generic attribute dict instead of using it as is)
-# TODO: Door state is initially closed even though should be open (Vessan ovi wc2)
+# # TODO: Door state is initially closed even though should be open (Vessan ovi wc2)
 # TODO: Fix names in unnameable objects (start menu images)
 # TODO: Adding new sequence images is buggy (doesn't create new sequence entry in the object despite the image)
 # TODO: When removing sequence images remove the entry too
 # TODO: Hiuskeepperi has correct use target but no outcome
 #		the poster_withglue is not listed in the outcome combobox
-# TODO: Old images/xxx_plceholder.png sources
+# # TODO: Old images/xxx_plceholder.png sources
 # TODO: Are new items added to comboboxes?
-# TODO: Removing view
+# # TODO: Removing view
 # TODO: Save view texts too in addition to their objects
+# TODO: Adding new item from combo should focus on the new item?
 
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
@@ -37,7 +38,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.setSizePolicy(QtGui.QSizePolicy(
 		QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed))
 		
-		self.parent = parent
+		self.editor = parent
 		self.imageCache = ImageCache()
 			
 		self.createOtionFields()
@@ -416,7 +417,6 @@ class SettingsWidget(QtGui.QWidget):
 		self.currentObject.setText(self.textObjectTextEdit.text())
 		
 	def changeEndingCheckbox(self):
-		print("changeu", self.endingCheckbox)
 		self.currentObject.setIsEnding(self.endingCheckbox.isChecked())
 		
 	# Start menu
@@ -512,7 +512,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.pickupTextEdit.setText(pickupText)
 		
 		# Use type of the item
-		itemTarget = self.parent.getItemUse(item)
+		itemTarget = self.editor.getItemUse(item)
 		itemTargetType = itemTarget.__class__.__name__
 		useType = 0
 		
@@ -742,7 +742,7 @@ class SettingsWidget(QtGui.QWidget):
 			
 			# Add door's closed image
 			self.currentObject.setClosed(True)
-			self.currentObject.closedImage.placeholderImage.setSource(self.parent.editorImagePath+"door_placeholder.png")
+			self.currentObject.closedImage.placeholderImage.setSource(self.editor.getPlaceholderImagePath("Door"))
 			
 		# Initially open, only "open" state is possible
 		else:
@@ -824,9 +824,9 @@ class SettingsWidget(QtGui.QWidget):
 	# Update parent tab elements
 	def updateParent(self):
 		if (self.currentObject.__class__.__name__ in ("Room", "Sequence")):
-			self.parent.drawRooms()
+			self.editor.drawRooms()
 		else:
-			self.parent.drawRoomItems()
+			self.editor.drawRoomItems()
 		
 	# Change object use type
 	def changeItemUseType(self, index):
@@ -855,7 +855,7 @@ class SettingsWidget(QtGui.QWidget):
 					self.useTargetCombo.itemData(index).key.clearTarget()
 					
 				# Set the object to be locked with new key
-				imagePath = "images/container_placeholder.png"
+				imagePath = self.editor.getPlaceholderImagePath(objectType)
 				selectedObject.setLocked(True, imagePath, self.currentObject)
 				
 			# Put into container
@@ -871,7 +871,7 @@ class SettingsWidget(QtGui.QWidget):
 		
 	# Create new game object
 	def createObject(self, objectType):
-		self.parent.createObject(objectType)
+		self.editor.createObject(objectType)
 	
 	def showAllTexts(self):
 		print("Clicked show all texts")
@@ -908,10 +908,10 @@ class SettingsWidget(QtGui.QWidget):
 	# Populate a given combobox with game rooms
 	def populateRoomCombobox(self, combobox, addChoice=True):
 		if (addChoice):
-			imgPixmap = self.imageCache.createPixmap("images/add_new_icon.png")
+			imgPixmap = self.imageCache.createPixmap(self.editor.newIconPath)
 			combobox.addItem(imgPixmap, "Lisää uusi huone")
 			
-		for room in self.parent.getRoomObjects():
+		for room in self.editor.getRoomObjects():
 			# TODO: Some model to eliminate redundancy from getName/roomName patterns
 			roomName = room.getName()
 			if not (roomName):
@@ -959,19 +959,19 @@ class SettingsWidget(QtGui.QWidget):
 		
 		# Add the given string as the first item
 		if (noChoiceText):
-			imgPixmap = self.imageCache.createPixmap("images/no_choice_icon.png")
+			imgPixmap = self.imageCache.createPixmap(self.editor.noChoiceIconPath)
 			combobox.addItem(imgPixmap, noChoiceText, userData=noChoiceMethod)
 			itemCounter = 1
 			
 		# Add items to add given types of objects
 		if (addChoices):
-			imgPixmap = self.imageCache.createPixmap("images/add_new_icon.png")
+			imgPixmap = self.imageCache.createPixmap(self.editor.newIconPath)
 			for choice in addChoices:
-				combobox.addItem(imgPixmap, "Lisää uusi %s" %(self.parent.getGeneralName(choice).lower()), userData=choice)
+				combobox.addItem(imgPixmap, "Lisää uusi %s" %(self.editor.getGeneralName(choice).lower()), userData=choice)
 				itemCounter += 1
 			
 		for objType in objectTypes:
-			objRooms = self.parent.getObjectsByType(objType)
+			objRooms = self.editor.getObjectsByType(objType)
 			
 			# Combobox has rooms with their obstacles under them
 			for room in objRooms:

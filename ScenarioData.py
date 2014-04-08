@@ -362,7 +362,6 @@ class ScenarioData(object):
 		if (gameObject.__class__.__name__ in ("Item", "Object")):
 			for room in self.getObjectsByType(("item", "object")):
 				for obj in room["objects"]:
-					print("WTF",obj.id)
 					l = len(obj.texts)
 					obj.removeText(gameObject.id)
 					

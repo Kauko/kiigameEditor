@@ -6,7 +6,7 @@ class View(object):
 
 	# Static method to create unique view ID
 	usedIds = []
-	def createUniqueId(self, newId=None):
+	def createUniqueId(newId=None):
 		if not (newId):
 			newId = str(randint(0, 1000000000))
 			

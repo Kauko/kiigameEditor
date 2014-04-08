@@ -18,6 +18,20 @@ class Editor(QtGui.QMainWindow):
 		
 		self.imageCache = ImageCache()
 		
+		self.placeholderImages = {
+			"Room": "room_placeholder.png",
+			"Sequence": "sequence_placeholder.png",
+			"Sequenceimage": "sequence_placeholder.png",
+			"Object": "object_placeholder.png",
+			"Item": "object_placeholder.png",
+			"Door": "door_placeholder.png",
+			"Container": "container_placeholder.png",
+			"Obstacle": "obstacle_placeholder.png",
+			"Text": "text_placeholder.png"
+		}
+		self.newIconPath = self.editorImagePath + "add_new_icon.png"
+		self.noChoiceIconPath = self.editorImagePath + "no_choice_icon.png"
+		
 		self.setWindowTitle("Kiigame - Pelieditori")
 		
 		self.tabWidget = QtGui.QTabWidget()
@@ -159,6 +173,9 @@ class Editor(QtGui.QMainWindow):
 		elif (selectedType == "Sequence"):
 			self.addObjectsCombo.addItem("Kuva", userData="sequenceimage")
 			
+	def getPlaceholderImagePath(self, objectType):
+		return self.editorImagePath + self.placeholderImages[objectType.capitalize()]
+		
 	def addViewsComboChanged(self):
 		selected = self.addViewsCombo.itemData(self.addViewsCombo.currentIndex())
 		if not (selected in ("room", "sequence", "end")):
@@ -338,27 +355,23 @@ class Editor(QtGui.QMainWindow):
 		
 		if (objectType == "object"):
 			newObject = selectedRoom.room.addObject()
-			placeholderImage = "object_placeholder.png"
 		elif (objectType == "item"):
 			newObject = selectedRoom.room.addItem()
-			placeholderImage = "object_placeholder.png"
 		elif (objectType == "door"):
 			newObject = selectedRoom.room.addDoor()
-			placeholderImage = "door_placeholder.png"
 		elif (objectType == "container"):
 			newObject = selectedRoom.room.addContainer()
-			placeholderImage = "container_placeholder.png"
 		elif (objectType == "obstacle"):
 			newObject = selectedRoom.room.addObstacle()
-			placeholderImage = "obstacle_placeholder.png"
 		elif (objectType == "sequenceimage"):
 			newObject = selectedRoom.room.addImage()
-			placeholderImage = "sequence_placeholder.png"
 		else:
 			return
 			
+		placeholderImage = self.getPlaceholderImagePath(objectType)
+		
 		# Set placeholder image source
-		newObject.getRepresentingImage().placeholderImage.setSource(self.editorImagePath + placeholderImage)
+		newObject.getRepresentingImage().placeholderImage.setSource(placeholderImage)
 		
 		# Create new combobox item
 		itemWidget = ItemWidget(newObject)
@@ -368,16 +381,13 @@ class Editor(QtGui.QMainWindow):
 		
 		if (objectType == "room"):
 			newObject = self.scenarioData.addRoom(None, None, None)
-			newObject.createPlaceholderImage(self.editorImagePath+"room_placeholder.png")
 		elif (objectType == "sequence"):
 			newObject = self.scenarioData.addSequence(None, None, None)
-			newObject.createPlaceholderImage(self.editorImagePath+"sequence_placeholder.png")
-		elif (objectType == "end"):
-			newObject = self.scenarioData.addEnd(None, None, None)
-			newObject.createPlaceholderImage(self.editorImagePath+"end_placeholder.png")
 		else:
 			return
 			
+		newObject.createPlaceholderImage(self.getPlaceholderImagePath(objectType))
+		
 		widgetItem = ViewWidget(newObject, self.scenarioData.dataDir)
 		self.left_scene.addItem(widgetItem)
 		
@@ -555,7 +565,7 @@ class Editor(QtGui.QMainWindow):
 		for item in roomItems:
 			imagePath = None
 			if (item.__class__.__name__ == "Text"):
-				imagePath = self.editorImagePath+"text_placeholder.png"
+				imagePath = self.getPlaceholderImagePath("Text")
 			widgetItem = ItemWidget(item, imagePath)
 			
 			self.middle_scene.addItem(widgetItem)

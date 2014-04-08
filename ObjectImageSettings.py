@@ -68,12 +68,9 @@ class ObjectImageSettings(QtGui.QWidget):
 		if (self.lockedCheckbox.isChecked()):
 			self.gameObject.setLocked(True)
 			
-			if (self.objectType == "Door"):
-				placeholder = "door_placeholder.png"
-			elif (self.objectType == "Container"):
-				placeholder = "container_placeholder.png"
+			placeholder = self.parent.editor.getPlaceholderImagePath(self.objectType)
 			
-			self.gameImageObject = self.gameObject.lockedImage.placeholderImage.setSource(self.parent.parent.editorImagePath+placeholder)
+			self.gameImageObject = self.gameObject.lockedImage.placeholderImage.setSource(self.parent.editor.editorImagePath+placeholder)
 		else:
 			self.gameObject.setLocked(False)
 			self.keyCombo.setCurrentIndex(0)
@@ -111,14 +108,12 @@ class ObjectImageSettings(QtGui.QWidget):
 			self.clickEdit.setText("")
 			
 	def setImage(self):
-		# Given gameImageObject may be None (no lockedImage, for example)
 		if (self.gameImageObject):
 			imagePath = self.gameImageObject.getRepresentingImage().absoluteImagePath
 			self.parent.setObjectImage(imagePath, self.image)
-		elif self.objectType == "Door":
-			imagePath = self.parent.parent.editorImagePath + "door_placeholder.png"
-		elif self.objectType == "Container":
-			imagePath = self.parent.parent.editorImagePath + "container_placeholder.png"
+		# Given gameImageObject may be None (no lockedImage, for example)
+		elif self.objectType in ("Door", "Container"):
+			imagePath = self.parent.editor.getPlaceholderImagePath(self.objectType)
 			
 		# Ask parent to actually draw the image
 		self.parent.setObjectImage(imagePath, self.image)
