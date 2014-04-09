@@ -256,7 +256,7 @@ class Editor(QtGui.QMainWindow):
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_space = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_space)
-		self.spaceLayout.addWidget(right_frame, 1, 5, 1, 4)
+		self.spaceLayout.addWidget(right_frame, 1, 5, 1, 2)
 		
 		self.scrollAreaSpace = QtGui.QScrollArea()
 		self.scrollAreaSpace.setWidgetResizable(True)
