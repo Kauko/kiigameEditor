@@ -250,13 +250,13 @@ class Editor(QtGui.QMainWindow):
 		left_frame = QtGui.QGroupBox("Tila")
 		left_frame_layout = QtGui.QHBoxLayout()
 		left_frame.setLayout(left_frame_layout)
-		self.spaceLayout.addWidget(left_frame, 1, 0, 1, 7)
+		self.spaceLayout.addWidget(left_frame, 1, 0, 1, 5)
 
 		# Settings
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_space = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_space)
-		self.spaceLayout.addWidget(right_frame, 1, 8, 1, 4)
+		self.spaceLayout.addWidget(right_frame, 1, 5, 1, 4)
 		
 		self.scrollAreaSpace = QtGui.QScrollArea()
 		self.scrollAreaSpace.setWidgetResizable(True)
