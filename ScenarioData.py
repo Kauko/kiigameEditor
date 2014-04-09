@@ -54,17 +54,18 @@ class ScenarioData(object):
 			if (objectCategory == "misc"):
 				self.miscObjects.append(child)
 				continue
-			    
+			
 			layerChildren = None
 			for layer in child:
 				if (layer == "children"):
 					layerChildren = child[layer]
 				elif (layer == "attrs"):
-					layerAttrs = child[layer]
+					#layerAttrs = child[layer]
+					continue
 			
 			if not (layerChildren):
 				continue
-			    
+			
 			# Go through the objects in the layer
 			# And check for relation with objects.json objects
 			createdObjects = OrderedDict()

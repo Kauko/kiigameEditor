@@ -505,7 +505,7 @@ class Door(Object):
 	
 	# Generic attributes for doors
 	objectAttributes = {'className': 'Image', 'object': {'category': '', 'state': 'open', 'locked': False, 'transition': '', 'blocked': False, 'open_image': ''}}
-	 
+	
 	def __init__(self, parentView, itemId, images, objectAttributes):
 		if not (objectAttributes):
 			objectAttributes = Door.objectAttributes
@@ -811,10 +811,8 @@ class JSONImage(Object):
 		self.imageAttributes["object_name"] = objectName
 		
 	def setCoordinates(self, x, y):
-		print("setCoordinates trying")
 		self.imageAttributes["x"] = x
 		self.imageAttributes["y"] = y
-		print("setCoordinates succeeded")
 		
 	def getCoordinates(self):
 		print(self.id, self.imageAttributes)

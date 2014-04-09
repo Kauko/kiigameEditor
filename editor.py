@@ -364,11 +364,11 @@ class Editor(QtGui.QMainWindow):
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsSelectable)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges)
 			pixItem.setAcceptDrops(True)
-			
+
 			#print(item.id)
 			pos = item.getPosition()
 			if not (pos):
-				print ("In empty room")
+				print("In empty room")
 			else:
 				pixItem.setPos(pos[0],pos[1])
 				self.spaceScene.addItem(pixItem)
@@ -548,7 +548,6 @@ class Editor(QtGui.QMainWindow):
 				if ("pickup" in itemImage.texts):
 					maxAmount += 1
 				# TODO: Sorting doesn't work, fix possibly by setItem here and setCellWidget inside item
-				nameCount = 0
 				if ("name" in itemImage.texts):
 					textCount -= 1
 					
