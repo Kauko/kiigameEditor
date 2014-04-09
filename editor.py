@@ -205,7 +205,7 @@ class Editor(QtGui.QMainWindow):
 		for room in self.getRoomObjects():
 			if room == selectedRoom:
 				room.moveItem(selectedItem)
-		selectedItem.parentView.removeObject(selectedItem)
+		self.left_scene.selectedItems()[0].room.removeObject(selectedItem)
 		self.updateSpaceTab()
 		
 	def removeObjectsButtonClicked(self):
@@ -256,7 +256,7 @@ class Editor(QtGui.QMainWindow):
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_space = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_space)
-		self.spaceLayout.addWidget(right_frame, 1, 8, 1, 2)
+		self.spaceLayout.addWidget(right_frame, 1, 8, 1, 4)
 		
 		self.scrollAreaSpace = QtGui.QScrollArea()
 		self.scrollAreaSpace.setWidgetResizable(True)
