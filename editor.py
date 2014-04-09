@@ -68,14 +68,14 @@ class Editor(QtGui.QMainWindow):
 	def createMainTab(self):
 		self.mainTab = QtGui.QWidget()
 		
-		layout = QtGui.QGridLayout()
-		self.mainTab.setLayout(layout)
+		self.mainLayout = QtGui.QGridLayout()
+		self.mainTab.setLayout(self.mainLayout)
 		
 		# Room preview
 		left_frame = QtGui.QGroupBox("Tilat")
 		left_frame_layout = QtGui.QGridLayout()
 		left_frame.setLayout(left_frame_layout)
-		layout.addWidget(left_frame, 1, 0, 1, 2)
+		self.mainLayout.addWidget(left_frame, 1, 0, 1, 2)
 		
 		# Set-up widget for showing rooms
 		self.left_scene = QtGui.QListWidget(self)
@@ -94,12 +94,12 @@ class Editor(QtGui.QMainWindow):
 		self.addViewsCombo.addItem("Välianimaatio", userData="sequence")
 		#self.addViewsCombo.addItem("Loppukuva", userData="end")
 		self.addViewsCombo.currentIndexChanged.connect(self.addViewsComboChanged)
-		layout.addWidget(self.addViewsCombo, 0, 0)
+		self.mainLayout.addWidget(self.addViewsCombo, 0, 0)
 		
 		self.removeViewsButton = QtGui.QPushButton("Poista valittu tila")
 		self.setRemoveViewsButtonDisabled()
 		self.removeViewsButton.clicked.connect(self.removeViewsButtonClicked)
-		layout.addWidget(self.removeViewsButton, 0, 1)
+		self.mainLayout.addWidget(self.removeViewsButton, 0, 1)
 		
 		# Draw rooms and select the first one
 		self.drawRooms()
@@ -110,7 +110,7 @@ class Editor(QtGui.QMainWindow):
 		middle_frame = QtGui.QGroupBox("Tilan objektit")
 		middle_frame_layout = QtGui.QVBoxLayout()
 		middle_frame.setLayout(middle_frame_layout)
-		layout.addWidget(middle_frame, 1, 2, 1, 2)
+		self.mainLayout.addWidget(middle_frame, 1, 2, 1, 2)
 		
 		# Set-up widget for showing room items
 		self.middle_scene = QtGui.QListWidget(self)
@@ -121,14 +121,14 @@ class Editor(QtGui.QMainWindow):
 		self.middle_scene.doubleClicked.connect(self.comboDoubleClicked)
 		
 		self.addObjectsCombo = QtGui.QComboBox(self)
-		layout.addWidget(self.addObjectsCombo, 0, 2)
+		self.mainLayout.addWidget(self.addObjectsCombo, 0, 2)
 		self.addObjectsCombo.currentIndexChanged.connect(self.addObjectsComboChanged)
 		self.populateAddObjectsCombo()
 		
 		self.removeObjectsButton = QtGui.QPushButton("Poista valittu esine")
 		self.setRemoveObjectsButtonDisabled()
 		self.removeObjectsButton.clicked.connect(self.removeObjectsButtonClicked)
-		layout.addWidget(self.removeObjectsButton, 0, 3)
+		self.mainLayout.addWidget(self.removeObjectsButton, 0, 3)
 		
 		self.drawRoomItems()
 		
@@ -136,7 +136,7 @@ class Editor(QtGui.QMainWindow):
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_main = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_main)
-		layout.addWidget(right_frame, 1, 4)
+		self.mainLayout.addWidget(right_frame, 1, 4)
 		
 		self.settingsWidget = SettingsWidget.SettingsWidget(self)
 		self.settingsWidget.displayOptions(selectedRoom.room)
@@ -229,8 +229,8 @@ class Editor(QtGui.QMainWindow):
 	def createSpaceTab(self):
 		self.spaceTab = QtGui.QWidget()
 
-		layout = QtGui.QGridLayout()
-		self.spaceTab.setLayout(layout)
+		self.spaceLayout = QtGui.QGridLayout()
+		self.spaceTab.setLayout(self.spaceLayout)
 		
 		# Another settings widget for room view
 		#self.spaceSettingsWidget = SettingsWidget.SettingsWidget(self)
@@ -241,13 +241,13 @@ class Editor(QtGui.QMainWindow):
 		left_frame = QtGui.QGroupBox("Tila")
 		left_frame_layout = QtGui.QHBoxLayout()
 		left_frame.setLayout(left_frame_layout)
-		layout.addWidget(left_frame, 1, 0, 10, 10)
+		self.spaceLayout.addWidget(left_frame, 1, 0, 10, 10)
 
 		# Settings
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_space = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_space)
-		layout.addWidget(right_frame, 1, 11, 10, 5)
+		self.spaceLayout.addWidget(right_frame, 1, 11, 10, 5)
 		
 		self.scrollAreaSpace = QtGui.QScrollArea()
 		self.right_frame_layout_space.addWidget(self.scrollAreaSpace)
@@ -294,11 +294,9 @@ class Editor(QtGui.QMainWindow):
 		#left_frame_layout.addWidget(zIndexLabel, 1, 9)
 		
 		# Buttons bar
-		#layout.addWidget(self.addObjectsCombo, 0, 0)
-		#layout.addWidget(self.removeObjectsButton, 0, 1)
-		layout.addWidget(zIndexLabel, 0, 0)
-		layout.addWidget(increaseButton, 0, 1)
-		layout.addWidget(decreaseButton, 0, 2)
+		self.spaceLayout.addWidget(zIndexLabel, 0, 2)
+		self.spaceLayout.addWidget(increaseButton, 0, 3)
+		self.spaceLayout.addWidget(decreaseButton, 0, 4)
 		
 		self.updateSpaceTab()
 		
@@ -372,11 +370,15 @@ class Editor(QtGui.QMainWindow):
 			#self.right_frame_layout_main.addWidget(self.scrollAreaMain)
 			self.scrollAreaMain.takeWidget()
 			self.scrollAreaMain.setWidget(self.settingsWidget)
+			self.mainLayout.addWidget(self.addObjectsCombo, 0, 2)
+			self.mainLayout.addWidget(self.removeObjectsButton, 0, 3)
 		# Space tab
 		elif (index == 1):
 			#self.right_frame_layout_space.addWidget(self.scrollAreaSpace)
 			self.scrollAreaSpace.takeWidget()
 			self.scrollAreaSpace.setWidget(self.settingsWidget)
+			self.spaceLayout.addWidget(self.addObjectsCombo, 0, 0)
+			self.spaceLayout.addWidget(self.removeObjectsCombo, 0, 1)
 		# Texts tab
 		elif (index == 2):
 			self.drawTextItems
