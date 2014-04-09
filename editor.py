@@ -366,9 +366,14 @@ class Editor(QtGui.QMainWindow):
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsSelectable)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges)
 			pixItem.setAcceptDrops(True)
+			
+			inEmptyRoom = False
 
 			pos = item.getPosition()
 			if not (pos):
+				inEmptyRoom = True
+			
+			if(inEmptyRoom):
 				print("In empty room")
 			else:
 				pixItem.setPos(pos[0],pos[1])
