@@ -1,4 +1,4 @@
-from PySide import QtGui, QtCore
+from PySide import QtGui
 
 # Singleton image cacher to prevent them being loaded more than once
 class ImageCache(object):

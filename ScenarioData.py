@@ -141,7 +141,7 @@ class ScenarioData(object):
 		
 	# Save scenario to JSON files
 	def saveScenario(self):
-		scenarioTexts = {}
+		#scenarioTexts = {}
 		scenarioObjects = {}
 		scenarioImages = []
 		
@@ -155,7 +155,7 @@ class ScenarioData(object):
 			
 			# Go through objects inside views
 			for viewChild in view.getChildren():
-				childJSON = viewChild.objectAttributes
+				#childJSON = viewChild.objectAttributes
 				
 				# Go through images inside objects
 				for childImage in viewChild.images:
@@ -173,8 +173,8 @@ class ScenarioData(object):
 			
 		# Go through self.texts and add modified texts from objects
 		objects = self.getAllObjects()[0]
-		for object in objects:
-			for objectImage in object.getImages():
+		for obj in objects:
+			for objectImage in obj.getImages():
 				if (objectImage.id in self.texts):
 					self.texts[objectImage.id] = objectImage.texts
 		
@@ -183,12 +183,13 @@ class ScenarioData(object):
 			scenarioImages.append(misc)
 		
 		# Bundle everything together
-		scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
-		scenarioChildren = self.__createLayerJSON__(scenarioAttrs, scenarioImages, "Stage")
+		#scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
+		#scenarioChildren = self.__createLayerJSON__(scenarioAttrs, scenarioImages, "Stage")
 		
-		textsJSON = json.dumps(self.texts, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
-		imagesJSON = json.dumps(scenarioChildren, sort_keys=True, indent=4, separators=(',', ': '))
-		objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
+		#These were unused
+		#textsJSON = json.dumps(self.texts, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
+		#imagesJSON = json.dumps(scenarioChildren, sort_keys=True, indent=4, separators=(',', ': '))
+		#objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
 		
 		#print(textsJSON)
 		#print(imagesJSON)
@@ -303,11 +304,11 @@ class ScenarioData(object):
 		rightTypes = ["Object", "Item", "Container", "Door", "Obstacle"]
 		
 		for room in self.roomList:
-			for object in room.getItems():
-				if (object.__class__.__name__ in rightTypes and object.getClassname() != "Text"):
-						retObjects.append(object)
-						imgCount += len(object.getImages())
-						if (object.getRepresentingImage().imageAttributes["category"] == "secret"):
+			for obj in room.getItems():
+				if (obj.__class__.__name__ in rightTypes and obj.getClassname() != "Text"):
+						retObjects.append(obj)
+						imgCount += len(obj.getImages())
+						if (obj.getRepresentingImage().imageAttributes["category"] == "secret"):
 							secretCount += 1
 					
 		return [retObjects, imgCount, secretCount]
@@ -363,7 +364,7 @@ class ScenarioData(object):
 		if (gameObject.__class__.__name__ in ("Item", "Object")):
 			for room in self.getObjectsByType(("item", "object")):
 				for obj in room["objects"]:
-					l = len(obj.texts)
+					#l = len(obj.texts)
 					obj.removeText(gameObject.id)
 					
 	# TODO: Remove menu, ends, starts, custom objects

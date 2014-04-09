@@ -89,7 +89,7 @@ class Object(object):
 		return self.getRepresentingImage().getCoordinates()
 		
 	def setPosition(self, position):
-		print ("Position set to: ", position.x(), position.y())
+		#print ("Position set to: ", position.x(), position.y())
 		self.getRepresentingImage().setCoordinates(position.x(), position.y())
 		
 	def initPosition(self):
@@ -815,7 +815,7 @@ class JSONImage(Object):
 		self.imageAttributes["y"] = y
 		
 	def getCoordinates(self):
-		print(self.id, self.imageAttributes)
+		#print(self.id, self.imageAttributes)
 		try:
 			return (self.imageAttributes["x"], self.imageAttributes["y"])
 		except KeyError:
