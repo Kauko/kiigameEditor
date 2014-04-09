@@ -3,6 +3,7 @@
 import json, View, Object
 from collections import OrderedDict
 from os.path import dirname, abspath
+import ModuleLocation
 
 class ScenarioData(object):
 	def __init__(self, scenarioName):
@@ -15,7 +16,7 @@ class ScenarioData(object):
 		self.endViewList = []
 		self.menuList = []
 		
-		self.dataDir = "%s/%s/%s/" %(dirname(abspath(__file__)), "gamedata", scenarioName)
+		self.dataDir = "%s/%s/%s/" %(dirname(abspath(ModuleLocation.getLocation())), "gamedata", scenarioName)
 		
 	# Load and parse game data files
 	def loadScenario(self):

@@ -4,6 +4,7 @@ from PySide import QtGui, QtCore
 import SettingsWidget, ScenarioData
 from ImageCache import ImageCache
 from os.path import dirname, abspath
+import ModuleLocation
 
 # TODO: Keeping mouse down and moving it around in item combo shows items
 #		one step behind
@@ -12,7 +13,7 @@ class Editor(QtGui.QMainWindow):
 	def __init__(self, parent=None):
 		super(Editor, self).__init__(parent)
 		
-		self.editorImagePath = "%s/images/" %(dirname(abspath(__file__)))
+		self.editorImagePath = "%s/images/" %(dirname(abspath(ModuleLocation.getLocation())))
 		self.scenarioData = ScenarioData.ScenarioData("latkazombit")
 		self.scenarioData.loadScenario()
 		
