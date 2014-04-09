@@ -824,8 +824,8 @@ class JSONImage(Object):
 	def setCategory(self, category):
 		self.imageAttributes["category"] = category
 		
-	#def setObjectName(self, objectId):
-	#	self.imageAttributes["id"] = objectId
+	def setObjectName(self, objectId):
+		self.imageAttributes["id"] = objectId
 		
 # Differentiate sequence images from normal images
 class SequenceImage(JSONImage):
