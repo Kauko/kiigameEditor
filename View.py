@@ -395,6 +395,10 @@ class Room(View):
 		newObject.initPosition()
 		self.objectList.append(newObject)
 		return newObject
+	
+	# Move an existing item here
+	def moveItem(self, item):
+		self.objectList.append(item)
 		
 	# Create new container
 	def addContainer(self, objectAttributes=None, imageAttributes=None):

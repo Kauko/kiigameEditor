@@ -198,6 +198,15 @@ class Editor(QtGui.QMainWindow):
 		if not (selected in ("object", "item", "door", "container", "obstacle", "sequenceimage")):
 			return
 		self.createObject(selected)
+	
+	def roomsComboboxChanged(self):
+		selectedRoom = self.roomsCombobox.itemData(self.roomsCombobox.currentIndex())
+		selectedItem = self.settingsWidget.currentObject
+		for room in self.getRoomObjects():
+			if room == selectedRoom:
+				room.moveItem(selectedItem)
+		selectedItem.parentView.removeObject(selectedItem)
+		self.updateSpaceTab()
 		
 	def removeObjectsButtonClicked(self):
 		# Remove from the room
@@ -286,7 +295,7 @@ class Editor(QtGui.QMainWindow):
 		'''
 		
 		# Z-index buttons
-		zIndexLabel = QtGui.QLabel("Järjestys")
+		zIndexLabel = QtGui.QLabel("Järjestys:")
 		increaseButton = QtGui.QPushButton("Tuo esine eteen")
 		increaseButton.clicked.connect(lambda: self.changeItemZIndex(1, self.settingsWidget.currentObject))
 		decreaseButton = QtGui.QPushButton("Vie esine taakse")
@@ -294,24 +303,25 @@ class Editor(QtGui.QMainWindow):
 		#left_frame_layout.addWidget(zIndexLabel, 1, 9)
 		
 		# Combobox for putting item into another room
-		roomsCombobox = QtGui.QComboBox(self)
-		roomsCombobox.setIconSize(QtCore.QSize(20,20))
+		self.roomsCombobox = QtGui.QComboBox(self)
+		self.roomsCombobox.setIconSize(QtCore.QSize(20,20))
 		for room in self.getRoomObjects():
 			roomName = room.getName()
 			if not (roomName):
 				roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
 			imgPixmap = self.imageCache.createPixmap(room.getRepresentingImage().getRepresentingImage().absoluteImagePath)
 			roomIcon = QtGui.QIcon(imgPixmap)
-			roomsCombobox.addItem(roomIcon, roomName, userData=room)
+			self.roomsCombobox.addItem(roomIcon, roomName, userData=room)
+		self.roomsCombobox.currentIndexChanged.connect(self.roomsComboboxChanged)
 		
-		changeRooms = QtGui.QLabel("Siirrä esine eri huoneeseen")
+		changeRooms = QtGui.QLabel("Siirrä esine eri huoneeseen:")
 		
 		# Buttons bar
 		self.spaceLayout.addWidget(zIndexLabel, 0, 2)
 		self.spaceLayout.addWidget(increaseButton, 0, 3)
 		self.spaceLayout.addWidget(decreaseButton, 0, 4)
 		self.spaceLayout.addWidget(changeRooms, 0, 5)
-		self.spaceLayout.addWidget(roomsCombobox, 0, 6)
+		self.spaceLayout.addWidget(self.roomsCombobox, 0, 6)
 		
 		self.updateSpaceTab()
 		
