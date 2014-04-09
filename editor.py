@@ -250,15 +250,16 @@ class Editor(QtGui.QMainWindow):
 		left_frame = QtGui.QGroupBox("Tila")
 		left_frame_layout = QtGui.QHBoxLayout()
 		left_frame.setLayout(left_frame_layout)
-		self.spaceLayout.addWidget(left_frame, 1, 0, 10, 10)
+		self.spaceLayout.addWidget(left_frame, 1, 0, 1, 7)
 
 		# Settings
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_space = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_space)
-		self.spaceLayout.addWidget(right_frame, 1, 11, 10, 5)
+		self.spaceLayout.addWidget(right_frame, 1, 8, 1, 2)
 		
 		self.scrollAreaSpace = QtGui.QScrollArea()
+		self.scrollAreaSpace.setWidgetResizable(True)
 		self.right_frame_layout_space.addWidget(self.scrollAreaSpace)
 		
 		self.spaceScene = QtGui.QGraphicsScene(self)
@@ -365,7 +366,6 @@ class Editor(QtGui.QMainWindow):
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges)
 			pixItem.setAcceptDrops(True)
 
-			#print(item.id)
 			pos = item.getPosition()
 			if not (pos):
 				print("In empty room")
