@@ -89,8 +89,11 @@ class Object(object):
 		return self.getRepresentingImage().getCoordinates()
 		
 	def setPosition(self, position):
-		print ("posiii", position.x(), position.y())
+		print ("Position set to: ", position.x(), position.y())
 		self.getRepresentingImage().setCoordinates(position.x(), position.y())
+		
+	def initPosition(self):
+		self.getRepresentingImage().setCoordinates(0, 0)
 		
 	# Returns of the most "representing" image for an item such as open door
 	# instead closed door image
@@ -808,8 +811,10 @@ class JSONImage(Object):
 		self.imageAttributes["object_name"] = objectName
 		
 	def setCoordinates(self, x, y):
+		print("setCoordinates trying")
 		self.imageAttributes["x"] = x
 		self.imageAttributes["y"] = y
+		print("setCoordinates succeeded")
 		
 	def getCoordinates(self):
 		print(self.id, self.imageAttributes)

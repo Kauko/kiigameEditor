@@ -813,6 +813,8 @@ class SettingsWidget(QtGui.QWidget):
 	# Change the image of a gameobject
 	def changeObjectImage(self, imagePath, image=None, gameObject=None):
 		# If no image, a default image var will be used
+		print(self.editor.middle_scene.currentItem().item.getRepresentingImage().setSource(imagePath))
+		self.editor.updateSpaceTab()
 		self.setObjectImage(imagePath, image)
 		
 		if not (gameObject):

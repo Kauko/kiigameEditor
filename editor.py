@@ -229,7 +229,7 @@ class Editor(QtGui.QMainWindow):
 	def createSpaceTab(self):
 		self.spaceTab = QtGui.QWidget()
 
-		layout = QtGui.QHBoxLayout()
+		layout = QtGui.QGridLayout()
 		self.spaceTab.setLayout(layout)
 		
 		# Another settings widget for room view
@@ -241,26 +241,23 @@ class Editor(QtGui.QMainWindow):
 		left_frame = QtGui.QGroupBox("Tila")
 		left_frame_layout = QtGui.QHBoxLayout()
 		left_frame.setLayout(left_frame_layout)
-		layout.addWidget(left_frame)
+		layout.addWidget(left_frame, 1, 0, 10, 10)
 
 		# Settings
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_space = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_space)
-		layout.addWidget(right_frame)
+		layout.addWidget(right_frame, 1, 11, 10, 5)
 		
 		self.scrollAreaSpace = QtGui.QScrollArea()
-		self.scrollAreaSpace.setWidgetResizable(True)
-		#self.scrollAreaSpace.setWidget(self.settingsWidget)
-		
 		self.right_frame_layout_space.addWidget(self.scrollAreaSpace)
 		
 		self.spaceScene = QtGui.QGraphicsScene(self)
 		self.spaceView = QtGui.QGraphicsView(self.spaceScene)
-		#self.spaceView.setDragMode(QtGui.QGraphicsView.ScrollHandDrag)
 		left_frame_layout.addWidget(self.spaceView)
 		
-		# Room bar
+		'''
+		# Room bar (replaced with combobox)
 		self.roomBar = QtGui.QListWidget()
 		self.roomBar.setIconSize(QtCore.QSize(170, 170))
 		self.roomBar.setViewMode(QtGui.QListView.IconMode)
@@ -272,9 +269,7 @@ class Editor(QtGui.QMainWindow):
 		self.roomBar.setDragDropMode(QtGui.QAbstractItemView.DragDrop)
 		self.roomBar.setAcceptDrops(True)
 		self.roomBar.dropEvent = self.drop
-		#self.roomBarLayout = QtGui.QHBoxLayout()
-		#self.roomBar.setLayout(self.roomBarLayout)
-		#left_frame_layout.addWidget(self.roomBar, 0, 0, 4, 9)
+		
 		
 		# Add rooms to room bar
 		rooms = self.scenarioData.getRooms()
@@ -287,25 +282,23 @@ class Editor(QtGui.QMainWindow):
 		self.proxy.setWidget(self.roomBar)
 		roomBarGeometry = QtCore.QRectF(0, 0, 900, 200)
 		self.proxy.setGeometry(roomBarGeometry)
+		self.spaceScene.addItem(self.proxy)
+		'''
 		
 		# Z-index buttons
 		zIndexLabel = QtGui.QLabel("Järjestys")
-		increaseButton = QtGui.QPushButton("Tuo eteen")
+		increaseButton = QtGui.QPushButton("Tuo esine eteen")
 		increaseButton.clicked.connect(lambda: self.changeItemZIndex(1, self.settingsWidget.currentObject))
-		decreaseButton = QtGui.QPushButton("Vie taakse")
+		decreaseButton = QtGui.QPushButton("Vie esine taakse")
 		decreaseButton.clicked.connect(lambda: self.changeItemZIndex(-1, self.settingsWidget.currentObject))
-		#left_frame_layout.addWidget(zIndexLabel, 0, 9)
-		#left_frame_layout.addWidget(increaseButton)
-		#left_frame_layout.addWidget(decreaseButton)
-		self.proxy2 = QtGui.QGraphicsProxyWidget()
-		self.proxy2.setWidget(zIndexLabel)
-		self.proxy2.setZValue(10000)
-		self.proxy3 = QtGui.QGraphicsProxyWidget()
-		self.proxy3.setWidget(increaseButton)
-		self.proxy3.setPos(200, 200)
-		self.proxy3.setZValue(10000)
-		self.proxy4 = QtGui.QGraphicsProxyWidget()
-		self.proxy4.setWidget(decreaseButton)
+		#left_frame_layout.addWidget(zIndexLabel, 1, 9)
+		
+		# Buttons bar
+		#layout.addWidget(self.addObjectsCombo, 0, 0)
+		#layout.addWidget(self.removeObjectsButton, 0, 1)
+		layout.addWidget(zIndexLabel, 0, 0)
+		layout.addWidget(increaseButton, 0, 1)
+		layout.addWidget(decreaseButton, 0, 2)
 		
 		self.updateSpaceTab()
 		
@@ -322,11 +315,7 @@ class Editor(QtGui.QMainWindow):
 		pixmapWidget = QtGui.QLabel()
 		pixmapWidget.setPixmap(pixmap)
 		pixmapWidget.setGeometry(0, 200, pixmap.width(), pixmap.height())
-		self.proxy5 = QtGui.QGraphicsProxyWidget()
-		self.proxy5.setWidget(pixmapWidget)
-		self.spaceScene.addItem(self.proxy5)
-		self.spaceScene.addItem(self.proxy)
-		#self.spaceScene.addPixmap(pixmap)
+		self.spaceScene.addPixmap(pixmap)
 		self.spaceItems = selectedRoom.room.getItems()
 		
 		# Display objects
@@ -353,20 +342,14 @@ class Editor(QtGui.QMainWindow):
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges)
 			pixItem.setAcceptDrops(True)
 			
-			#pixItem = QtGui.QGraphicsPixmapItem(pixmap)
-			#pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
-			
 			#print(item.id)
 			pos = item.getPosition()
 			if not (pos):
 				print ("In empty room")
 			else:
-				pixItem.setPos(pos[0],pos[1]+200)
+				pixItem.setPos(pos[0],pos[1])
 				self.spaceScene.addItem(pixItem)
 				
-		self.spaceScene.addItem(self.proxy2)
-		self.spaceScene.addItem(self.proxy3)
-		self.spaceScene.addItem(self.proxy4)
 		selectedRoom.room.setItems(self.spaceItems)
 
 	def changeItemZIndex(self, change, item):
@@ -1022,21 +1005,20 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		QtGui.QGraphicsItem.mousePressEvent(self, event)
 
 	def dragMoveEvent(self, event):
-		QtGui.QGraphicsItem.dragMoveEvent(self, event)
 		print("dropp")
+		QtGui.QGraphicsItem.dragMoveEvent(self, event)
 
 	def mouseReleaseEvent(self, event):
-		try:
-			itemList = self.parent.spaceScene.collidingItems(self)
-			for item in itemList:
-				print ("ITEMIIT", item.widget())
-			QtGui.QGraphicsPixmapItem.mouseReleaseEvent(self, event)
-			self.parent.settingsWidget.currentObject.setPosition(self.pos())
-		except:
-			return
+		#itemList = self.parent.spaceScene.collidingItems(self)
+		#for item in itemList:
+		#	print ("ITEMIIT", item.widget())
+		self.parent.settingsWidget.currentObject.setPosition(self.pos())
+		print(self.pos())
+		QtGui.QGraphicsItem.mouseReleaseEvent(self, event)
 
 	def dropEvent(self, event):
 		print("DROOOOP")
+		QtGui.QGraphicsItem.dropEvent(self, event)
 
 if __name__ == '__main__':
 	from sys import argv, exit
