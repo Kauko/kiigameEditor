@@ -97,11 +97,6 @@ class Editor(QtGui.QMainWindow):
 		self.addViewsCombo.currentIndexChanged.connect(self.addViewsComboChanged)
 		self.mainLayout.addWidget(self.addViewsCombo, 0, 0)
 		
-		self.removeViewsButton = QtGui.QPushButton("Poista valittu tila")
-		self.setRemoveViewsButtonDisabled()
-		self.removeViewsButton.clicked.connect(self.removeViewsButtonClicked)
-		self.mainLayout.addWidget(self.removeViewsButton, 0, 1)
-		
 		# Draw rooms and select the first one
 		self.drawRooms()
 		selectedRoom = self.left_scene.itemAt(0, 0)
@@ -140,6 +135,12 @@ class Editor(QtGui.QMainWindow):
 		self.mainLayout.addWidget(self.addObjectsCombo, 0, 2)
 		self.addObjectsCombo.currentIndexChanged.connect(self.addObjectsComboChanged)
 		self.populateAddObjectsCombo()
+		
+		# Adding buttons for removing views and objects
+		self.removeViewsButton = QtGui.QPushButton("Poista valittu tila")
+		self.setRemoveViewsButtonDisabled()
+		self.removeViewsButton.clicked.connect(self.removeViewsButtonClicked)
+		self.mainLayout.addWidget(self.removeViewsButton, 0, 1)
 		
 		self.removeObjectsButton = QtGui.QPushButton("Poista valittu esine")
 		self.setRemoveObjectsButtonDisabled()
@@ -229,11 +230,13 @@ class Editor(QtGui.QMainWindow):
 		self.removeObjectsButton.setDisabled(isDisabled)
 		
 	def setRemoveViewsButtonDisabled(self, forceDisable=False):
-		selected = self.left_scene.selectedItems()
-		if (len(selected) == 0 and forceDisable == False):
-			isDisabled = True
-		else:
+		selected = self.settingsWidget.currentObject
+		objectType = selected.__class__.__name__
+		if (objectType == "Room" or objectType == "Sequence" or objectType == "SequenceImage" or objectType == "Start" or
+			objectType == "End" or objectType == "MenuImage" or objectType == "BeginingImage"):
 			isDisabled = False
+		else:
+			isDisabled = True
 			
 		self.removeViewsButton.setDisabled(isDisabled)
 		
@@ -602,7 +605,8 @@ class Editor(QtGui.QMainWindow):
 		selected = self.middle_scene.currentItem()
 		if (selected):
 			self.settingsWidget.displayOptions(selected.item)
-			
+		
+		self.setRemoveViewsButtonDisabled()
 		self.setRemoveObjectsButtonDisabled()
 		
 	# Draw the leftmost frame items
@@ -1036,6 +1040,7 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		
 		self.parent.settingsWidget.displayOptions(selectedItem)
 		self.parent.setRemoveObjectsButtonDisabled()
+		self.parent.setRemoveViewsButtonDisabled()
 		QtGui.QGraphicsItem.mousePressEvent(self, event)
 
 	def dragMoveEvent(self, event):
