@@ -211,12 +211,12 @@ class Editor(QtGui.QMainWindow):
 		
 	def removeObjectsButtonClicked(self):
 		# Remove from the room
-		selected = self.middle_scene.currentItem()
-		selected.item.parentView.removeObject(selected.item)
+		selected = self.settingsWidget.currentObject
+		selected.parentView.removeObject(selected)
+		self.updateSpaceTab()
 		
-		# Remove from combobox
-		row = self.middle_scene.currentRow()
-		self.middle_scene.takeItem(row)
+		# Update items combobox
+		self.drawRoomItems()
 		
 	def setRemoveObjectsButtonDisabled(self, forceDisable=False):
 		selected = self.middle_scene.selectedItems()
