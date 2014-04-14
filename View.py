@@ -214,7 +214,8 @@ class Sequence(View):
 		# Remove from actualy sequence images list
 		self.sequenceImages.remove(item)
 		
-		self.scenarioData.removeObject(childObject)
+		# TODO: childObject not defined
+		#self.scenarioData.removeObject(childObject)
 		
 # Start menu
 class Start(View):

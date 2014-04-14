@@ -261,7 +261,7 @@ class Editor(QtGui.QMainWindow):
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_space = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_space)
-		self.spaceLayout.addWidget(right_frame, 1, 6, 1, 2)
+		self.spaceLayout.addWidget(right_frame, 1, 6, 1, 1)
 		
 		self.scrollAreaSpace = QtGui.QScrollArea()
 		self.scrollAreaSpace.setWidgetResizable(True)
@@ -270,35 +270,6 @@ class Editor(QtGui.QMainWindow):
 		self.spaceScene = QtGui.QGraphicsScene(self)
 		self.spaceView = QtGui.QGraphicsView(self.spaceScene)
 		left_frame_layout.addWidget(self.spaceView)
-		
-		'''
-		# Room bar (replaced with combobox)
-		self.roomBar = QtGui.QListWidget()
-		self.roomBar.setIconSize(QtCore.QSize(170, 170))
-		self.roomBar.setViewMode(QtGui.QListView.IconMode)
-		self.roomBar.setFlow(QtGui.QListView.TopToBottom)
-		self.roomBar.setMovement(QtGui.QListView.Static)
-		self.roomBar.itemSelectionChanged.connect(self.roomClicked)
-		self.roomBar.doubleClicked.connect(self.comboDoubleClicked)
-		self.roomBar.clicked.connect(self.roomClicked)
-		self.roomBar.setDragDropMode(QtGui.QAbstractItemView.DragDrop)
-		self.roomBar.setAcceptDrops(True)
-		self.roomBar.dropEvent = self.drop
-		
-		
-		# Add rooms to room bar
-		rooms = self.scenarioData.getRooms()
-		for room in rooms:
-			roomWidget = ViewWidget(room, self.scenarioData.dataDir)
-			#roomWidget.add
-			self.roomBar.addItem(roomWidget)
-			
-		self.proxy = QtGui.QGraphicsProxyWidget()
-		self.proxy.setWidget(self.roomBar)
-		roomBarGeometry = QtCore.QRectF(0, 0, 900, 200)
-		self.proxy.setGeometry(roomBarGeometry)
-		self.spaceScene.addItem(self.proxy)
-		'''
 		
 		# Z-index buttons
 		zIndexLabel = QtGui.QLabel("Järjestys:")

@@ -910,7 +910,7 @@ class SettingsWidget(QtGui.QWidget):
 					self.useTargetCombo.itemData(index).key.clearTarget()
 					
 				# Set the object to be locked with new key
-				imagePath = self.editor.getPlaceholderImagePath(objectType)
+				imagePath = self.editor.getPlaceholderImagePath(targetType)
 				selectedObject.setLocked(True, imagePath, self.currentObject)
 				
 			# Put into container

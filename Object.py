@@ -696,7 +696,7 @@ class Obstacle(Object):
 			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
 		try:
 			if (self.unblockingImage):
-				self.texts.update(texts[self.unblockingText.id])
+				self.texts.update(self.texts[self.unblockingText.id])
 		except KeyError:
 			print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
 			
@@ -824,7 +824,7 @@ class JSONImage(Object):
 	def setCategory(self, category):
 		self.imageAttributes["category"] = category
 		
-	def setObjectName(self, objectId):
+	def setObjectId(self, objectId):
 		self.imageAttributes["id"] = objectId
 		
 # Differentiate sequence images from normal images
