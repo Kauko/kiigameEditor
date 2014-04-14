@@ -976,7 +976,7 @@ class TextsWidget(QtGui.QWidget):
 			targetObject = self.text_scene.item(row, 0)
 			try:
 				interactionText = self.text_scene.selectedItems()[0].text()
-				self.currentItem.textItem.setInteractionText(targetObject.id, interactionText)
+				self.currentItem.parentItem.setInteractionText(targetObject.id, interactionText)
 				self.parent.drawTextItems()
 			except:
 				pass
