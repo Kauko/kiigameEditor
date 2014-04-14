@@ -79,8 +79,6 @@ class SettingsWidget(QtGui.QWidget):
 			self.setObstacleOptions(gameObject)
 		elif (objectType == "JSONImage"):
 			self.setJSONImageOptions(gameObject)
-		elif (objectType == "Start"):
-			self.setStartOptions(gameObject)
 		elif (objectType == "MenuImage"):
 			self.setJSONImageOptions(gameObject)
 		elif (objectType == "BeginingImage"):

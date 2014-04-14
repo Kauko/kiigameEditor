@@ -113,6 +113,21 @@ class Editor(QtGui.QMainWindow):
 		middle_frame.setLayout(middle_frame_layout)
 		self.mainLayout.addWidget(middle_frame, 1, 2, 1, 2)
 		
+		# Settings for items and rooms
+		right_frame = QtGui.QGroupBox("Asetukset")
+		self.right_frame_layout_main = QtGui.QVBoxLayout()
+		right_frame.setLayout(self.right_frame_layout_main)
+		self.mainLayout.addWidget(right_frame, 1, 4)
+		
+		self.settingsWidget = SettingsWidget.SettingsWidget(self)
+		self.settingsWidget.displayOptions(selectedRoom.room)
+		
+		# Set settings widget scrollable instead resizing main window
+		self.scrollAreaMain = QtGui.QScrollArea()
+		self.scrollAreaMain.setWidgetResizable(True)
+		self.right_frame_layout_main.addWidget(self.scrollAreaMain)
+		self.scrollAreaMain.setWidget(self.settingsWidget)
+		
 		# Set-up widget for showing room items
 		self.middle_scene = QtGui.QListWidget(self)
 		self.middle_scene.setIconSize(QtCore.QSize(100, 100))
@@ -132,22 +147,6 @@ class Editor(QtGui.QMainWindow):
 		self.mainLayout.addWidget(self.removeObjectsButton, 0, 3)
 		
 		self.drawRoomItems()
-		
-		# Settings for items and rooms
-		right_frame = QtGui.QGroupBox("Asetukset")
-		self.right_frame_layout_main = QtGui.QVBoxLayout()
-		right_frame.setLayout(self.right_frame_layout_main)
-		self.mainLayout.addWidget(right_frame, 1, 4)
-		
-		self.settingsWidget = SettingsWidget.SettingsWidget(self)
-		self.settingsWidget.displayOptions(selectedRoom.room)
-		
-		# Set settings widget scrollable instead resizing main window
-		self.scrollAreaMain = QtGui.QScrollArea()
-		self.scrollAreaMain.setWidgetResizable(True)
-		self.scrollAreaMain.setWidget(self.settingsWidget)
-		
-		self.right_frame_layout_main.addWidget(self.scrollAreaMain)
 		
 	def comboDoubleClicked(self):
 		self.tabWidget.setCurrentIndex(1)
@@ -219,8 +218,10 @@ class Editor(QtGui.QMainWindow):
 		self.drawRoomItems()
 		
 	def setRemoveObjectsButtonDisabled(self, forceDisable=False):
-		selected = self.middle_scene.selectedItems()
-		if (len(selected) == 0 or forceDisable == True):
+		selected = self.settingsWidget.currentObject
+		objectType = selected.__class__.__name__
+		if (objectType == "Room" or objectType == "Sequence" or objectType == "SequenceImage" or objectType == "Start" or
+			objectType == "End" or objectType == "Text" or objectType == "JSONImage" or objectType == "MenuImage" or objectType == "BeginingImage"):
 			isDisabled = True
 		else:
 			isDisabled = False
@@ -403,6 +404,7 @@ class Editor(QtGui.QMainWindow):
 			self.scrollAreaMain.setWidget(self.settingsWidget)
 			self.mainLayout.addWidget(self.addObjectsCombo, 0, 2)
 			self.mainLayout.addWidget(self.removeObjectsButton, 0, 3)
+			self.setRemoveObjectsButtonDisabled()
 		# Space tab
 		elif (index == 1):
 			#self.right_frame_layout_space.addWidget(self.scrollAreaSpace)
@@ -410,6 +412,7 @@ class Editor(QtGui.QMainWindow):
 			self.scrollAreaSpace.setWidget(self.settingsWidget)
 			self.spaceLayout.addWidget(self.addObjectsCombo, 0, 0)
 			self.spaceLayout.addWidget(self.removeObjectsButton, 0, 1)
+			self.setRemoveObjectsButtonDisabled()
 		# Texts tab
 		elif (index == 2):
 			self.drawTextItems
@@ -590,7 +593,7 @@ class Editor(QtGui.QMainWindow):
 		self.settingsWidget.displayOptions(self.left_scene.selectedItems()[0].room)
 		self.setRemoveViewsButtonDisabled()
 		self.populateAddObjectsCombo()
-		
+		self.setRemoveObjectsButtonDisabled()
 		self.updateSpaceTab()
 		
 	# Click on an item in the main tab room preview
@@ -1032,6 +1035,7 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 				selectedItem = item
 		
 		self.parent.settingsWidget.displayOptions(selectedItem)
+		self.parent.setRemoveObjectsButtonDisabled()
 		QtGui.QGraphicsItem.mousePressEvent(self, event)
 
 	def dragMoveEvent(self, event):
