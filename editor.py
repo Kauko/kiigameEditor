@@ -336,7 +336,7 @@ class Editor(QtGui.QMainWindow):
 			
 			pixmap = self.imageCache.createPixmap(img.absoluteImagePath)
 			pixmap = pixmap.scaledToHeight(pixmap.height()*scale)
-			pixItem = SpaceViewItem(pixmap, item.getRepresentingImage().id, self)
+			pixItem = SpaceViewItem(pixmap, item.id, self)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemIsSelectable)
 			pixItem.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges)
@@ -1006,8 +1006,10 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 			return
 			
 		for item in roomItems:
-			if (item.getRepresentingImage().id == self.name):
+			if (item.id == self.name):
 				selectedItem = item
+			else:
+				print("Error: item.id not found in roomItems!")
 		
 		self.parent.settingsWidget.displayOptions(selectedItem)
 		self.parent.setRemoveObjectsButtonDisabled()

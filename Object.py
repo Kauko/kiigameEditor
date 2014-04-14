@@ -52,7 +52,7 @@ class Object(object):
 		# images can have same ID as their owners
 		else:
 			self.id = objectId
-			
+		
 		self.parentView = parentView
 		self.objectAttributes = objectAttributes
 		
