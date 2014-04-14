@@ -49,10 +49,10 @@ class Object(object):
 				self.id = Object.createUniqueId()
 
 		# JSONImage doesn't need an image or an ID check because
-		# images can have same ID as their owners
+		# images can have the same ID as their owners
 		else:
 			self.id = objectId
-		
+			
 		self.parentView = parentView
 		self.objectAttributes = objectAttributes
 		

@@ -408,11 +408,11 @@ class Editor(QtGui.QMainWindow):
 			newObject = selectedRoom.room.addImage()
 		else:
 			return
-			
+		
 		placeholderImage = self.getPlaceholderImagePath(objectType)
 		
 		# Set placeholder image source
-		newObject.getRepresentingImage().placeholderImage.setSource(placeholderImage)
+		newObject.getRepresentingImage().setSource(placeholderImage)
 		
 		# Create new combobox item
 		itemWidget = ItemWidget(newObject)
@@ -425,6 +425,11 @@ class Editor(QtGui.QMainWindow):
 		
 		# Update settingsWidget comboboxes
 		self.settingsWidget.updateComboboxes(objectType)
+		
+		# Init new item's position and update spaceTab
+		print(newObject)
+		newObject.initPosition()
+		self.updateSpaceTab()
 		
 	def createView(self, objectType):
 		
@@ -1008,8 +1013,9 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		for item in roomItems:
 			if (item.id == self.name):
 				selectedItem = item
-			else:
-				print("Error: item.id not found in roomItems!")
+				
+		if (selectedItem == None):
+			print("Error: item.id not found in roomItems!")
 		
 		self.parent.settingsWidget.displayOptions(selectedItem)
 		self.parent.setRemoveObjectsButtonDisabled()

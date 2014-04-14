@@ -394,7 +394,6 @@ class Room(View):
 		imageId = self.id + "_item"
 		print(imageId)
 		newObject = Object.Item(self, imageId, imageAttributes, objectAttributes)
-		newObject.initPosition()
 		self.objectList.append(newObject)
 		return newObject
 	
