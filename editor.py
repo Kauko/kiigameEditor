@@ -251,13 +251,13 @@ class Editor(QtGui.QMainWindow):
 		left_frame = QtGui.QGroupBox("Tila")
 		left_frame_layout = QtGui.QHBoxLayout()
 		left_frame.setLayout(left_frame_layout)
-		self.spaceLayout.addWidget(left_frame, 1, 0, 1, 5)
+		self.spaceLayout.addWidget(left_frame, 1, 0, 1, 6)
 
 		# Settings
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_space = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_space)
-		self.spaceLayout.addWidget(right_frame, 1, 5, 1, 2)
+		self.spaceLayout.addWidget(right_frame, 1, 6, 1, 2)
 		
 		self.scrollAreaSpace = QtGui.QScrollArea()
 		self.scrollAreaSpace.setWidgetResizable(True)
@@ -833,7 +833,7 @@ class TextsWidget(QtGui.QWidget):
 		self.separator.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
 		
 		# Interaction texts
-		self.interactionTextGroupBox = QtGui.QGroupBox("Tekstit muiden esineiden kanssa")
+		self.interactionTextGroupBox = QtGui.QGroupBox("Tekstit esinettä käytettäessä muihin esineisiin")
 		self.interactionTextLayout = QtGui.QVBoxLayout()
 		self.text_scene = QtGui.QTableWidget(self)
 		self.interactionTextGroupBox.setLayout(self.interactionTextLayout)
@@ -873,14 +873,12 @@ class TextsWidget(QtGui.QWidget):
 		self.displayOptionLayout.addWidget(self.displayDoneButton)
 		
 		# Interaction texts
-		# TODO: The rows shouldn't be so high, would be better to see more items at a time
-		# TODO: Also this text_scene should always stretch more than the other widgets, same reason as above TODO
+		# TODO: This text_scene should always stretch more than the other widgets
 		self.interactionTextLayout.addWidget(self.text_scene)
 		self.text_scene.setRowCount(0)
 		self.text_scene.setColumnCount(2)
 		self.text_scene.setColumnWidth(0, 250)
 		self.text_scene.setColumnWidth(1, 250)
-		self.text_scene
 		
 		# TODO: Texts for open, closed, empty, full, etc.
 		self.itemSettings = [
