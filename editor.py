@@ -1017,6 +1017,7 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		if (selectedItem == None):
 			print("Error: item.id not found in roomItems!")
 		
+		print(selectedItem.getRepresentingImage().getID())
 		self.parent.settingsWidget.displayOptions(selectedItem)
 		self.parent.setRemoveObjectsButtonDisabled()
 		self.parent.setRemoveViewsButtonDisabled()

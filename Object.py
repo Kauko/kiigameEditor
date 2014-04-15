@@ -53,6 +53,12 @@ class Object(object):
 		else:
 			self.id = objectId
 			
+		i = 0
+		for image in self.images:
+			i+=1
+			if(image.getID()==""):
+				image.setID(self.id + "_" + str(i))
+			
 		self.parentView = parentView
 		self.objectAttributes = objectAttributes
 		
@@ -791,6 +797,15 @@ class JSONImage(Object):
 			
 	def setName(self, name):
 		self.texts["name"] = name
+	
+	def getID(self):
+		try:
+			return self.id
+		except:
+			print("Warning: imageID not found.")
+			
+	def setID(self, newID):
+		self.id = newID
 		
 	def getFileName(self):
 		# TODO: self.getSource() returns None?
