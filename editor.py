@@ -112,7 +112,7 @@ class Editor(QtGui.QMainWindow):
 		right_frame = QtGui.QGroupBox("Asetukset")
 		self.right_frame_layout_main = QtGui.QVBoxLayout()
 		right_frame.setLayout(self.right_frame_layout_main)
-		self.mainLayout.addWidget(right_frame, 1, 4)
+		self.mainLayout.addWidget(right_frame, 1, 4, 1, 2)
 		
 		self.settingsWidget = SettingsWidget.SettingsWidget(self)
 		self.settingsWidget.displayOptions(selectedRoom.room)
@@ -143,9 +143,26 @@ class Editor(QtGui.QMainWindow):
 		self.mainLayout.addWidget(self.removeViewsButton, 0, 1)
 		
 		self.removeObjectsButton = QtGui.QPushButton("Poista valittu esine")
-		self.setRemoveObjectsButtonDisabled()
 		self.removeObjectsButton.clicked.connect(self.removeObjectsButtonClicked)
 		self.mainLayout.addWidget(self.removeObjectsButton, 0, 3)
+		
+		# Combobox for putting item into another room
+		self.roomsCombobox = QtGui.QComboBox(self)
+		self.roomsCombobox.setIconSize(QtCore.QSize(20,20))
+		for room in self.getRoomObjects():
+			roomName = room.getName()
+			if not (roomName):
+				roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
+			imgPixmap = self.imageCache.createPixmap(room.getRepresentingImage().getRepresentingImage().absoluteImagePath)
+			roomIcon = QtGui.QIcon(imgPixmap)
+			self.roomsCombobox.addItem(roomIcon, roomName, userData=room)
+		self.roomsCombobox.currentIndexChanged.connect(self.roomsComboboxChanged)
+		self.changeRoomsLabel = QtGui.QLabel("Siirrä esine eri huoneeseen:")
+		
+		self.mainLayout.addWidget(self.changeRoomsLabel, 0, 4)
+		self.mainLayout.addWidget(self.roomsCombobox, 0, 5)
+		
+		self.setRemoveObjectsButtonDisabled()
 		
 		self.drawRoomItems()
 		
@@ -228,6 +245,7 @@ class Editor(QtGui.QMainWindow):
 			isDisabled = False
 			
 		self.removeObjectsButton.setDisabled(isDisabled)
+		self.roomsCombobox.setDisabled(isDisabled)
 		
 	def setRemoveViewsButtonDisabled(self, forceDisable=False):
 		selected = self.settingsWidget.currentObject
@@ -279,26 +297,10 @@ class Editor(QtGui.QMainWindow):
 		decreaseButton.clicked.connect(lambda: self.changeItemZIndex(-1, self.settingsWidget.currentObject))
 		#left_frame_layout.addWidget(zIndexLabel, 1, 9)
 		
-		# Combobox for putting item into another room
-		self.roomsCombobox = QtGui.QComboBox(self)
-		self.roomsCombobox.setIconSize(QtCore.QSize(20,20))
-		for room in self.getRoomObjects():
-			roomName = room.getName()
-			if not (roomName):
-				roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
-			imgPixmap = self.imageCache.createPixmap(room.getRepresentingImage().getRepresentingImage().absoluteImagePath)
-			roomIcon = QtGui.QIcon(imgPixmap)
-			self.roomsCombobox.addItem(roomIcon, roomName, userData=room)
-		self.roomsCombobox.currentIndexChanged.connect(self.roomsComboboxChanged)
-		
-		changeRooms = QtGui.QLabel("Siirrä esine eri huoneeseen:")
-		
 		# Buttons bar
 		self.spaceLayout.addWidget(zIndexLabel, 0, 2)
 		self.spaceLayout.addWidget(increaseButton, 0, 3)
 		self.spaceLayout.addWidget(decreaseButton, 0, 4)
-		self.spaceLayout.addWidget(changeRooms, 0, 5)
-		self.spaceLayout.addWidget(self.roomsCombobox, 0, 6)
 		
 		self.updateSpaceTab()
 		
@@ -378,6 +380,8 @@ class Editor(QtGui.QMainWindow):
 			self.scrollAreaMain.setWidget(self.settingsWidget)
 			self.mainLayout.addWidget(self.addObjectsCombo, 0, 2)
 			self.mainLayout.addWidget(self.removeObjectsButton, 0, 3)
+			self.mainLayout.addWidget(self.changeRoomsLabel, 0, 4)
+			self.mainLayout.addWidget(self.roomsCombobox, 0, 5)
 			self.setRemoveObjectsButtonDisabled()
 		# Space tab
 		elif (index == 1):
@@ -386,6 +390,8 @@ class Editor(QtGui.QMainWindow):
 			self.scrollAreaSpace.setWidget(self.settingsWidget)
 			self.spaceLayout.addWidget(self.addObjectsCombo, 0, 0)
 			self.spaceLayout.addWidget(self.removeObjectsButton, 0, 1)
+			self.spaceLayout.addWidget(self.changeRoomsLabel, 0, 5)
+			self.spaceLayout.addWidget(self.roomsCombobox, 0, 6)
 			self.setRemoveObjectsButtonDisabled()
 		# Texts tab
 		elif (index == 2):

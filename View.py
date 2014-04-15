@@ -392,7 +392,6 @@ class Room(View):
 	# Create new item
 	def addItem(self, objectAttributes=None, imageAttributes=None):
 		imageId = self.id + "_item"
-		print(imageId)
 		newObject = Object.Item(self, imageId, imageAttributes, objectAttributes)
 		self.objectList.append(newObject)
 		return newObject
