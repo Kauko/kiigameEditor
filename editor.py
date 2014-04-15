@@ -149,18 +149,11 @@ class Editor(QtGui.QMainWindow):
 		# Combobox for putting item into another room
 		self.roomsCombobox = QtGui.QComboBox(self)
 		self.roomsCombobox.setIconSize(QtCore.QSize(20,20))
-		for room in self.getRoomObjects():
-			roomName = room.getName()
-			if not (roomName):
-				roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
-			imgPixmap = self.imageCache.createPixmap(room.getRepresentingImage().getRepresentingImage().absoluteImagePath)
-			roomIcon = QtGui.QIcon(imgPixmap)
-			self.roomsCombobox.addItem(roomIcon, roomName, userData=room)
 		self.roomsCombobox.currentIndexChanged.connect(self.roomsComboboxChanged)
 		self.changeRoomsLabel = QtGui.QLabel("Siirrä esine eri huoneeseen:")
-		
 		self.mainLayout.addWidget(self.changeRoomsLabel, 0, 4)
 		self.mainLayout.addWidget(self.roomsCombobox, 0, 5)
+		self.populateRoomsComboBox()
 		
 		self.setRemoveObjectsButtonDisabled()
 		
@@ -168,6 +161,31 @@ class Editor(QtGui.QMainWindow):
 		
 	def comboDoubleClicked(self):
 		self.tabWidget.setCurrentIndex(1)
+	
+	def populateRoomsComboBox(self):
+		self.roomsCombobox.clear()
+		for room in self.getRoomObjects():
+			roomName = room.getName()
+			if not (roomName):
+				roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
+			imgPixmap = self.imageCache.createPixmap(room.getRepresentingImage().absoluteImagePath)
+			roomIcon = QtGui.QIcon(imgPixmap)
+			self.roomsCombobox.addItem(roomIcon, roomName, userData=room)
+	
+	def disableItemsRoomInRoomsCombobox(self):
+		# First, enable all the items
+		for i in range(0, self.roomsCombobox.count()):
+			self.roomsCombobox.setItemData(i, 33, QtCore.Qt.UserRole - 1)
+		
+		# Then disable then one that the selected item is in
+		item = self.settingsWidget.currentObject
+		print(item.parentView)
+		for room in self.getRoomObjects():
+			if (room == item.parentView):
+				itemsRoom = room
+				for i in range(0, self.roomsCombobox.count()):
+					if (self.roomsCombobox.itemText(i) == itemsRoom.getName()):
+						self.roomsCombobox.setItemData(i, 0, QtCore.Qt.UserRole - 1);
 		
 	def populateAddObjectsCombo(self):
 		selectedType = self.left_scene.currentItem().room.__class__.__name__
@@ -225,6 +243,7 @@ class Editor(QtGui.QMainWindow):
 				room.moveItem(selectedItem)
 		self.left_scene.selectedItems()[0].room.removeObject(selectedItem)
 		self.updateSpaceTab()
+		self.drawRoomItems()
 		
 	def removeObjectsButtonClicked(self):
 		# Remove from the room
@@ -460,6 +479,9 @@ class Editor(QtGui.QMainWindow):
 		# Update settingsWidget comboboxes
 		self.settingsWidget.updateComboboxes(objectType)
 		
+		# Update roomsComboBox
+		self.populateRoomsComboBox()
+		
 	def createTextsTab(self):
 		self.textsTab = QtGui.QWidget()
 
@@ -590,6 +612,7 @@ class Editor(QtGui.QMainWindow):
 		
 		self.setRemoveViewsButtonDisabled()
 		self.setRemoveObjectsButtonDisabled()
+		self.disableItemsRoomInRoomsCombobox()
 		
 	# Draw the leftmost frame items
 	def drawRooms(self):
@@ -1027,6 +1050,7 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		self.parent.settingsWidget.displayOptions(selectedItem)
 		self.parent.setRemoveObjectsButtonDisabled()
 		self.parent.setRemoveViewsButtonDisabled()
+		self.disableItemsRoomInRoomsCombobox()
 		QtGui.QGraphicsItem.mousePressEvent(self, event)
 
 	def dragMoveEvent(self, event):
