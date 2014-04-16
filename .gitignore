@@ -1,5 +1,6 @@
 /nbproject/
 /__pycache__/
+/build/
 .project
 .pydevproject
 .settings/
