@@ -8,7 +8,7 @@ import sys
 base = 'Win32GUI' if sys.platform=='win32' else None
 
 executables = [
-    Executable('editor.py', base=base, targetName = 'Kiigame Editor')
+    Executable('editor.py', base = base, targetName = 'Kiigame Editor.exe', icon = "icon.ico")
 ]
 
 setup(name='Kiigame - Editor',
