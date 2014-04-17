@@ -46,7 +46,7 @@ class SettingsWidget(QtGui.QWidget):
 		self.editor = parent
 		self.imageCache = ImageCache()
 			
-		self.createOtionFields()
+		self.createOptionFields()
 		
 	def displayOptions(self, gameObject):
 		self.currentObject = gameObject
@@ -92,7 +92,7 @@ class SettingsWidget(QtGui.QWidget):
 			item.show()
 			
 	# Settings for the object view
-	def createOtionFields(self):
+	def createOptionFields(self):
 		# Name
 		self.nameLabel = QtGui.QLabel("Nimi")
 		self.objectNameEdit =  QtGui.QLineEdit()
@@ -287,6 +287,14 @@ class SettingsWidget(QtGui.QWidget):
 		self.layout.addWidget(self.sequenceFadeLabel)
 		self.layout.addWidget(self.sequenceFadeCombo)
 		
+		# Removebuttons
+		self.removeObjectButton = QtGui.QPushButton("Poista tämä esine")
+		self.layout.addWidget(self.removeObjectButton)
+		self.removeObjectButton.clicked.connect(lambda: self.removeObject())
+		self.removeViewButton = QtGui.QPushButton("Poista tämä näkymä")
+		self.layout.addWidget(self.removeViewButton)
+		self.removeViewButton.clicked.connect(lambda: self.removeView())
+		
 		# Which widgets are shown with each object
 		self.itemSettings = {
 			"Room": [
@@ -298,6 +306,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.musicTextEdit,
 				self.musicBtn,
 				self.musicClear,
+				self.removeViewButton
 				#self.whereFromLabel
 				# TODO: doorCombo for "where from" values
 			],
@@ -308,6 +317,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.musicTextEdit,
 				self.musicBtn,
 				self.musicClear,
+				self.removeViewButton
 			],
 			"SequenceImage": [
 				self.imgTextLabel,
@@ -315,7 +325,8 @@ class SettingsWidget(QtGui.QWidget):
 				self.sequenceTimeLabel,
 				self.sequenceTimeEdit,
 				self.sequenceFadeLabel,
-				self.sequenceFadeCombo
+				self.sequenceFadeCombo,
+				self.removeViewButton
 			],
 			"End": [
 				self.imgTextLabel,
@@ -369,7 +380,8 @@ class SettingsWidget(QtGui.QWidget):
 				self.allTextsButton,
 				self.useConsumeCheckbox,
 				self.outcomeLabel,
-				self.outcomeCombobox
+				self.outcomeCombobox,
+				self.removeObjectButton
 			],
 			"Object": [
 				self.nameLabel,
@@ -379,6 +391,7 @@ class SettingsWidget(QtGui.QWidget):
 				self.endingCheckbox,
 				self.examineTextLabel,
 				self.examineTextEdit,
+				self.removeObjectButton
 			],
 			"Door": [
 				#self.doorTransitionLabelLine,
@@ -390,7 +403,8 @@ class SettingsWidget(QtGui.QWidget):
 				
 				self.openDoorImage,
 				self.closedDoorImage,
-				self.lockedDoorImage
+				self.lockedDoorImage,
+				self.removeObjectButton
 			],
 			"Container": [
 				self.lockedContainerImage,
@@ -400,12 +414,14 @@ class SettingsWidget(QtGui.QWidget):
 				self.whatGoesLabel,
 				self.whatGoesCombo,
 				self.whatComesLabel,
-				self.whatComesCombo
+				self.whatComesCombo,
+				self.removeObjectButton
 			],
 			"Obstacle": [
 				self.obstacleImage,
 				self.obstacleBlocksLabel,
-				self.obstacleBlocksCombo
+				self.obstacleBlocksCombo,
+				self.removeObjectButton
 			]
 		}
 		
@@ -928,6 +944,12 @@ class SettingsWidget(QtGui.QWidget):
 	def createObject(self, objectType):
 		self.editor.createObject(objectType)
 		self.updateComboboxes(objectType)
+		
+	def removeObject(self):
+		self.editor.removeObjectsButtonClicked()
+	
+	def removeView(self):
+		self.editor.removeViewsButtonClicked()
 		
 	def showAllTexts(self):
 		print("Clicked show all texts")
