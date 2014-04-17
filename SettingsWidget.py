@@ -952,7 +952,8 @@ class SettingsWidget(QtGui.QWidget):
 		self.editor.removeViewsButtonClicked()
 		
 	def showAllTexts(self):
-		print("Clicked show all texts")
+		# TODO: Select the actual object
+		self.editor.tabWidget.setCurrentIndex(2)
 		
 	def clearMusic(self):
 		self.currentObject.clearMusic()
