@@ -177,7 +177,7 @@ class Editor(QtGui.QMainWindow):
 		for i in range(0, self.roomsCombobox.count()):
 			self.roomsCombobox.setItemData(i, 33, QtCore.Qt.UserRole - 1)
 		
-		# Then disable then one that the selected item is in
+		# Then disable the one that the selected item is in
 		item = self.settingsWidget.currentObject
 		print(item.parentView)
 		for room in self.getRoomObjects():

@@ -4,5 +4,5 @@ import sys, os
 def getLocation():
     encoding = sys.getfilesystemencoding()
     if hasattr(sys, "frozen"):
-        return os.path.dirname(sys.executable)
+        return os.path.basename(sys.executable)
     return __file__
