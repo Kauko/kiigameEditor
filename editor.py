@@ -55,7 +55,6 @@ class Editor(QtGui.QMainWindow):
 		self.saveAct = QtGui.QAction("Tallenna", self)
 		self.saveAct.triggered.connect(self.scenarioData.saveScenario)
 		self.exitAct = QtGui.QAction("Lopeta", self)
-		#TODO: Nice-to-have, ask for confirmation before quitting?
 		self.exitAct.triggered.connect(self.close)
 	
 	def createMenus(self):
@@ -661,6 +660,23 @@ class Editor(QtGui.QMainWindow):
 			widgetItem = ItemWidget(item, imagePath)
 			
 			self.middle_scene.addItem(widgetItem)
+	
+	# Override the normal closing event to ask if the user really wants to exit
+	def closeEvent(self, event):
+		# We need to define our own buttons to always get them in Finnish
+		msgBox = QtGui.QMessageBox()
+		msgBox.setText("Haluatko varmasti poistua?");
+		yesButton = msgBox.addButton("Kyllä", QtGui.QMessageBox.YesRole)
+		noButton = msgBox.addButton("En", QtGui.QMessageBox.NoRole);
+		msgBox.setDefaultButton(noButton)
+		msgBox.setWindowTitle("Poistu?")
+		
+		msgBox.exec_()
+
+		if msgBox.clickedButton() == yesButton:
+			event.accept()
+		elif msgBox.clickedButton() == noButton:
+			event.ignore()
 			
 	def getImageDir(self):
 		return self.scenarioData.dataDir
