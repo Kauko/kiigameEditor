@@ -217,7 +217,7 @@ class Editor(QtGui.QMainWindow):
 			return
 		self.createView(selected)
 		
-	def removeViewsButtonClicked(self):
+	def removeView(self):
 		# Remove from game data
 		selected = self.left_scene.currentItem()
 		self.scenarioData.removeView(selected.room)
@@ -244,7 +244,7 @@ class Editor(QtGui.QMainWindow):
 		self.updateSpaceTab()
 		self.drawRoomItems()
 		
-	def removeObjectsButtonClicked(self):
+	def removeObject(self):
 		# Remove from the room
 		selected = self.settingsWidget.currentObject
 		selected.parentView.removeObject(selected)
@@ -677,6 +677,40 @@ class Editor(QtGui.QMainWindow):
 			event.accept()
 		elif msgBox.clickedButton() == noButton:
 			event.ignore()
+	
+	# Ask confirmation when removing views
+	def removeViewsButtonClicked(self):
+		# We need to define our own buttons to always get them in Finnish
+		msgBox = QtGui.QMessageBox()
+		msgBox.setText("Haluatko varmasti poistaa näkymän?");
+		yesButton = msgBox.addButton("Kyllä", QtGui.QMessageBox.YesRole)
+		noButton = msgBox.addButton("En", QtGui.QMessageBox.NoRole);
+		msgBox.setDefaultButton(noButton)
+		msgBox.setWindowTitle("Poista?")
+		
+		msgBox.exec_()
+
+		if msgBox.clickedButton() == yesButton:
+			self.removeView()
+		elif msgBox.clickedButton() == noButton:
+			return
+	
+	# Ask confirmation when removing views
+	def removeObjectsButtonClicked(self):
+		# We need to define our own buttons to always get them in Finnish
+		msgBox = QtGui.QMessageBox()
+		msgBox.setText("Haluatko varmasti poistaa esineen?");
+		yesButton = msgBox.addButton("Kyllä", QtGui.QMessageBox.YesRole)
+		noButton = msgBox.addButton("En", QtGui.QMessageBox.NoRole);
+		msgBox.setDefaultButton(noButton)
+		msgBox.setWindowTitle("Poista?")
+		
+		msgBox.exec_()
+
+		if msgBox.clickedButton() == yesButton:
+			self.removeObject()
+		elif msgBox.clickedButton() == noButton:
+			return
 			
 	def getImageDir(self):
 		return self.scenarioData.dataDir
