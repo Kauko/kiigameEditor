@@ -592,6 +592,8 @@ class Editor(QtGui.QMainWindow):
 				
 				row += 1
 		self.text_scene.setSortingEnabled(True)
+		self.text_scene.setHorizontalHeaderItem(0, QtGui.QTableWidgetItem("Esineen nimi"))
+		self.text_scene.setHorizontalHeaderItem(1, QtGui.QTableWidgetItem("Teksteistä tehtynä"))
 	
 	# Click on a room in the main tab
 	def roomClicked(self):
