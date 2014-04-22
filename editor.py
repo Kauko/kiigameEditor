@@ -389,6 +389,8 @@ class Editor(QtGui.QMainWindow):
 				self.spaceItems.insert(index+1, self.spaceItems.pop(index))
 
 		self.updateSpaceTab()
+		
+		# TODO: Re-select the item that was moved
 
 	def onTabChanged(self, index):
 		# Main tab
@@ -1102,7 +1104,7 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 		self.parent.settingsWidget.displayOptions(selectedItem)
 		self.parent.setRemoveObjectsButtonDisabled()
 		self.parent.setRemoveViewsButtonDisabled()
-		self.disableItemsRoomInRoomsCombobox()
+		self.parent.disableItemsRoomInRoomsCombobox()
 		QtGui.QGraphicsItem.mousePressEvent(self, event)
 
 	def dragMoveEvent(self, event):
@@ -1120,6 +1122,9 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 	def dropEvent(self, event):
 		print("DROOOOP")
 		QtGui.QGraphicsItem.dropEvent(self, event)
+	
+	def getName(self):
+		return self.name
 
 if __name__ == '__main__':
 	from sys import argv, exit

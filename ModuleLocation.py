@@ -1,4 +1,4 @@
-import sys, os
+﻿import sys, os
 
 # Return module path taking into account possible frozen state
 def getLocation():
