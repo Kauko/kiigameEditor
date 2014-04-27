@@ -147,6 +147,7 @@ class Editor(QtGui.QMainWindow):
 		
 		# Combobox for putting item into another room
 		self.roomsCombobox = QtGui.QComboBox(self)
+		
 		self.roomsCombobox.setIconSize(QtCore.QSize(20,20))
 		self.roomsCombobox.currentIndexChanged.connect(self.roomsComboboxChanged)
 		self.changeRoomsLabel = QtGui.QLabel("Siirrä esine eri huoneeseen:")

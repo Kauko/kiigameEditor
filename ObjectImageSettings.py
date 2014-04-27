@@ -118,7 +118,7 @@ class ObjectImageSettings(QtGui.QWidget):
 			imagePath = self.gameImageObject.getRepresentingImage().absoluteImagePath
 			self.parent.setObjectImage(imagePath, self.image)
 		# Given gameImageObject may be None (no lockedImage, for example)
-		elif self.objectType in ("Door", "Container"):
+		elif self.objectType in ("Door", "Container", "Obstacle"):
 			imagePath = self.parent.editor.getPlaceholderImagePath(self.objectType)
 			
 		# Ask parent to actually draw the image
