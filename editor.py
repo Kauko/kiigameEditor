@@ -437,7 +437,6 @@ class Editor(QtGui.QMainWindow):
 		
 		placeholderImage = self.getPlaceholderImagePath(objectType)
 		
-		# Set placeholder image source
 		newObject.getRepresentingImage().setSource(placeholderImage)
 		
 		# Create new combobox item
@@ -767,6 +766,7 @@ class ItemWidget(QtGui.QListWidgetItem):
 		
 		itemName = imageObject.getName()
 		if not (itemName):
+			self.item
 			itemName = "%s ei ole nimeä" %(item.generalNameAdessive)
 		self.setText(itemName)
 		

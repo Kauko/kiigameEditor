@@ -789,6 +789,8 @@ class SettingsWidget(QtGui.QWidget):
 	# Text that comes after using an item
 	def changeUseText(self):
 		# TODO: Disable text field if no target is selected
+		
+			
 		self.currentObject.setUseText(self.useTextEdit.toPlainText())
 		
 	def changePickupText(self):
@@ -827,6 +829,7 @@ class SettingsWidget(QtGui.QWidget):
 	# Change the image of a gameobject
 	def changeObjectImage(self, imagePath, image=None, gameObject=None):
 		# If no image, a default image var will be used
+		# TODO: Copy the chosen image to the 'images' folder of the scenario?
 		self.currentObject.getRepresentingImage().setSource(imagePath)
 		self.setObjectImage(imagePath, image)
 		self.editor.updateSpaceTab()
@@ -954,6 +957,7 @@ class SettingsWidget(QtGui.QWidget):
 	def showAllTexts(self):
 		# TODO: Select the actual object
 		self.editor.tabWidget.setCurrentIndex(2)
+		#self.currentObject.
 		
 	def clearMusic(self):
 		self.currentObject.clearMusic()

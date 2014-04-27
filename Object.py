@@ -384,7 +384,13 @@ class Container(Object):
 		return list(filter((None).__ne__, images))
 		
 	def getRepresentingImage(self):
-		return self.emptyImage
+		if self.emptyImage == None:
+			return self.images[0]
+		else:
+			return self.emptyImage
+	
+	def setRepresentingImage(self, img):
+		self.emptyImage = img
 
 	# Get the image activated by the given item
 	def getUseImage(self, useItem):
@@ -634,7 +640,13 @@ class Door(Object):
 		return list(filter((None).__ne__, images))
 		
 	def getRepresentingImage(self):
-		return self.openImage
+		if self.openImage == None:
+			return self.images[0]
+		else:
+			return self.openImage
+	
+	def setRepresentingImage(self, img):
+		self.openImage = img
 
 	# Get the image activated by the given item
 	def getUseImage(self, useItem):
@@ -726,7 +738,13 @@ class Obstacle(Object):
 		return list(filter((None).__ne__, images))
 		
 	def getRepresentingImage(self):
-		return self.blockingImage
+		if self.blockingImage == None:
+			return self.images[0]
+		else:
+			return self.blockingImage
+	
+	def setRepresentingImage(self, img):
+		self.blockingImage = img
 
 	# Get the image activated by the given item
 	def getUseImage(self, useItem):
