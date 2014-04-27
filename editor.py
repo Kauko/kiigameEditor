@@ -419,7 +419,10 @@ class Editor(QtGui.QMainWindow):
 			self.drawTextItems
 			
 	def createObject(self, objectType):
-		selectedRoom = self.left_scene.selectedItems()[0]
+		try:
+			selectedRoom = self.left_scene.selectedItems()[0]
+		except IndexError:
+			selectedRoom = self.settingsWidget.currentObject
 		
 		if (objectType == "object"):
 			newObject = selectedRoom.room.addObject()
