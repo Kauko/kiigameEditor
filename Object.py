@@ -47,6 +47,7 @@ class Object(object):
 				self.id = Object.createUniqueId(objectId)
 			else:
 				self.id = Object.createUniqueId()
+			
 
 		# JSONImage doesn't need an image or an ID check because
 		# images can have the same ID as their owners
@@ -385,9 +386,8 @@ class Container(Object):
 		
 	def getRepresentingImage(self):
 		if self.emptyImage == None:
-			return self.images[0]
-		else:
-			return self.emptyImage
+			self.emptyImage = self.images[0]
+		return self.emptyImage
 	
 	def setRepresentingImage(self, img):
 		self.emptyImage = img
@@ -641,9 +641,8 @@ class Door(Object):
 		
 	def getRepresentingImage(self):
 		if self.openImage == None:
-			return self.images[0]
-		else:
-			return self.openImage
+			self.openImage = self.images[0]
+		return self.openImage
 	
 	def setRepresentingImage(self, img):
 		self.openImage = img
@@ -739,9 +738,8 @@ class Obstacle(Object):
 		
 	def getRepresentingImage(self):
 		if self.blockingImage == None:
-			return self.images[0]
-		else:
-			return self.blockingImage
+			self.blockingImage = self.images[0]
+		return self.blockingImage
 	
 	def setRepresentingImage(self, img):
 		self.blockingImage = img

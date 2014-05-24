@@ -101,6 +101,8 @@ class ObjectImageSettings(QtGui.QWidget):
 	def changeImage(self, imagePath):
 		self.parent.setObjectImage(imagePath, self.image)
 		self.gameImageObject.setSource(imagePath)
+		self.parent.updateParent()
+		self.parent.editor.updateSpaceTab()
 		
 	# Set the whole widget's enabled status
 	def setDisabled(self, isDisabled):
@@ -120,6 +122,7 @@ class ObjectImageSettings(QtGui.QWidget):
 		# Given gameImageObject may be None (no lockedImage, for example)
 		elif self.objectType in ("Door", "Container", "Obstacle"):
 			imagePath = self.parent.editor.getPlaceholderImagePath(self.objectType)
+			self.parent.setObjectImage(imagePath, self.image)
 			
 		# Ask parent to actually draw the image
 		self.parent.setObjectImage(imagePath, self.image)

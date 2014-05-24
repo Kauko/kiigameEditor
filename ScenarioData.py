@@ -184,30 +184,30 @@ class ScenarioData(object):
 			scenarioImages.append(misc)
 		
 		# Bundle everything together
-		#scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
-		#scenarioChildren = self.__createLayerJSON__(scenarioAttrs, scenarioImages, "Stage")
+		scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
+		scenarioChildren = self.__createLayerJSON__(scenarioAttrs, scenarioImages, "Stage")
 		
 		#These were unused
-		#textsJSON = json.dumps(self.texts, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
-		#imagesJSON = json.dumps(scenarioChildren, sort_keys=True, indent=4, separators=(',', ': '))
-		#objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
+		textsJSON = json.dumps(self.texts, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
+		imagesJSON = json.dumps(scenarioChildren, sort_keys=True, indent=4, separators=(',', ': '))
+		objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
 		
 		#print(textsJSON)
 		#print(imagesJSON)
 		#print(objectsJSON)
 		
 		# Save into file
-		#f = open(self.dataDir + "texts_lol.json", "w", encoding='utf-8')
-		#f.write(textsJSON)
-		#f.close()
+		f = open(self.dataDir + "texts.json", "w", encoding='utf-8')
+		f.write(textsJSON)
+		f.close()
 
-		#f = open(self.dataDir + "images.json", "w")
-		#f.write(imagesJSON)
-		#f.close()
+		f = open(self.dataDir + "images.json", "w")
+		f.write(imagesJSON)
+		f.close()
 		
-		#f = open(self.dataDir + "objects.json", "w")
-		#f.write(objectsJSON)
-		#f.close()
+		f = open(self.dataDir + "objects.json", "w")
+		f.write(objectsJSON)
+		f.close()
 		
 	# Game object layers
 	def __createLayerJSON__(self, attrs, children, className="Layer"):

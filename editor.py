@@ -766,7 +766,7 @@ class ItemWidget(QtGui.QListWidgetItem):
 		self.setSizeHint(QtCore.QSize(100,100))
 		
 		self.item = item
-		imageObject = item.getRepresentingImage().getRepresentingImage()
+		imageObject = item.getRepresentingImage()
 		
 		itemName = imageObject.getName()
 		if not (itemName):

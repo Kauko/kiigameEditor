@@ -832,13 +832,14 @@ class SettingsWidget(QtGui.QWidget):
 		# TODO: Copy the chosen image to the 'images' folder of the scenario?
 		self.currentObject.getRepresentingImage().setSource(imagePath)
 		self.setObjectImage(imagePath, image)
-		self.editor.updateSpaceTab()
 		print(imagePath)
 		
 		if not (gameObject):
 			gameObject = self.currentObject
 		
+		self.editor.drawRoomItems()
 		self.updateParent()
+		self.editor.updateSpaceTab()
 		
 	# Change music
 	def changeMusic(self, imagePath):
