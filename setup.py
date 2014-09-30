@@ -2,17 +2,19 @@ from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but it might need
 # fine tuning.
-buildOptions = dict(packages = [], excludes = [])
+buildOptions = dict(packages=[], excludes=[])
 
 import sys
-base = 'Win32GUI' if sys.platform=='win32' else None
+base = 'Win32GUI' if sys.platform == 'win32' else None
 
 executables = [
-    Executable('editor.py', base = base, targetName = 'Kiigame Editor.exe', icon = "icon.ico")
+    Executable(
+        'editor.py', base=base,
+        targetName='Kiigame Editor.exe', icon="icon.ico")
 ]
 
 setup(name='Kiigame - Editor',
-      version = '0.3',
-      description = '',
-      options = dict(build_exe = buildOptions),
-      executables = executables)
+      version='0.3',
+      description='',
+      options=dict(build_exe=buildOptions),
+      executables=executables)
