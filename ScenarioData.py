@@ -16,7 +16,9 @@ class ScenarioData(object):
         self.endViewList = []
         self.menuList = []
         
-        self.dataDir = "%s/%s/%s/" %(dirname(abspath(ModuleLocation.getLocation())), "gamedata", scenarioName)
+        self.dataDir = "%s/%s/%s/"\
+            % (dirname(abspath(ModuleLocation.getLocation())),
+                "gamedata", scenarioName)
         
     # Load and parse game data files
     def loadScenario(self):
@@ -81,7 +83,10 @@ class ScenarioData(object):
                     try:
                         jsonObject = objects[itemId]
                     except KeyError:
-                        print("Warning: Could not find object.json object for '%s' (object_name -> '%s')" %(item["attrs"]["id"], itemId))
+                        print(
+                            "Warning: Could not find object.json object for\
+                            '%s' (object_name -> '%s')"
+                            % (item["attrs"]["id"], itemId))
                     
                 elif (itemId in objects):
                     jsonObject = objects[itemId]
@@ -101,12 +106,13 @@ class ScenarioData(object):
                 
                 createdObjects[itemId]["image"].append(jsonImage)
 
-            # Compose the final dict key and values             
+            # Compose the final dict key and values
             objectsByCat[objectCategory][objectId] = {}
             objectsByCat[objectCategory][objectId]["image"] = createdObjects
             objectsByCat[objectCategory][objectId]["object"] = layerObject
             objectsByCat[objectCategory][objectId]["attrs"] = child["attrs"]
-            objectsByCat[objectCategory][objectId]["className"] = child["className"]
+            objectsByCat[objectCategory][objectId]["className"] =\
+                child["className"]
             
         #import pprint
         #pp = pprint.PrettyPrinter(indent=4)
@@ -147,7 +153,8 @@ class ScenarioData(object):
         scenarioImages = []
         
         # Go through views
-        for view in self.roomList + self.sequenceList + [self.startView] + self.endViewList + self.menuList + self.customObjectList:
+        for view in self.roomList + self.sequenceList + [self.startView] +\
+                self.endViewList + self.menuList + self.customObjectList:
             viewChildren = []
             
             # Contents for objects.json from view
@@ -160,16 +167,26 @@ class ScenarioData(object):
                 
                 # Go through images inside objects
                 for childImage in viewChild.images:
-                    viewChildren.append(self.__createLayerChildJSON__(childImage.imageAttributes, childImage.getClassname()))
+                    viewChildren.append(
+                        self.__createLayerChildJSON__(
+                            childImage.imageAttributes,
+                            childImage.getClassname()))
                     
                     # Contents for objects.json from image
                     if ("object_name" in childImage.imageAttributes):
-                        scenarioObjects[childImage.imageAttributes["object_name"]] = childImage.objectAttributes["object"]
+                        scenarioObjects[
+                            childImage.imageAttributes["object_name"]] =\
+                            childImage.objectAttributes["object"]
                         
                 if (type(viewChild) == Object.JSONImage):
-                    viewChildren.append(self.__createLayerChildJSON__(viewChild.imageAttributes, viewChild.getClassname()))
+                    viewChildren.append(
+                        self.__createLayerChildJSON__(
+                            viewChild.imageAttributes, viewChild.getClassname()
+                            )
+                        )
                     
-            layerJSON = self.__createLayerJSON__(view.attrs, viewChildren, view.classname)
+            layerJSON = self.__createLayerJSON__(
+                view.attrs, viewChildren, view.classname)
             scenarioImages.append(layerJSON)
             
         # Go through self.texts and add modified texts from objects
@@ -185,12 +202,17 @@ class ScenarioData(object):
         
         # Bundle everything together
         scenarioAttrs = {"id": "Stage", "width": 981, "height": 643}
-        scenarioChildren = self.__createLayerJSON__(scenarioAttrs, scenarioImages, "Stage")
+        scenarioChildren = self.__createLayerJSON__(
+            scenarioAttrs, scenarioImages, "Stage")
         
         #These were unused
-        textsJSON = json.dumps(self.texts, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
-        imagesJSON = json.dumps(scenarioChildren, sort_keys=True, indent=4, separators=(',', ': '))
-        objectsJSON = json.dumps(scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
+        textsJSON = json.dumps(
+            self.texts, ensure_ascii=False, sort_keys=True, indent=4,
+            separators=(',', ': '))
+        imagesJSON = json.dumps(
+            scenarioChildren, sort_keys=True, indent=4, separators=(',', ': '))
+        objectsJSON = json.dumps(
+            scenarioObjects, sort_keys=True, indent=4, separators=(',', ': '))
         
         #print(textsJSON)
         #print(imagesJSON)
@@ -306,10 +328,13 @@ class ScenarioData(object):
         
         for room in self.roomList:
             for obj in room.getItems():
-                if (obj.__class__.__name__ in rightTypes and obj.getClassname() != "Text"):
+                if (obj.__class__.__name__ in rightTypes and
+                        obj.getClassname() != "Text"):
+
                         retObjects.append(obj)
                         imgCount += len(obj.getImages())
-                        if (obj.getRepresentingImage().imageAttributes["category"] == "secret"):
+                        if (obj.getRepresentingImage()
+                                .imageAttributes["category"] == "secret"):
                             secretCount += 1
                     
         return [retObjects, imgCount, secretCount]
@@ -320,7 +345,7 @@ class ScenarioData(object):
                 return menu
                 
     def deleteObject(self, objectId):
-        for obj in self.objectList: 
+        for obj in self.objectList:
             if obj.id == objectId:
                 self.objectList.remove(obj)
 
@@ -340,7 +365,8 @@ class ScenarioData(object):
         return newView
         
     def addSequence(self, sequenceId, sequenceAttributes, sequenceImages):
-        newView = View.Sequence(self, sequenceId, sequenceAttributes, sequenceImages)
+        newView = View.Sequence(
+            self, sequenceId, sequenceAttributes, sequenceImages)
         self.sequenceList.append(newView)
         return newView
         
@@ -386,4 +412,3 @@ if (__name__ == "__main__"):
     sc = ScenarioData()
     sc.loadScenario()
     sc.saveScenario()
-

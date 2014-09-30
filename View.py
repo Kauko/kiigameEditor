@@ -18,12 +18,14 @@ class View(object):
         while (True):
             if not (newId in View.usedIds):
                 if (failed):
-                    print("Warning: Duplicate view ID '%s', new ID set as '%s'" %(originalId, newId))
+                    print(
+                        "Warning: Duplicate view ID '%s', new ID set as '%s'"
+                        % (originalId, newId))
                 View.usedIds.append(newId)
                 return newId
             failCount += 1
             failed = True
-            newId = "%s_duplicate_%i" %(originalId, failCount)
+            newId = "%s_duplicate_%i" % (originalId, failCount)
             
     def __init__(self, scenarioData, viewAttributes, viewId=None):
         if (viewId):
@@ -41,7 +43,7 @@ class View(object):
         else:
             self.texts = {}
         
-        self.placeholderImage = None # If no representingImage, use this
+        self.placeholderImage = None  # If no representingImage, use this
         
         self.nameable = True
         
@@ -113,16 +115,31 @@ class Menu(View):
 # Game cutscenes
 class Sequence(View):
     # Generic attributes for sequences
-    sequenceAttributes = {'attrs': {'id': '', 'object_name': '', 'visible': False, 'category': 'sequence'}, 'object': {'music': '', 'images': {}, 'category': 'sequence'}, 'className': 'Layer'}
+    sequenceAttributes = {
+        'attrs': {
+            'id': '',
+            'object_name': '',
+            'visible': False,
+            'category': 'sequence'
+        },
+        'object': {
+            'music': '',
+            'images': {},
+            'category': 'sequence'
+        },
+        'className': 'Layer'
+    }
     
     generalName = "Välianimaatio"
     generalNameAdessive = "Välianimaatiolla"
     
-    def __init__(self, scenarioData, sequenceId, sequenceAttributes, sequenceImages):
+    def __init__(self, scenarioData, sequenceId,
+                 sequenceAttributes, sequenceImages):
         if not (sequenceAttributes):
             sequenceAttributes = Sequence.sequenceAttributes
             
-        super(Sequence, self).__init__(scenarioData, sequenceAttributes, sequenceId)
+        super(Sequence, self).\
+            __init__(scenarioData, sequenceAttributes, sequenceId)
         
         self.sequenceImages = []
         
@@ -179,7 +196,8 @@ class Sequence(View):
     # Create new item
     def addImage(self, objectAttributes=None, imageAttributes=None):
         imageId = self.id + "_image"
-        newObject = Object.SequenceImage(self, objectAttributes, imageAttributes, imageId)
+        newObject = Object.SequenceImage(
+            self, objectAttributes, imageAttributes, imageId)
         self.sequenceImages.append(newObject)
         
         self.createImageEntry(newObject.id)
@@ -189,7 +207,11 @@ class Sequence(View):
     # Create a new image entry to object
     def createImageEntry(self, imageId):
         images = self.object["images"]
-        images[str(len(images) + 1)] = {'show_time': 0, 'do_fade': False, 'id': imageId}
+        images[str(len(images) + 1)] = {
+            'show_time': 0,
+            'do_fade': False,
+            'id': imageId
+        }
         
     # Remove an image entry from objects
     def removeImageEntry(self, index):
@@ -234,15 +256,17 @@ class Start(View):
             
             # Create objects according to its category
             if (imageId == "begining"):
-                self.beginingImage = Object.BeginingImage(self, imageAttributes, objectAttributes)
+                self.beginingImage = Object.BeginingImage(
+                    self, imageAttributes, objectAttributes)
             if (imageId == "start"):
-                self.background = Object.JSONImage(self, imageAttributes, objectAttributes)
+                self.background = Object.JSONImage(
+                    self, imageAttributes, objectAttributes)
                 
     def postInit(self, getGameObject):
         # Create menu items
         menu = getGameObject("menu", self.object["menu"])
         try:
-            for imageId,action in menu.object["items"].items():
+            for imageId, action in menu.object["items"].items():
                 print("post", menu.object["items"].items())
                 if (action == "start_game"):
                     self.startButton = menu.getItemById(imageId)
@@ -254,7 +278,9 @@ class Start(View):
             print("NoneType-error")
                 
     def getChildren(self):
-        return [self.background, self.startButton, self.creditsButton, self.emptyButton, self.beginingImage]
+        return [
+            self.background, self.startButton, self.creditsButton,
+            self.emptyButton, self.beginingImage]
 
     def getRepresentingImage(self):
         return self.background
@@ -265,7 +291,21 @@ class Start(View):
 # End menu
 class End(View):
     # Generic attributes for ends
-    endAttributes = {'object': {'music': '', 'sequence': '', 'category': 'end', 'menu': ''}, 'className': 'Layer', 'attrs': {'category': 'end', 'id': '', 'visible': False, 'object_name': ''}}
+    endAttributes = {
+        'object': {
+            'music': '',
+            'sequence': '',
+            'category': 'end',
+            'menu': ''
+        },
+        'className': 'Layer',
+        'attrs': {
+            'category': 'end',
+            'id': '',
+            'visible': False,
+            'object_name': ''
+        }
+    }
     
     generalName = "Pelin loppukuva"
     generalNameAdessive = "Loppukuvalla"
@@ -289,13 +329,16 @@ class End(View):
             objectAttributes = endImages[imageId]
             imageId = imageAttributes["id"]
             
-            self.endImages.append(Object.JSONImage(self, imageAttributes, objectAttributes))
+            self.endImages.append(
+                Object.JSONImage(
+                    self, imageAttributes, objectAttributes))
             
     def postInit(self, getGameObject):
         # Create text item
         # TODO: Connect texts and ends in kiigame to get rid of hard coded ID
         try:
-            self.endText = getGameObject("custom", "end_texts").getRepresentingImage()
+            self.endText = getGameObject(
+                "custom", "end_texts").getRepresentingImage()
         except:
             print("NoneType-error")
         
@@ -320,7 +363,19 @@ class End(View):
 # Any game room
 class Room(View):
     # Generic attributes for rooms
-    roomAttributes = {'className': 'Layer', 'attrs': {'object_name': '', 'id': '', 'visible': False, 'category': 'room', 'start': False}, 'object': {'music': ''}}
+    roomAttributes = {
+        'className': 'Layer',
+        'attrs': {
+            'object_name': '',
+            'id': '',
+            'visible': False,
+            'category': 'room',
+            'start': False
+        },
+        'object': {
+            'music': ''
+        }
+    }
     
     generalName = "Huone"
     generalNameAdessive = "Huoneella"
@@ -347,20 +402,27 @@ class Room(View):
             
             # Create objects according to their category
             if (imageAttributes["className"] == "Text"):
-                self.objectList.append(Object.Text(self, images[0], imageAttributes, imageId))
+                self.objectList.append(
+                    Object.Text(self, images[0], imageAttributes, imageId))
             elif (imageCategory == "room_background"):
-                self.background = Object.JSONImage(self, images[0], imageAttributes)
+                self.background = Object.JSONImage(
+                    self, images[0], imageAttributes)
             # TODO: Secret items - fix it in kiigame first
             elif (imageCategory == "item"):
-                self.objectList.append(Object.Item(self, imageId, images, imageAttributes))
+                self.objectList.append(
+                    Object.Item(self, imageId, images, imageAttributes))
             elif (imageCategory == "container"):
-                self.objectList.append(Object.Container(self, imageId, images, imageAttributes))
+                self.objectList.append(
+                    Object.Container(self, imageId, images, imageAttributes))
             elif (imageCategory == "door"):
-                self.objectList.append(Object.Door(self, imageId, images, imageAttributes))
+                self.objectList.append(
+                    Object.Door(self, imageId, images, imageAttributes))
             elif (imageCategory == "obstacle"):
-                self.objectList.append(Object.Obstacle(self, imageId, images, imageAttributes))
+                self.objectList.append(
+                    Object.Obstacle(self, imageId, images, imageAttributes))
             else:
-                self.objectList.append(Object.Object(self, imageId, images, imageAttributes))
+                self.objectList.append(
+                    Object.Object(self, imageId, images, imageAttributes))
                 
     def deleteChild(self, objectId):
         for obj in self.objectList:
@@ -385,14 +447,16 @@ class Room(View):
     # Create new generic object
     def addObject(self, objectAttributes=None, imageAttributes=None):
         imageId = self.id + "_object"
-        newObject = Object.Object(self, imageId, imageAttributes, objectAttributes)
+        newObject = Object.Object(
+            self, imageId, imageAttributes, objectAttributes)
         self.objectList.append(newObject)
         return newObject
         
     # Create new item
     def addItem(self, objectAttributes=None, imageAttributes=None):
         imageId = self.id + "_item"
-        newObject = Object.Item(self, imageId, imageAttributes, objectAttributes)
+        newObject = Object.Item(
+            self, imageId, imageAttributes, objectAttributes)
         self.objectList.append(newObject)
         return newObject
     
@@ -403,21 +467,24 @@ class Room(View):
     # Create new container
     def addContainer(self, objectAttributes=None, imageAttributes=None):
         imageId = self.id + "_container"
-        newObject = Object.Container(self, imageId, imageAttributes, objectAttributes)
+        newObject = Object.Container(
+            self, imageId, imageAttributes, objectAttributes)
         self.objectList.append(newObject)
         return newObject
         
     # Create new door
     def addDoor(self, objectAttributes=None, imageAttributes=None):
         imageId = self.id + "_door"
-        newObject = Object.Door(self, imageId, imageAttributes, objectAttributes)
+        newObject = Object.Door(
+            self, imageId, imageAttributes, objectAttributes)
         self.objectList.append(newObject)
         return newObject
         
     # Create new obstacle
     def addObstacle(self, objectAttributes=None, imageAttributes=None):
         imageId = self.id + "_container"
-        newObject = Object.Obstacle(self, imageId, imageAttributes, objectAttributes)
+        newObject = Object.Obstacle(
+            self, imageId, imageAttributes, objectAttributes)
         self.objectList.append(newObject)
         return newObject
         
@@ -442,9 +509,11 @@ class Custom(View):
             imageAttributes = viewImages[imageId]
             
             if (imageAttributes["className"] == "Text"):
-                newObject = Object.Text(self, images[0], imageAttributes, imageId)
+                newObject = Object.Text(
+                    self, images[0], imageAttributes, imageId)
             else:
-                newObject = Object.Object(self, imageId, images, imageAttributes)
+                newObject = Object.Object(
+                    self, imageId, images, imageAttributes)
             self.objectList.append(newObject)
                 
     def deleteChild(self, objectId):
@@ -456,7 +525,7 @@ class Custom(View):
         return self.objectList
         
     def getRepresentingImage(self):
-        return self.objectList[0]#.getRepresentingImage()
+        return self.objectList[0]  # .getRepresentingImage()
         
     def getItems(self):
         return self.objectList

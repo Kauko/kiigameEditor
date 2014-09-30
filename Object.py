@@ -23,13 +23,15 @@ class Object(object):
         while (True):
             if not (newId in Object.usedIds):
                 if (failed):
-                    print("Warning: Duplicate object ID '%s', new ID set as '%s'" %(originalId, newId))
+                    print(
+                        "Warning: Duplicate object ID '%s', new ID set as '%s'"
+                        % (originalId, newId))
                 Object.usedIds.append(newId)
                 return newId
                 
             failCount += 1
             failed = True
-            newId = "%s_duplicate_%i" %(originalId, failCount)
+            newId = "%s_duplicate_%i" % (originalId, failCount)
             
     def __init__(self, parentView, objectId, images, objectAttributes):
         if not (objectAttributes):
@@ -42,7 +44,8 @@ class Object(object):
 
         if not (isinstance(self, JSONImage)):
             for image in images:
-                self.images.append(JSONImage(parentView, image, objectAttributes))
+                self.images.append(
+                    JSONImage(parentView, image, objectAttributes))
             if (objectId):
                 self.id = Object.createUniqueId(objectId)
             else:
@@ -57,7 +60,7 @@ class Object(object):
         i = 0
         for image in self.images:
             i+=1
-            if(image.getID()==""):
+            if(image.getID() == ""):
                 image.setID(self.id + "_" + str(i))
             
         self.parentView = parentView
@@ -67,7 +70,9 @@ class Object(object):
             self.texts = parentView.scenarioData.texts[self.id]
         except KeyError:
             self.texts = {}
-            print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
+            print(
+                "Warning: Could not find texts.json entry for object '%s'"
+                % (self.id))
             
     # Fill in attributes from objects that were missing during __init__
     # Every item needs to implement this
@@ -158,7 +163,14 @@ class Item(Object):
     generalNameAdessive = "Käyttöesineellä"
     
     # Generic attributes for items
-    objectAttributes = {'className': 'Image', 'object': {'consume': False, 'category': 'item', 'outcome': '', 'trigger': ''}}
+    objectAttributes = {
+        'className': 'Image',
+        'object': {
+            'consume': False,
+            'category': 'item',
+            'outcome': '',
+            'trigger': ''}
+        }
     
     def __init__(self, parentView, itemId, images, objectAttributes):
         if not (objectAttributes):
@@ -166,25 +178,28 @@ class Item(Object):
         if not (images):
             images = [JSONImage.imageAttributes]
             
-        super(Item, self).__init__(parentView, itemId, images, objectAttributes)
+        super(Item, self).\
+            __init__(parentView, itemId, images, objectAttributes)
         
         # Handle these in postInit
-        self.trigger = None # Use on object
+        self.trigger = None  # Use on object
         self.outcome = None
         
-        self.target = None # Can be any other object
+        self.target = None  # Can be any other object
         self.goesInto = None
         self.comesFrom = None
         
     def postInit(self, getGameObject):
         try:
-            self.trigger = getGameObject("object", self.objectAttributes["object"]["trigger"])
+            self.trigger = getGameObject(
+                "object", self.objectAttributes["object"]["trigger"])
             self.target = self.trigger
         except KeyError:
             pass
             
         try:
-            self.outcome = getGameObject("object", self.objectAttributes["object"]["outcome"])
+            self.outcome = getGameObject(
+                "object", self.objectAttributes["object"]["outcome"])
         except KeyError:
             pass
             
@@ -318,7 +333,19 @@ class Container(Object):
     generalNameAdessive = "Säiliöllä"
     
     # Generic attributes for containers
-    objectAttributes = {'className': 'Image', 'object': {'locked': False, 'full_image': '', 'state': 'empty', 'in': '', 'empty_image': '', 'out': '', 'category': 'container', 'blocked': False}}
+    objectAttributes = {
+        'className': 'Image',
+        'object': {
+            'locked': False,
+            'full_image': '',
+            'state': 'empty',
+            'in': '',
+            'empty_image': '',
+            'out': '',
+            'category': 'container',
+            'blocked': False
+        }
+    }
     
     def __init__(self, parentView, itemId, images, objectAttributes):
         if not (objectAttributes):
@@ -326,19 +353,23 @@ class Container(Object):
         if not (images):
             images = [JSONImage.imageAttributes]
             
-        super(Container, self).__init__(parentView, itemId, images, objectAttributes)
+        super(Container, self).\
+            __init__(parentView, itemId, images, objectAttributes)
         
         # Create the available image objects
         try:
-            self.emptyImage = self.getImage(objectAttributes["object"]["empty_image"])
+            self.emptyImage = self.getImage(
+                objectAttributes["object"]["empty_image"])
         except KeyError:
             self.emptyImage = None
         try:
-            self.lockedImage = self.getImage(objectAttributes["object"]["locked_image"])
+            self.lockedImage = self.getImage(
+                objectAttributes["object"]["locked_image"])
         except KeyError:
             self.lockedImage = None
         try:
-            self.fullImage = self.getImage(objectAttributes["object"]["full_image"])
+            self.fullImage = self.getImage(
+                objectAttributes["object"]["full_image"])
         except KeyError:
             self.fullImage = None
             
@@ -346,15 +377,20 @@ class Container(Object):
         
         try:
             if (self.emptyImage):
-                self.texts.update(parentView.scenarioData.texts[self.emptyImage.id])
+                self.texts.update(
+                    parentView.scenarioData.texts[self.emptyImage.id])
             
             if (self.lockedImage):
-                self.texts.update(parentView.scenarioData.texts[self.lockedImage.id])
+                self.texts.update(
+                    parentView.scenarioData.texts[self.lockedImage.id])
                 
             if (self.fullImage):
-                self.texts.update(parentView.scenarioData.texts[self.fullImage.id])
+                self.texts.update(
+                    parentView.scenarioData.texts[self.fullImage.id])
         except KeyError:
-            print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
+            print(
+                "Warning: Could not find texts.json entry for object '%s'"
+                % (self.id))
             
         # Handle these in postInit
         self.key = None
@@ -363,19 +399,22 @@ class Container(Object):
         
     def postInit(self, getGameObject):
         try:
-            self.setKey(getGameObject("object", self.objectAttributes["object"]["key"]))
+            self.setKey(getGameObject(
+                "object", self.objectAttributes["object"]["key"]))
 
         except KeyError:
             pass
 
         try:
-            self.inItem = getGameObject("object", self.objectAttributes["object"]["in"])
+            self.inItem = getGameObject(
+                "object", self.objectAttributes["object"]["in"])
             self.inItem.setGoesInto(self)
         except KeyError:
             pass
             
         try:
-            self.outItem = getGameObject("object", self.objectAttributes["object"]["out"])
+            self.outItem = getGameObject(
+                "object", self.objectAttributes["object"]["out"])
             self.outItem.setComesFrom(self)
         except KeyError:
             pass
@@ -385,7 +424,7 @@ class Container(Object):
         return list(filter((None).__ne__, images))
         
     def getRepresentingImage(self):
-        if self.emptyImage == None:
+        if self.emptyImage is None:
             self.emptyImage = self.images[0]
         return self.emptyImage
     
@@ -404,10 +443,13 @@ class Container(Object):
     # Returns True if container is locked, otherwise False
     def isLocked(self):
         try:
-            if (self.objectAttributes["object"]["locked"] == True):
+            if (self.objectAttributes["object"]["locked"] is True):
                 return True
         except KeyError:
-            print("Warning: Attribute 'locked' not defined for container object '%s'" %(self.id))
+            print(
+                "Warning: Attribute 'locked' not defined for\
+                 container object '%s'"
+                % (self.id))
         return False
 
     def setIsLocked(self, isLocked):
@@ -476,7 +518,8 @@ class Container(Object):
             self.key = None
             
         if (setLocked):
-            imageObject = JSONImage(self.parentView, None, self.objectAttributes, imageId=self.id)
+            imageObject = JSONImage(
+                self.parentView, None, self.objectAttributes, imageId=self.id)
             if (imagePath):
                 imageObject.setSource(imagePath)
             # TODO: Put other attributes here too (?)
@@ -516,7 +559,17 @@ class Door(Object):
     generalNameAdessive = "Kulkureitillä"
     
     # Generic attributes for doors
-    objectAttributes = {'className': 'Image', 'object': {'category': '', 'state': 'open', 'locked': False, 'transition': '', 'blocked': False, 'open_image': ''}}
+    objectAttributes = {
+        'className': 'Image',
+        'object': {
+            'category': '',
+            'state': 'open',
+            'locked': False,
+            'transition': '',
+            'blocked': False,
+            'open_image': ''
+        }
+    }
     
     def __init__(self, parentView, itemId, images, objectAttributes):
         if not (objectAttributes):
@@ -524,23 +577,28 @@ class Door(Object):
         if not (images):
             images = [JSONImage.imageAttributes]
             
-        super(Door, self).__init__(parentView, itemId, images, objectAttributes)
+        super(Door, self).\
+            __init__(parentView, itemId, images, objectAttributes)
         
         # Create the available image objects
         try:
-            self.closedImage = self.getImage(objectAttributes["object"]["closed_image"])
+            self.closedImage = self.getImage(
+                objectAttributes["object"]["closed_image"])
         except KeyError:
             self.closedImage = None
         try:
-            self.lockedImage = self.getImage(objectAttributes["object"]["locked_image"])
+            self.lockedImage = self.getImage(
+                objectAttributes["object"]["locked_image"])
         except KeyError:
             self.lockedImage = None
         try:
-            self.openImage = self.getImage(objectAttributes["object"]["open_image"])
+            self.openImage = self.getImage(
+                objectAttributes["object"]["open_image"])
         except KeyError:
             self.openImage = None
         try:
-            self.blockedImage = self.getImage(objectAttributes["object"]["blocked_image"])
+            self.blockedImage = self.getImage(
+                objectAttributes["object"]["blocked_image"])
         except KeyError:
             self.blockedImage = None
             
@@ -548,18 +606,24 @@ class Door(Object):
         
         try:
             if (self.closedImage):
-                self.texts.update(parentView.scenarioData.texts[self.closedImage.id])
+                self.texts.update(
+                    parentView.scenarioData.texts[self.closedImage.id])
             
             if (self.lockedImage):
-                self.texts.update(parentView.scenarioData.texts[self.lockedImage.id])
+                self.texts.update(
+                    parentView.scenarioData.texts[self.lockedImage.id])
                 
             if (self.openImage):
-                self.texts.update(parentView.scenarioData.texts[self.openImage.id])
+                self.texts.update(
+                    parentView.scenarioData.texts[self.openImage.id])
                 
             if (self.blockedImage):
-                self.texts.update(parentView.scenarioData.texts[self.blockedImage.id])
+                self.texts.update(
+                    parentView.scenarioData.texts[self.blockedImage.id])
         except KeyError:
-            print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
+            print(
+                "Warning: Could not find texts.json entry for object '%s'"
+                % (self.id))
             
         # Handle these in postInit
         self.key = None
@@ -567,12 +631,15 @@ class Door(Object):
         
     def postInit(self, getGameObject):
         try:
-            self.setKey(getGameObject("object", self.objectAttributes["object"]["key"]))
+            self.setKey(
+                getGameObject(
+                    "object", self.objectAttributes["object"]["key"]))
         except KeyError:
             pass
             
         try:
-            self.transition = getGameObject("room", self.objectAttributes["object"]["transition"])
+            self.transition = getGameObject(
+                "room", self.objectAttributes["object"]["transition"])
         except KeyError:
             pass
         
@@ -584,10 +651,11 @@ class Door(Object):
             
         if (setLocked):
             # Create locked image
-            imageObject = JSONImage(self.parentView, None, self.objectAttributes, imageId=self.id)
+            imageObject = JSONImage(
+                self.parentView, None, self.objectAttributes, imageId=self.id)
             if (imagePath):
                 imageObject.setSource(imagePath)
-            # TODO: Put other attributes here too   
+            # TODO: Put other attributes here too
             
             self.images.append(imageObject)
             self.lockedImage = imageObject
@@ -608,7 +676,7 @@ class Door(Object):
                 
             try:
                 self.objectAttributes["object"]["locked_image"]
-            except KeyError: 
+            except KeyError:
                 pass
                 
             self.lockedImage = None
@@ -618,7 +686,8 @@ class Door(Object):
     # If closed, add closed image. If not closed, remove closed image
     def setClosed(self, setClosed):
         if (setClosed):
-            imageObject = JSONImage(self.parentView, None, self.objectAttributes, imageId=self.id)
+            imageObject = JSONImage(
+                self.parentView, None, self.objectAttributes, imageId=self.id)
             self.images.append(imageObject)
             self.closedImage = imageObject
             
@@ -636,11 +705,16 @@ class Door(Object):
             self.closedImage = None
             
     def getImages(self):
-        images = [self.closedImage, self.lockedImage, self.openImage, self.blockedImage]
+        images = [
+            self.closedImage,
+            self.lockedImage,
+            self.openImage,
+            self.blockedImage
+        ]
         return list(filter((None).__ne__, images))
         
     def getRepresentingImage(self):
-        if self.openImage == None:
+        if self.openImage is None:
             self.openImage = self.images[0]
         return self.openImage
     
@@ -659,10 +733,12 @@ class Door(Object):
     # Returns True if door is locked, otherwise False
     def isLocked(self):
         try:
-            if (self.objectAttributes["object"]["locked"] == True):
+            if (self.objectAttributes["object"]["locked"] is True):
                 return True
         except KeyError:
-            print("Warning: Attribute 'locked' not defined for door object '%s'" %(self.id))
+            print(
+                "Warning: Attribute 'locked' not defined for door object '%s'"
+                % (self.id))
         return False
 
     def setIsLocked(self, isLocked):
@@ -683,7 +759,17 @@ class Obstacle(Object):
     generalNameAdessive = "Esteellä"
     
     # Generic attributes for obstacles
-    objectAttributes = {'className': 'Image', 'object': {'related': [], 'target': '', 'trigger': '', 'blocking_image': '', 'category': 'obstacle', 'blocking': True}}
+    objectAttributes = {
+        'className': 'Image',
+        'object': {
+            'related': [],
+            'target': '',
+            'trigger': '',
+            'blocking_image': '',
+            'category': 'obstacle',
+            'blocking': True
+            }
+        }
     
     def __init__(self, parentView, itemId, images, objectAttributes):
         if not (objectAttributes):
@@ -691,16 +777,19 @@ class Obstacle(Object):
         if not (images):
             images = [JSONImage.imageAttributes]
             
-        super(Obstacle, self).__init__(parentView, itemId, images, objectAttributes)
+        super(Obstacle, self).\
+            __init__(parentView, itemId, images, objectAttributes)
         # Create the available image objects
         try:
-            self.blockingImage = self.getImage(objectAttributes["object"]["blocking_image"])
+            self.blockingImage = self.getImage(
+                objectAttributes["object"]["blocking_image"])
         except KeyError:
             self.blockingImage = None
 
         try:
             # TODO: To be implemented in kiigame
-            self.unblockingImage = self.getImage(objectAttributes["object"]["unblocking_image"])
+            self.unblockingImage = self.getImage(
+                objectAttributes["object"]["unblocking_image"])
         except KeyError:
             self.unblockingImage = None
         
@@ -708,14 +797,19 @@ class Obstacle(Object):
 
         try:
             if (self.blockingImage):
-                self.texts.update(parentView.scenarioData.texts[self.blockingImage.id])
+                self.texts.update(
+                    parentView.scenarioData.texts[self.blockingImage.id])
         except KeyError:
-            print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
+            print(
+                "Warning: Could not find texts.json entry for object '%s'"
+                % (self.id))
         try:
             if (self.unblockingImage):
                 self.texts.update(self.texts[self.unblockingText.id])
         except KeyError:
-            print("Warning: Could not find texts.json entry for object '%s'" %(self.id))
+            print(
+                "Warning: Could not find texts.json entry for object '%s'"
+                % (self.id))
             
         # Handle these in postInit
         self.blockTarget = None
@@ -723,12 +817,14 @@ class Obstacle(Object):
 
     def postInit(self, getGameObject):
         try:
-            self.blockTarget = getGameObject("object", self.objectAttributes["object"]["target"])
+            self.blockTarget = getGameObject(
+                "object", self.objectAttributes["object"]["target"])
         except KeyError:
             pass
             
         try:
-            self.setTrigger(getGameObject("object", self.objectAttributes["object"]["trigger"]))
+            self.setTrigger(getGameObject(
+                "object", self.objectAttributes["object"]["trigger"]))
         except KeyError:
             pass
             
@@ -737,7 +833,7 @@ class Obstacle(Object):
         return list(filter((None).__ne__, images))
         
     def getRepresentingImage(self):
-        if self.blockingImage == None:
+        if self.blockingImage is None:
             self.blockingImage = self.images[0]
         return self.blockingImage
     
@@ -775,14 +871,23 @@ class Obstacle(Object):
             
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
-    imageAttributes = {'category': '', 'id': '', 'object_name': '', 'src': '', 'visible': False, 'x': 0, 'y': 0}
+    imageAttributes = {
+        'category': '',
+        'id': '',
+        'object_name': '',
+        'src': '',
+        'visible': False,
+        'x': 0,
+        'y': 0
+    }
     
     generalName = "Kuva"
     generalNameAdessive = "Kuvalla"
     
     # imageAttributes has to be dict, not a list as with other objects
     # objectAttributes is a dict with object, attrs and className keys
-    def __init__(self, parentView, imageAttributes, objectAttributes, imageId=None):
+    def __init__(self, parentView, imageAttributes,
+                 objectAttributes, imageId=None):
 
         if not (imageAttributes):
             imageAttributes = deepcopy(JSONImage.imageAttributes)
@@ -791,13 +896,15 @@ class JSONImage(Object):
         if not (imageId):
             imageId = imageAttributes["id"]
 
-        super(JSONImage, self).__init__(parentView, imageId, None, objectAttributes)
+        super(JSONImage, self).\
+            __init__(parentView, imageId, None, objectAttributes)
         
         self.imageAttributes = imageAttributes
         self.placeholderImage = PlaceholderImage(self)
         
         if (imageAttributes):
-            self.absoluteImagePath = "%simages/%s" %(parentView.scenarioData.dataDir, self.getFileName())
+            self.absoluteImagePath = "%simages/%s"\
+                % (parentView.scenarioData.dataDir, self.getFileName())
             
     def getRepresentingImage(self):
         if (len(self.imageAttributes["src"]) == 0):
@@ -809,7 +916,7 @@ class JSONImage(Object):
         try:
             return self.texts["name"]
         except KeyError:
-            return None 
+            return None
             
     def setName(self, name):
         self.texts["name"] = name
@@ -834,7 +941,8 @@ class JSONImage(Object):
         
     def setSource(self, absoluteImagePath):
         # Cut the plain filename out of the name
-        self.imageAttributes["src"] = "images/"+absoluteImagePath.split("/")[-1]
+        self.imageAttributes["src"] =\
+            "images/"+absoluteImagePath.split("/")[-1]
         
         self.absoluteImagePath = absoluteImagePath
         
@@ -863,8 +971,10 @@ class SequenceImage(JSONImage):
     generalName = "Kuva"
     generalNameAdessive = "Kuvalla"
     
-    def __init__(self, parentView, imageAttributes, objectAttributes, imageId=None):
-        super(SequenceImage, self).__init__(parentView, imageAttributes, objectAttributes, imageId)
+    def __init__(self, parentView, imageAttributes,
+                 objectAttributes, imageId=None):
+        super(SequenceImage, self).\
+            __init__(parentView, imageAttributes, objectAttributes, imageId)
         
     # Get the display time for this image
     def getShowTime(self):
@@ -887,8 +997,10 @@ class MenuImage(JSONImage):
     generalName = "Valikkokuva"
     generalNameAdessive = "Valikkokuvalla"
     
-    def __init__(self, parentView, imageAttributes, objectAttributes, imageId=None):
-        super(MenuImage, self).__init__(parentView, imageAttributes, objectAttributes, imageId)
+    def __init__(self, parentView, imageAttributes,
+                 objectAttributes, imageId=None):
+        super(MenuImage, self).\
+            __init__(parentView, imageAttributes, objectAttributes, imageId)
 
 # Differentiate begining image from normal images
 # This is here mostly for the general name and adessive
@@ -896,15 +1008,19 @@ class BeginingImage(JSONImage):
     generalName = "Alkuruutu"
     generalNameAdessive = "Alkuruudulla"
     
-    def __init__(self, parentView, imageAttributes, objectAttributes, imageId=None):
-        super(BeginingImage, self).__init__(parentView, imageAttributes, objectAttributes, imageId)
+    def __init__(self, parentView, imageAttributes,
+                 objectAttributes, imageId=None):
+        super(BeginingImage, self).\
+            __init__(parentView, imageAttributes, objectAttributes, imageId)
 
 class Text(JSONImage):
     generalName = "Teksti"
     generalNameAdessive = "Tekstillä"
     
-    def __init__(self, parentView, imageAttributes, objectAttributes, imageId=None):
-        super(Text, self).__init__(parentView, imageAttributes, objectAttributes, imageId)
+    def __init__(self, parentView, imageAttributes,
+                 objectAttributes, imageId=None):
+        super(Text, self).\
+            __init__(parentView, imageAttributes, objectAttributes, imageId)
         
     def getSource(self):
         return
@@ -940,7 +1056,8 @@ class PlaceholderImage(JSONImage):
     def setSource(self, absoluteImagePath):
         
         # Cut the plain filename out of the name
-        self.imageAttributes["src"] = "images/"+absoluteImagePath.split("/")[-1]
+        self.imageAttributes["src"] =\
+            "images/"+absoluteImagePath.split("/")[-1]
         
         self.absoluteImagePath = absoluteImagePath
         
