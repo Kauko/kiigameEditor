@@ -2,7 +2,8 @@ from PySide import QtGui, QtCore
 
 # A widget that may have an object's closed, locked and open state settings
 class ObjectImageSettings(QtGui.QWidget):
-    def __init__(self, titleLabelText, nameLabelText, canBeLocked=False, lockedText=None, parent=None):
+    def __init__(self, titleLabelText, nameLabelText,
+                 canBeLocked=False, lockedText=None, parent=None):
         super(ObjectImageSettings, self).__init__(parent)
         
         self.layout = QtGui.QVBoxLayout()
@@ -17,7 +18,9 @@ class ObjectImageSettings(QtGui.QWidget):
         self.nameEdit.focusOutEvent = lambda s: self.changeNameEdit()
         
         self.image = QtGui.QLabel(self)
-        self.image.mousePressEvent = lambda s: self.parent.showImageDialog(lambda imagePath: self.changeImage(imagePath))
+        self.image.mousePressEvent =\
+            lambda s: self.parent.showImageDialog(
+                lambda imagePath: self.changeImage(imagePath))
         
         self.clickLabel = QtGui.QLabel("Teksti klikatessa")
         self.clickEdit = QtGui.QTextEdit()
@@ -35,7 +38,6 @@ class ObjectImageSettings(QtGui.QWidget):
             self.keyLabel = QtGui.QLabel("Mikä avaa?")
             self.keyCombo = self.parent.createCombobox()
             
-            
             self.layout.addWidget(self.lockedCheckbox)
             self.layout.addWidget(self.keyLabel)
             self.layout.addWidget(self.keyCombo)
@@ -49,7 +51,9 @@ class ObjectImageSettings(QtGui.QWidget):
     def updateComboboxes(self, objectType):
         objectType = objectType.lower()
         if (objectType == "item"):
-            self.parent.updateItemCombobox(self.keyCombo, "Avainta ei valittu!", ("item",), ("item",), self.clearKey, self.changeKey)
+            self.parent.updateItemCombobox(
+                self.keyCombo, "Avainta ei valittu!", ("item",), ("item",),
+                self.clearKey, self.changeKey)
             
     def changeNameEdit(self):
         self.parent.changeName(self.nameEdit, self.gameImageObject)
@@ -66,7 +70,8 @@ class ObjectImageSettings(QtGui.QWidget):
             self.gameObject.clearKey()
             
             # Set object's key to the object pointed by combobox
-            self.gameObject.setKey(self.keyCombo.itemData(self.keyCombo.currentIndex()))
+            self.gameObject.setKey(
+                self.keyCombo.itemData(self.keyCombo.currentIndex()))
         else:
             return
         
@@ -74,9 +79,12 @@ class ObjectImageSettings(QtGui.QWidget):
         if (self.lockedCheckbox.isChecked()):
             self.gameObject.setLocked(True)
             
-            placeholder = self.parent.editor.getPlaceholderImagePath(self.objectType)
+            placeholder =\
+                self.parent.editor.getPlaceholderImagePath(self.objectType)
             
-            self.gameImageObject = self.gameObject.lockedImage.placeholderImage.setSource(self.parent.editor.editorImagePath+placeholder)
+            self.gameImageObject =\
+                self.gameObject.lockedImage.placeholderImage.setSource(
+                    self.parent.editor.editorImagePath+placeholder)
         else:
             self.gameObject.setLocked(False)
             self.keyCombo.setCurrentIndex(0)
@@ -117,11 +125,13 @@ class ObjectImageSettings(QtGui.QWidget):
             
     def setImage(self):
         if (self.gameImageObject):
-            imagePath = self.gameImageObject.getRepresentingImage().absoluteImagePath
+            imagePath =\
+                self.gameImageObject.getRepresentingImage().absoluteImagePath
             self.parent.setObjectImage(imagePath, self.image)
         # Given gameImageObject may be None (no lockedImage, for example)
         elif self.objectType in ("Door", "Container", "Obstacle"):
-            imagePath = self.parent.editor.getPlaceholderImagePath(self.objectType)
+            imagePath =\
+                self.parent.editor.getPlaceholderImagePath(self.objectType)
             self.parent.setObjectImage(imagePath, self.image)
             
         # Ask parent to actually draw the image
@@ -154,7 +164,10 @@ class ObjectImageSettings(QtGui.QWidget):
             except:
                 pass
                         
-        self.parent.setObjectName(self.gameImageObject, self.gameObject.generalNameAdessive, self.nameEdit)
+        self.parent.setObjectName(
+            self.gameImageObject, self.gameObject.generalNameAdessive,
+            self.nameEdit
+        )
         self.parent.setExamineText(self.gameImageObject, self.clickEdit)
         
     # Set the correct key item in keyCombo

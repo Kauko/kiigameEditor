@@ -13,7 +13,8 @@ class Editor(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(Editor, self).__init__(parent)
         
-        self.editorImagePath = "%s/images/" %(dirname(abspath(ModuleLocation.getLocation())))
+        self.editorImagePath = "%s/images/" \
+            % (dirname(abspath(ModuleLocation.getLocation())))
         self.scenarioData = ScenarioData.ScenarioData("latkazombit")
         self.scenarioData.loadScenario()
         
@@ -93,7 +94,8 @@ class Editor(QtGui.QMainWindow):
         self.addViewsCombo.addItem("Huone", userData="room")
         self.addViewsCombo.addItem("Välianimaatio", userData="sequence")
         #self.addViewsCombo.addItem("Loppukuva", userData="end")
-        self.addViewsCombo.currentIndexChanged.connect(self.addViewsComboChanged)
+        self.addViewsCombo.currentIndexChanged.connect(
+            self.addViewsComboChanged)
         self.mainLayout.addWidget(self.addViewsCombo, 0, 0)
         
         # Draw rooms and select the first one
@@ -132,7 +134,8 @@ class Editor(QtGui.QMainWindow):
         
         self.addObjectsCombo = QtGui.QComboBox(self)
         self.mainLayout.addWidget(self.addObjectsCombo, 0, 2)
-        self.addObjectsCombo.currentIndexChanged.connect(self.addObjectsComboChanged)
+        self.addObjectsCombo.currentIndexChanged.connect(
+            self.addObjectsComboChanged)
         self.populateAddObjectsCombo()
         
         # Adding buttons for removing views and objects
@@ -142,14 +145,17 @@ class Editor(QtGui.QMainWindow):
         self.mainLayout.addWidget(self.removeViewsButton, 0, 1)
         
         self.removeObjectsButton = QtGui.QPushButton("Poista valittu esine")
-        self.removeObjectsButton.clicked.connect(self.removeObjectsButtonClicked)
+        self.removeObjectsButton.clicked.connect(
+            self.removeObjectsButtonClicked)
         self.mainLayout.addWidget(self.removeObjectsButton, 0, 3)
         
         # Combobox for putting item into another room
         self.roomsCombobox = QtGui.QComboBox(self)
         
-        self.roomsCombobox.setIconSize(QtCore.QSize(20,20))
-        self.roomsCombobox.currentIndexChanged.connect(self.roomsComboboxChanged)
+        self.roomsCombobox.setIconSize(
+            QtCore.QSize(20, 20))
+        self.roomsCombobox.currentIndexChanged.connect(
+            self.roomsComboboxChanged)
         self.changeRoomsLabel = QtGui.QLabel("Siirrä esine eri huoneeseen:")
         self.mainLayout.addWidget(self.changeRoomsLabel, 0, 4)
         self.mainLayout.addWidget(self.roomsCombobox, 0, 5)
@@ -167,8 +173,10 @@ class Editor(QtGui.QMainWindow):
         for room in self.getRoomObjects():
             roomName = room.getName()
             if not (roomName):
-                roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
-            imgPixmap = self.imageCache.createPixmap(room.getRepresentingImage().absoluteImagePath)
+                roomName = "%s ei ole nimeä" \
+                    % (room.generalNameAdessive)
+            imgPixmap = self.imageCache.createPixmap(
+                room.getRepresentingImage().absoluteImagePath)
             roomIcon = QtGui.QIcon(imgPixmap)
             self.roomsCombobox.addItem(roomIcon, roomName, userData=room)
     
@@ -185,7 +193,8 @@ class Editor(QtGui.QMainWindow):
                 itemsRoom = room
                 for i in range(0, self.roomsCombobox.count()):
                     if (self.roomsCombobox.itemText(i) == itemsRoom.getName()):
-                        self.roomsCombobox.setItemData(i, 0, QtCore.Qt.UserRole - 1);
+                        self.roomsCombobox.setItemData(
+                            i, 0, QtCore.Qt.UserRole - 1)
         
     def populateAddObjectsCombo(self):
         selectedType = self.left_scene.currentItem().room.__class__.__name__
@@ -210,10 +219,12 @@ class Editor(QtGui.QMainWindow):
             self.addObjectsCombo.addItem("Kuva", userData="sequenceimage")
             
     def getPlaceholderImagePath(self, objectType):
-        return self.editorImagePath + self.placeholderImages[objectType.capitalize()]
+        return self.editorImagePath +\
+            self.placeholderImages[objectType.capitalize()]
         
     def addViewsComboChanged(self):
-        selected = self.addViewsCombo.itemData(self.addViewsCombo.currentIndex())
+        selected = self.addViewsCombo.itemData(
+            self.addViewsCombo.currentIndex())
         if not (selected in ("room", "sequence", "end")):
             return
         self.createView(selected)
@@ -230,13 +241,16 @@ class Editor(QtGui.QMainWindow):
         self.drawRoomItems()
         
     def addObjectsComboChanged(self):
-        selected = self.addObjectsCombo.itemData(self.addObjectsCombo.currentIndex())
-        if not (selected in ("object", "item", "door", "container", "obstacle", "sequenceimage")):
+        selected = self.addObjectsCombo.itemData(
+            self.addObjectsCombo.currentIndex())
+        if not (selected in ("object", "item", "door",
+                "container", "obstacle", "sequenceimage")):
             return
         self.createObject(selected)
     
     def roomsComboboxChanged(self):
-        selectedRoom = self.roomsCombobox.itemData(self.roomsCombobox.currentIndex())
+        selectedRoom = self.roomsCombobox.itemData(
+            self.roomsCombobox.currentIndex())
         selectedItem = self.settingsWidget.currentObject
         for room in self.getRoomObjects():
             if room == selectedRoom:
@@ -257,8 +271,11 @@ class Editor(QtGui.QMainWindow):
     def setRemoveObjectsButtonDisabled(self, forceDisable=False):
         selected = self.settingsWidget.currentObject
         objectType = selected.__class__.__name__
-        if (objectType == "Room" or objectType == "Sequence" or objectType == "SequenceImage" or objectType == "Start" or
-            objectType == "End" or objectType == "Text" or objectType == "JSONImage" or objectType == "MenuImage" or objectType == "BeginingImage"):
+        if (objectType == "Room" or objectType == "Sequence" or
+                objectType == "SequenceImage" or objectType == "Start" or
+                objectType == "End" or objectType == "Text" or
+                objectType == "JSONImage" or objectType == "MenuImage" or
+                objectType == "BeginingImage"):
             isDisabled = True
         else:
             isDisabled = False
@@ -269,8 +286,10 @@ class Editor(QtGui.QMainWindow):
     def setRemoveViewsButtonDisabled(self, forceDisable=False):
         selected = self.settingsWidget.currentObject
         objectType = selected.__class__.__name__
-        if (objectType == "Room" or objectType == "Sequence" or objectType == "SequenceImage" or objectType == "Start" or
-            objectType == "End" or objectType == "MenuImage" or objectType == "BeginingImage"):
+        if (objectType == "Room" or objectType == "Sequence" or
+                objectType == "SequenceImage" or objectType == "Start" or
+                objectType == "End" or objectType == "MenuImage" or
+                objectType == "BeginingImage"):
             isDisabled = False
         else:
             isDisabled = True
@@ -311,9 +330,13 @@ class Editor(QtGui.QMainWindow):
         # Z-index buttons
         zIndexLabel = QtGui.QLabel("Järjestys:")
         increaseButton = QtGui.QPushButton("Tuo esine eteen")
-        increaseButton.clicked.connect(lambda: self.changeItemZIndex(1, self.settingsWidget.currentObject))
+        increaseButton.clicked.connect(
+            lambda: self.changeItemZIndex(
+                1, self.settingsWidget.currentObject))
         decreaseButton = QtGui.QPushButton("Vie esine taakse")
-        decreaseButton.clicked.connect(lambda: self.changeItemZIndex(-1, self.settingsWidget.currentObject))
+        decreaseButton.clicked.connect(
+            lambda: self.changeItemZIndex(
+                -1, self.settingsWidget.currentObject))
         #left_frame_layout.addWidget(zIndexLabel, 1, 9)
         
         # Buttons bar
@@ -332,7 +355,9 @@ class Editor(QtGui.QMainWindow):
         self.spaceScene.clear()
         
         # Display room image and set the same scale than in the game
-        pixmap = self.imageCache.createPixmap(selectedRoom.room.getRepresentingImage().absoluteImagePath).scaled(981, 543)
+        pixmap = self.imageCache.createPixmap(
+            selectedRoom.room.getRepresentingImage().absoluteImagePath
+            ).scaled(981, 543)
         pixmapWidget = QtGui.QLabel()
         pixmapWidget.setPixmap(pixmap)
         pixmapWidget.setGeometry(0, 200, pixmap.width(), pixmap.height())
@@ -372,7 +397,7 @@ class Editor(QtGui.QMainWindow):
             if(inEmptyRoom):
                 print("In empty room")
             else:
-                pixItem.setPos(pos[0],pos[1])
+                pixItem.setPos(pos[0], pos[1])
                 self.spaceScene.addItem(pixItem)
                 
         selectedRoom.room.setItems(self.spaceItems)
@@ -470,7 +495,8 @@ class Editor(QtGui.QMainWindow):
         else:
             return
             
-        newObject.createPlaceholderImage(self.getPlaceholderImagePath(objectType))
+        newObject.createPlaceholderImage(
+            self.getPlaceholderImagePath(objectType))
         
         # Create combobox item
         widgetItem = ViewWidget(newObject, self.scenarioData.dataDir)
@@ -513,7 +539,8 @@ class Editor(QtGui.QMainWindow):
         self.text_scene.setCurrentItem(selectedItem)
         
         # Texts
-        self.texts_frame = QtGui.QGroupBox("Tekstit - %s" %(selectedItem.text()))
+        self.texts_frame = QtGui.QGroupBox(
+            "Tekstit - %s" % (selectedItem.text()))
         self.texts_frame_layout = QtGui.QVBoxLayout()
         self.texts_frame.setLayout(self.texts_frame_layout)
         layout.addWidget(self.texts_frame)
@@ -530,7 +557,7 @@ class Editor(QtGui.QMainWindow):
             # TODO: Handle this better? Now there's a warning at the
             # beginning that textsWidget doesn't exist
             self.textsWidget.displayTexts(selected)
-            self.texts_frame.setTitle("Tekstit - %s" %(selected.text()))
+            self.texts_frame.setTitle("Tekstit - %s" % (selected.text()))
         
     def drawTextItems(self):
         #print ("DRAWING")
@@ -555,7 +582,8 @@ class Editor(QtGui.QMainWindow):
                 self.text_scene.insertRow(self.text_scene.rowCount())
                 
                 # Add a text item to the first column
-                widgetItem = TextItemWidget(itemImage, item, self.scenarioData.dataDir, 25)
+                widgetItem = TextItemWidget(
+                    itemImage, item, self.scenarioData.dataDir, 25)
                 self.text_scene.setItem(row, 0, widgetItem)
                 
                 # Maximum amount of texts for item
@@ -567,7 +595,8 @@ class Editor(QtGui.QMainWindow):
                     
                 if ("pickup" in itemImage.texts):
                     maxAmount += 1
-                # TODO: Sorting doesn't work, fix possibly by setItem here and setCellWidget inside item
+                # TODO: Sorting doesn't work,
+                # fix possibly by setItem here and setCellWidget inside item
                 if ("name" in itemImage.texts):
                     textCount -= 1
                     
@@ -575,12 +604,14 @@ class Editor(QtGui.QMainWindow):
                     maxAmount = 1
                     
                 if (item.__class__.__name__ == "Item"
-                    or itemImage.imageAttributes["category"] == "reward"):
-                    # Max amount is number of all images minus item itself and secrets (no interaction)
+                        or itemImage.imageAttributes["category"] == "reward"):
+                    # Max amount is number of all images minus item
+                    # itself and secrets (no interaction)
                     maxAmount += imgCount-1-secretCount
                     
                     # Different pictures for the inventory and the room
-                    if ("src2" in itemImage.imageAttributes or itemImage.imageAttributes["category"] == "secret"):
+                    if ("src2" in itemImage.imageAttributes or
+                            itemImage.imageAttributes["category"] == "secret"):
                         maxAmount = 1
                     
                 # Add a progressbar to the second column
@@ -597,13 +628,16 @@ class Editor(QtGui.QMainWindow):
                 
                 row += 1
         self.text_scene.setSortingEnabled(True)
-        self.text_scene.setHorizontalHeaderItem(0, QtGui.QTableWidgetItem("Esineen nimi"))
-        self.text_scene.setHorizontalHeaderItem(1, QtGui.QTableWidgetItem("Teksteistä tehtynä"))
+        self.text_scene.setHorizontalHeaderItem(
+            0, QtGui.QTableWidgetItem("Esineen nimi"))
+        self.text_scene.setHorizontalHeaderItem(
+            1, QtGui.QTableWidgetItem("Teksteistä tehtynä"))
     
     # Click on a room in the main tab
     def roomClicked(self):
         self.drawRoomItems()
-        self.settingsWidget.displayOptions(self.left_scene.selectedItems()[0].room)
+        self.settingsWidget.displayOptions(
+            self.left_scene.selectedItems()[0].room)
         self.setRemoveViewsButtonDisabled()
         self.populateAddObjectsCombo()
         self.setRemoveObjectsButtonDisabled()
@@ -647,7 +681,8 @@ class Editor(QtGui.QMainWindow):
             self.left_scene.addItem(widgetItem)
             
         # Start
-        widgetItem = ViewWidget(self.scenarioData.startView, self.scenarioData.dataDir)
+        widgetItem = ViewWidget(
+            self.scenarioData.startView, self.scenarioData.dataDir)
         self.left_scene.addItem(widgetItem)
             
     # Draw the middle frame room items
@@ -672,9 +707,9 @@ class Editor(QtGui.QMainWindow):
     def closeEvent(self, event):
         # We need to define our own buttons to always get them in Finnish
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Haluatko varmasti poistua?");
+        msgBox.setText("Haluatko varmasti poistua?")
         yesButton = msgBox.addButton("Kyllä", QtGui.QMessageBox.YesRole)
-        noButton = msgBox.addButton("En", QtGui.QMessageBox.NoRole);
+        noButton = msgBox.addButton("En", QtGui.QMessageBox.NoRole)
         msgBox.setDefaultButton(noButton)
         msgBox.setWindowTitle("Poistu?")
         
@@ -689,9 +724,9 @@ class Editor(QtGui.QMainWindow):
     def removeViewsButtonClicked(self):
         # We need to define our own buttons to always get them in Finnish
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Haluatko varmasti poistaa näkymän?");
+        msgBox.setText("Haluatko varmasti poistaa näkymän?")
         yesButton = msgBox.addButton("Kyllä", QtGui.QMessageBox.YesRole)
-        noButton = msgBox.addButton("En", QtGui.QMessageBox.NoRole);
+        noButton = msgBox.addButton("En", QtGui.QMessageBox.NoRole)
         msgBox.setDefaultButton(noButton)
         msgBox.setWindowTitle("Poista?")
         
@@ -706,9 +741,9 @@ class Editor(QtGui.QMainWindow):
     def removeObjectsButtonClicked(self):
         # We need to define our own buttons to always get them in Finnish
         msgBox = QtGui.QMessageBox()
-        msgBox.setText("Haluatko varmasti poistaa esineen?");
+        msgBox.setText("Haluatko varmasti poistaa esineen?")
         yesButton = msgBox.addButton("Kyllä", QtGui.QMessageBox.YesRole)
-        noButton = msgBox.addButton("En", QtGui.QMessageBox.NoRole);
+        noButton = msgBox.addButton("En", QtGui.QMessageBox.NoRole)
         msgBox.setDefaultButton(noButton)
         msgBox.setWindowTitle("Poista?")
         
@@ -763,7 +798,7 @@ class ItemWidget(QtGui.QListWidgetItem):
         super(ItemWidget, self).__init__(parent)
         
         # Row size, especially height
-        self.setSizeHint(QtCore.QSize(100,100))
+        self.setSizeHint(QtCore.QSize(100, 100))
         
         self.item = item
         imageObject = item.getRepresentingImage()
@@ -771,7 +806,7 @@ class ItemWidget(QtGui.QListWidgetItem):
         itemName = imageObject.getName()
         if not (itemName):
             self.item
-            itemName = "%s ei ole nimeä" %(item.generalNameAdessive)
+            itemName = "%s ei ole nimeä" % (item.generalNameAdessive)
         self.setText(itemName)
         
         # imagePath can be overriden
@@ -810,7 +845,8 @@ class TextItemWidget(QtGui.QTableWidgetItem):
         
         textItemName = self.textItem.getName()
         if not (textItemName):
-            textItemName = "%s ei ole nimeä" %(self.textItem.generalNameAdessive)
+            textItemName = "%s ei ole nimeä" %\
+                (self.textItem.generalNameAdessive)
         else:
             textItemName += self.getImageType()
         self.setText(textItemName)
@@ -853,7 +889,8 @@ class TextItemWidget(QtGui.QTableWidgetItem):
 #
 #   def calculateProgress(self): # If there's many images, .texts doesn't work!
 #
-#       print ("LOL", self.textItem.id, self.maxAmount, len(self.textItem.texts)-1)
+#       print ("LOL", self.textItem.id, 
+#           self.maxAmount, len(self.textItem.texts)-1)
 #       self.progressBar.setMinimum(0)
 #       self.progressBar.setMaximum(self.maxAmount)
 #       self.progressBar.setValue(len(self.textItem.texts)-1)
@@ -887,23 +924,28 @@ class TextsWidget(QtGui.QWidget):
         self.useTextEdit.focusOutEvent = lambda s: self.changeText("use")
         
         # Default text
-        self.defaultTextLabel = QtGui.QLabel("Oletusteksti puuttuville teksteille:")
+        self.defaultTextLabel = QtGui.QLabel(
+            "Oletusteksti puuttuville teksteille:")
         self.defaultTextEdit = QtGui.QTextEdit()
         self.defaultTextEdit.setMaximumHeight(50)
-        self.defaultTextEdit.focusOutEvent = lambda s: self.changeText("default")
+        self.defaultTextEdit.focusOutEvent =\
+            lambda s: self.changeText("default")
         
         # Default text without use text
-        self.defaultTextLabel2 = QtGui.QLabel("Oletusteksti puuttuville teksteille:")
+        self.defaultTextLabel2 = QtGui.QLabel(
+            "Oletusteksti puuttuville teksteille:")
         self.defaultTextEdit2 = QtGui.QTextEdit()
         self.defaultTextEdit2.setMaximumHeight(50)
-        self.defaultTextEdit2.focusOutEvent = lambda s: self.changeText("default")
+        self.defaultTextEdit2.focusOutEvent =\
+            lambda s: self.changeText("default")
         
         # Separator
         self.separator = QtGui.QLabel("")
         self.separator.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
         
         # Interaction texts
-        self.interactionTextGroupBox = QtGui.QGroupBox("Tekstit esinettä käytettäessä muihin esineisiin")
+        self.interactionTextGroupBox =\
+            QtGui.QGroupBox("Tekstit esinettä käytettäessä muihin esineisiin")
         self.interactionTextLayout = QtGui.QVBoxLayout()
         self.text_scene = QtGui.QTableWidget(self)
         self.interactionTextGroupBox.setLayout(self.interactionTextLayout)
@@ -914,11 +956,14 @@ class TextsWidget(QtGui.QWidget):
         self.displayOptionLayout = QtGui.QHBoxLayout()
         self.displayOptionGroupBox.setLayout(self.displayOptionLayout)
         self.displayAllButton = QtGui.QRadioButton("Kaikki")
-        self.displayAllButton.clicked.connect(lambda: self.displayAllInteractions("all"))
+        self.displayAllButton.clicked.connect(
+            lambda: self.displayAllInteractions("all"))
         self.displayMissingButton = QtGui.QRadioButton("Puuttuvat")
-        self.displayMissingButton.clicked.connect(lambda: self.displayAllInteractions("missing"))
+        self.displayMissingButton.clicked.connect(
+            lambda: self.displayAllInteractions("missing"))
         self.displayDoneButton = QtGui.QRadioButton("Tehdyt")
-        self.displayDoneButton.clicked.connect(lambda: self.displayAllInteractions("done"))
+        self.displayDoneButton.clicked.connect(
+            lambda: self.displayAllInteractions("done"))
 
     def displayTexts(self, item):
         self.currentItem = item
@@ -943,7 +988,7 @@ class TextsWidget(QtGui.QWidget):
         self.displayOptionLayout.addWidget(self.displayDoneButton)
         
         # Interaction texts
-        # TODO: This text_scene should always stretch more than the other widgets
+        # TODO: This text_scene should stretch more than the other widgets
         self.interactionTextLayout.addWidget(self.text_scene)
         self.text_scene.setRowCount(0)
         self.text_scene.setColumnCount(2)
@@ -968,7 +1013,8 @@ class TextsWidget(QtGui.QWidget):
         ]
         
         # TODO: Secrets are not working right when removing their text
-        if (self.currentItem.textItem.imageAttributes["category"] == "secret" or "src2" in self.currentItem.textItem.imageAttributes):
+        if (self.currentItem.textItem.imageAttributes["category"] == "secret"
+                or "src2" in self.currentItem.textItem.imageAttributes):
             self.clickTextEdit.setText(self.currentItem.texts["pickup"])
         else:
             if not ("examine" in self.currentItem.texts):
@@ -977,7 +1023,8 @@ class TextsWidget(QtGui.QWidget):
                 self.clickTextEdit.setText(self.currentItem.texts["examine"])
         
         # Item
-        if (self.currentItem.objectType == "Item" and "src2" not in self.currentItem.textItem.imageAttributes):
+        if (self.currentItem.objectType == "Item"
+                and "src2" not in self.currentItem.textItem.imageAttributes):
             for setting in self.itemSettings:
                 setting.show()
             
@@ -992,7 +1039,9 @@ class TextsWidget(QtGui.QWidget):
             try:
                 if (self.currentItem.target):
                     # TODO: Better text for label?
-                    self.useTextLabel.setText("Teksti käyttökohteelle ”%s”:" %(self.currentItem.target))
+                    self.useTextLabel.setText(
+                        "Teksti käyttökohteelle ”%s”:"
+                        % (self.currentItem.target))
                     self.useTextEdit.setText(self.currentItem.useText)
                     self.defaultTextLabel2.hide()
                     self.defaultTextEdit2.hide()
@@ -1006,8 +1055,10 @@ class TextsWidget(QtGui.QWidget):
                 self.useTextEdit.hide()
                 
             try:
-                self.defaultTextEdit.setText(self.currentItem.texts["default"])
-                self.defaultTextEdit2.setText(self.currentItem.texts["default"])
+                self.defaultTextEdit.setText(
+                    self.currentItem.texts["default"])
+                self.defaultTextEdit2.setText(
+                    self.currentItem.texts["default"])
             except:
                 pass
         
@@ -1046,7 +1097,8 @@ class TextsWidget(QtGui.QWidget):
             targetObject = self.text_scene.item(row, 0)
             try:
                 interactionText = self.text_scene.selectedItems()[0].text()
-                self.currentItem.parentItem.setInteractionText(targetObject.id, interactionText)
+                self.currentItem.parentItem.setInteractionText(
+                    targetObject.id, interactionText)
                 self.parent.drawTextItems()
             except:
                 pass
@@ -1066,15 +1118,18 @@ class TextsWidget(QtGui.QWidget):
                     interactionText = ""
                 
                 if (targetImage.id == self.currentItem.id or
-                    targetImage.imageAttributes["category"] == "secret" or
-                    (displayOption == "missing" and interactionText != "") or
-                    (displayOption == "done" and interactionText == "")):
+                        targetImage.imageAttributes["category"] == "secret" or
+                        (displayOption == "missing" and interactionText != "")
+                        or
+                        (displayOption == "done" and interactionText == "")):
                     continue
                     
                 self.text_scene.insertRow(self.text_scene.rowCount())
                 imageObject = self.scenarioData.getJSONObject(targetImage.id)
                 # TODO: cell size doesn't work!
-                targetItem = TextItemWidget(imageObject, self.scenarioData.getObject(target.id), self.scenarioData.dataDir, 100)
+                targetItem = TextItemWidget(
+                    imageObject, self.scenarioData.getObject(target.id),
+                    self.scenarioData.dataDir, 100)
                 self.text_scene.setItem(row, 0, targetItem)
                 
                 interactionTextItem = QtGui.QTableWidgetItem()
@@ -1101,7 +1156,7 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
             if (item.id == self.name):
                 selectedItem = item
                 
-        if (selectedItem == None):
+        if (selectedItem is None):
             print("Error: item.id not found in roomItems!")
         
         print(selectedItem.getRepresentingImage().getID())
