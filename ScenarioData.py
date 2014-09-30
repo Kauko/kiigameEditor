@@ -1,9 +1,12 @@
 # -*- coding: UTF-8 -*-
 
-import json, View, Object
+import json
+import View
+import Object
 from collections import OrderedDict
 from os.path import dirname, abspath
 import ModuleLocation
+
 
 class ScenarioData(object):
     def __init__(self, scenarioName):

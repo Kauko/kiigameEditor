@@ -1,5 +1,6 @@
 from PySide import QtGui, QtCore
 
+
 # A widget that may have an object's closed, locked and open state settings
 class ObjectImageSettings(QtGui.QWidget):
     def __init__(self, titleLabelText, nameLabelText,

@@ -1,6 +1,7 @@
 from random import randint
 from copy import deepcopy
 
+
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
     generalName = "Kiinteä esine"
@@ -11,6 +12,7 @@ class Object(object):
 
     # Static method to create unique object ID
     usedIds = []
+
     def createUniqueId(newId=None):
         if not (newId):
             newId = str(randint(0, 1000000000))
@@ -58,7 +60,7 @@ class Object(object):
 
         i = 0
         for image in self.images:
-            i+=1
+            i += 1
             if(image.getID() == ""):
                 image.setID(self.id + "_" + str(i))
 
@@ -155,6 +157,7 @@ class Object(object):
         except KeyError:
             return
         self.texts = newTexts
+
 
 # Pickable item
 class Item(Object):
@@ -326,6 +329,7 @@ class Item(Object):
 
         elif (triggerType == "Obstacle"):
             targetObject.setTrigger(self)
+
 
 class Container(Object):
     generalName = "Säiliö"
@@ -553,6 +557,7 @@ class Container(Object):
             self.key.clearTarget()
         self.key = None
 
+
 class Door(Object):
     generalName = "Kulkureitti"
     generalNameAdessive = "Kulkureitillä"
@@ -753,6 +758,7 @@ class Door(Object):
             self.key.clearTarget()
         self.key = None
 
+
 class Obstacle(Object):
     generalName = "Este"
     generalNameAdessive = "Esteellä"
@@ -868,6 +874,7 @@ class Obstacle(Object):
         except KeyError:
             pass
 
+
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
     imageAttributes = {
@@ -965,6 +972,7 @@ class JSONImage(Object):
     def setObjectId(self, objectId):
         self.imageAttributes["id"] = objectId
 
+
 # Differentiate sequence images from normal images
 class SequenceImage(JSONImage):
     generalName = "Kuva"
@@ -991,6 +999,7 @@ class SequenceImage(JSONImage):
     def setDoFade(self, doFade):
         return self.parentView.setDoFade(self.id, doFade)
 
+
 # Differentiate menu images from normal images
 class MenuImage(JSONImage):
     generalName = "Valikkokuva"
@@ -1000,6 +1009,7 @@ class MenuImage(JSONImage):
                  objectAttributes, imageId=None):
         super(MenuImage, self).\
             __init__(parentView, imageAttributes, objectAttributes, imageId)
+
 
 # Differentiate begining image from normal images
 # This is here mostly for the general name and adessive
@@ -1011,6 +1021,7 @@ class BeginingImage(JSONImage):
                  objectAttributes, imageId=None):
         super(BeginingImage, self).\
             __init__(parentView, imageAttributes, objectAttributes, imageId)
+
 
 class Text(JSONImage):
     generalName = "Teksti"
@@ -1042,6 +1053,7 @@ class Text(JSONImage):
 
     def getRepresentingImage(self):
         return self
+
 
 # Placeholder image to be used by other images
 class PlaceholderImage(JSONImage):

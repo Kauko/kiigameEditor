@@ -1,8 +1,10 @@
 from PySide import QtGui
 
+
 # Singleton image cacher to prevent them being loaded more than once
 class ImageCache(object):
     _instance = None
+
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance =\

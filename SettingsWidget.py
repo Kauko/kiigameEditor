@@ -27,6 +27,7 @@ from ImageCache import ImageCache
 # TODO: Object types should be exactly as they are in the object!
 # TODO: "X ei ole nimeä" common delegate
 
+
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
     def __init__(self, parent=None):

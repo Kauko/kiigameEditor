@@ -1,14 +1,15 @@
 # -*- coding: UTF-8 -*-
 
 from PySide import QtGui, QtCore
-import SettingsWidget, ScenarioData
+import SettingsWidget
+import ScenarioData
 from ImageCache import ImageCache
 from os.path import dirname, abspath
 import ModuleLocation
 
+
 # TODO: Keeping mouse down and moving it around in item combo shows items
 #       one step behind
-
 class Editor(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(Editor, self).__init__(parent)
@@ -772,6 +773,7 @@ class Editor(QtGui.QMainWindow):
     def getGeneralName(self, objectType):
         return self.scenarioData.getGeneralName(objectType)
 
+
 # Widget used to display rooms, sequences, start and end views
 class ViewWidget(QtGui.QListWidgetItem):
     def __init__(self, room, imageDir, parent=None):
@@ -782,7 +784,7 @@ class ViewWidget(QtGui.QListWidgetItem):
         if (room.nameable):
             roomName = room.getName()
             if not (roomName):
-                roomName = "%s ei ole nimeä" %(room.generalNameAdessive)
+                roomName = "%s ei ole nimeä" % (room.generalNameAdessive)
         else:
             roomName = room.generalName
 
@@ -791,6 +793,7 @@ class ViewWidget(QtGui.QListWidgetItem):
         imagePath = room.getRepresentingImage().absoluteImagePath
         icon = QtGui.QIcon(imagePath)
         self.setIcon(icon)
+
 
 # Item widget that represents items in game views
 class ItemWidget(QtGui.QListWidgetItem):
@@ -815,6 +818,7 @@ class ItemWidget(QtGui.QListWidgetItem):
 
         icon = QtGui.QIcon(imagePath)
         self.setIcon(icon)
+
 
 # Text item widget that represents items in texts tab
 class TextItemWidget(QtGui.QTableWidgetItem):
@@ -889,11 +893,12 @@ class TextItemWidget(QtGui.QTableWidgetItem):
 #
 #   def calculateProgress(self): # If there's many images, .texts doesn't work!
 #
-#       print ("LOL", self.textItem.id, 
+#       print ("LOL", self.textItem.id,
 #           self.maxAmount, len(self.textItem.texts)-1)
 #       self.progressBar.setMinimum(0)
 #       self.progressBar.setMaximum(self.maxAmount)
 #       self.progressBar.setValue(len(self.textItem.texts)-1)
+
 
 # Texts widget that shows texts of specific item in the texts tab
 class TextsWidget(QtGui.QWidget):
@@ -1139,6 +1144,7 @@ class TextsWidget(QtGui.QWidget):
                 row += 1
         #self.text_scene.resizeRowsToContents()
         self.text_scene.setSortingEnabled(True)
+
 
 class SpaceViewItem(QtGui.QGraphicsPixmapItem):
     def __init__(self, pixmap, name, parent=None):

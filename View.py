@@ -1,11 +1,12 @@
 import Object
 from random import randint
 
+
 # Virtual class for views
 class View(object):
-
     # Static method to create unique view ID
     usedIds = []
+
     def createUniqueId(newId=None):
         if not (newId):
             newId = str(randint(0, 1000000000))
@@ -93,6 +94,7 @@ class View(object):
         self.placeholderImage = Object.JSONImage(self, None, None, self.id)
         self.placeholderImage.setSource(imagePath)
 
+
 class Menu(View):
     def __init__(self, scenarioData, menuId, menuAttributes, menuImages):
         super(Menu, self).__init__(scenarioData, menuAttributes, menuId)
@@ -111,6 +113,7 @@ class Menu(View):
 
     def getChildren(self):
         return self.menuImages
+
 
 # Game cutscenes
 class Sequence(View):
@@ -239,6 +242,7 @@ class Sequence(View):
         # TODO: childObject not defined
         #self.scenarioData.removeObject(childObject)
 
+
 # Start menu
 class Start(View):
     generalName = "Alkukuva"
@@ -287,6 +291,7 @@ class Start(View):
 
     def getItems(self):
         return self.getChildren()
+
 
 # End menu
 class End(View):
@@ -359,6 +364,7 @@ class End(View):
         if (len(self.endImages) == 0):
             return self.placeholderImage
         return self.endImages[0]
+
 
 # Any game room
 class Room(View):
@@ -494,6 +500,7 @@ class Room(View):
 
     def setItems(self, items):
         self.objectList = items
+
 
 # Custom view for custom layers
 class Custom(View):
