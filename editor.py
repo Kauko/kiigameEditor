@@ -15,8 +15,8 @@ class Editor(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(Editor, self).__init__(parent)
 
-        #Remove after testing
-        print(Client.hello_world())
+        print("Editor :: Attempting to start upload")
+        Client().upload_game_files('./gamedata/latkazombit')
 
         self.editorImagePath = "%s/images/" \
             % (dirname(abspath(ModuleLocation.getLocation())))
