@@ -3,6 +3,7 @@
 from PySide import QtGui, QtCore
 import SettingsWidget
 import ScenarioData
+from localizer import Localizer
 from ImageCache import ImageCache
 from os.path import dirname, abspath
 import ModuleLocation
@@ -16,7 +17,10 @@ class Editor(QtGui.QMainWindow):
         super(Editor, self).__init__(parent)
 
         #Remove after testing
-        print(Client.hello_world())
+        #print(Client.hello_world())
+
+        localizationReader = Localizer()
+        self.translation = localizationReader.getLocale()
 
         self.editorImagePath = "%s/images/" \
             % (dirname(abspath(ModuleLocation.getLocation())))
@@ -39,7 +43,8 @@ class Editor(QtGui.QMainWindow):
         self.newIconPath = self.editorImagePath + "add_new_icon.png"
         self.noChoiceIconPath = self.editorImagePath + "no_choice_icon.png"
 
-        self.setWindowTitle("Kiigame - Pelieditori")
+        #self.setWindowTitle("Kiigame - Pelieditori")
+        self.setWindowTitle(self.translation['mainWindowTitle'])
 
         self.tabWidget = QtGui.QTabWidget()
         self.setCentralWidget(self.tabWidget)
@@ -50,21 +55,30 @@ class Editor(QtGui.QMainWindow):
         self.createSpaceTab()
         self.createTextsTab()
 
-        self.tabWidget.addTab(self.mainTab, "Päänäkymä")
-        self.tabWidget.addTab(self.spaceTab, "Tila")
-        self.tabWidget.addTab(self.textsTab, "Tekstit")
+        self.tabWidget.addTab(
+            self.mainTab, self.translation['Tabs']['mainTab'])
+        self.tabWidget.addTab(
+            self.spaceTab, self.translation['Tabs']['spaceTab'])
+        self.tabWidget.addTab(
+            self.textsTab, self.translation['Tabs']['textsTab'])
         self.tabWidget.currentChanged.connect(self.onTabChanged)
 
     def createMenuActions(self):
         self.newAct = QtGui.QAction("Uusi", self)
-        self.openAct = QtGui.QAction("Avaa…", self)
-        self.saveAct = QtGui.QAction("Tallenna", self)
+        self.newAct = QtGui.QAction(
+            self.translation['createMenuAction']['new'], self)
+        self.openAct = QtGui.QAction(
+            self.translation['createMenuAction']['open'], self)
+        self.saveAct = QtGui.QAction(
+            self.translation['createMenuAction']['save'], self)
         self.saveAct.triggered.connect(self.scenarioData.saveScenario)
-        self.exitAct = QtGui.QAction("Lopeta", self)
+        self.exitAct = QtGui.QAction(
+            self.translation['createMenuAction']['quit'], self)
         self.exitAct.triggered.connect(self.close)
 
     def createMenus(self):
-        fileMenu = self.menuBar().addMenu("&Tiedosto")
+        fileMenu = self.menuBar().addMenu(
+            self.translation['createMenus']['file'])
         fileMenu.addAction(self.newAct)
         fileMenu.addAction(self.openAct)
         fileMenu.addAction(self.saveAct)
@@ -78,7 +92,8 @@ class Editor(QtGui.QMainWindow):
         self.mainTab.setLayout(self.mainLayout)
 
         # Room preview
-        left_frame = QtGui.QGroupBox("Tilat")
+        left_frame = QtGui.QGroupBox(
+            self.translation['createMainTab']['spaces'])
         left_frame_layout = QtGui.QGridLayout()
         left_frame.setLayout(left_frame_layout)
         self.mainLayout.addWidget(left_frame, 1, 0, 1, 2)
@@ -95,9 +110,13 @@ class Editor(QtGui.QMainWindow):
         left_frame_layout.addWidget(self.left_scene)
 
         self.addViewsCombo = QtGui.QComboBox(self)
-        self.addViewsCombo.addItem("Lisää tila")
-        self.addViewsCombo.addItem("Huone", userData="room")
-        self.addViewsCombo.addItem("Välianimaatio", userData="sequence")
+        self.addViewsCombo.addItem(
+            self.translation['createMainTab']['addSpace'])
+        self.addViewsCombo.addItem(
+            self.translation['createMainTab']['addRoom'], userData="room")
+        self.addViewsCombo.addItem(
+            self.translation['createMainTab']['addAnimation'],
+            userData="sequence")
         #self.addViewsCombo.addItem("Loppukuva", userData="end")
         self.addViewsCombo.currentIndexChanged.connect(
             self.addViewsComboChanged)
@@ -109,13 +128,15 @@ class Editor(QtGui.QMainWindow):
         self.left_scene.setCurrentItem(selectedRoom)
 
         # Room items
-        middle_frame = QtGui.QGroupBox("Tilan objektit")
+        middle_frame = QtGui.QGroupBox(
+            self.translation['createMainTab']['spaceObjects'])
         middle_frame_layout = QtGui.QVBoxLayout()
         middle_frame.setLayout(middle_frame_layout)
         self.mainLayout.addWidget(middle_frame, 1, 2, 1, 2)
 
         # Settings for items and rooms
-        right_frame = QtGui.QGroupBox("Asetukset")
+        right_frame = QtGui.QGroupBox(
+            self.translation['createMainTab']['settings'])
         self.right_frame_layout_main = QtGui.QVBoxLayout()
         right_frame.setLayout(self.right_frame_layout_main)
         self.mainLayout.addWidget(right_frame, 1, 4, 1, 2)
@@ -144,12 +165,14 @@ class Editor(QtGui.QMainWindow):
         self.populateAddObjectsCombo()
 
         # Adding buttons for removing views and objects
-        self.removeViewsButton = QtGui.QPushButton("Poista valittu tila")
+        self.removeViewsButton = QtGui.QPushButton(
+            self.translation['createMainTab']['removeSelectedSpace'])
         self.setRemoveViewsButtonDisabled()
         self.removeViewsButton.clicked.connect(self.removeViewsButtonClicked)
         self.mainLayout.addWidget(self.removeViewsButton, 0, 1)
 
-        self.removeObjectsButton = QtGui.QPushButton("Poista valittu esine")
+        self.removeObjectsButton = QtGui.QPushButton(
+            self.translation['createMainTab']['removeSelectedObject'])
         self.removeObjectsButton.clicked.connect(
             self.removeObjectsButtonClicked)
         self.mainLayout.addWidget(self.removeObjectsButton, 0, 3)
@@ -161,7 +184,8 @@ class Editor(QtGui.QMainWindow):
             QtCore.QSize(20, 20))
         self.roomsCombobox.currentIndexChanged.connect(
             self.roomsComboboxChanged)
-        self.changeRoomsLabel = QtGui.QLabel("Siirrä esine eri huoneeseen:")
+        self.changeRoomsLabel = QtGui.QLabel(
+            self.translation['createMainTab']['changeObjectsRoom'])
         self.mainLayout.addWidget(self.changeRoomsLabel, 0, 4)
         self.mainLayout.addWidget(self.roomsCombobox, 0, 5)
         self.populateRoomsComboBox()
@@ -814,6 +838,10 @@ class ItemWidget(QtGui.QListWidgetItem):
         if not (itemName):
             self.item
             itemName = "%s ei ole nimeä" % (item.generalNameAdessive)
+            # if locale = loc_fin
+                # itemName = "%s ei ole nimeä" % (item.generalNameAdessive)
+            # else
+                # itemName = (item.generalName) % "%s has no name"
         self.setText(itemName)
 
         # imagePath can be overriden
@@ -1048,6 +1076,7 @@ class TextsWidget(QtGui.QWidget):
             try:
                 if (self.currentItem.target):
                     # TODO: Better text for label?
+                    # Use translation file
                     self.useTextLabel.setText(
                         "Teksti käyttökohteelle ”%s”:"
                         % (self.currentItem.target))

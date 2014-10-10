@@ -36,6 +36,7 @@ class SettingsWidget(QtGui.QWidget):
         self.currentObject = None
         self.lastObjectType = None
 
+       ## TODO: change to translation file
         self.useTypes = {
             0: "Ei käyttöä",
             1: "Käytä toiseen esineeseen",

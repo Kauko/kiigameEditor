@@ -1,0 +1,183 @@
+{
+    "mainWindowTitle": "kiigame - pelieditori",
+
+    "Tabs":{
+	   "mainTab": "Päänäkymä",
+	   "spaceTab": "Tila",
+	   "textsTab": "Tekstit"
+	},
+
+    "createMenuActions":{
+	   "new": "Uusi",
+	   "open": "Avaa",
+	   "save": "Tallenna",
+	   "quit": "Lopeta"
+	},
+
+    "createMenus":{
+	   "file": "Tiedosto"
+	},
+
+    "createMainTab":{
+	   "spaces" : "Tilat",
+	   "addSpace" : "Lisää tila",
+	   "addRoom" : "Lisää huone",
+	   "addAnimation" : "Lisää animaatio",
+	   "spaceObjects" : "Tilan objektit",
+	   "settings" : "Asetukset",
+	   "removeSelectedSpace" : "Poista valittu tila",
+	   "removeSelectedObject" : "Poista valittu esine",
+	   "changeObjectsRoom" : "Vaihda esine eri huoneeseen"
+	},
+
+    "populateRoomComboBox": {
+	   "hasNoName" : "Ei ole nimeä"
+    },
+
+    "populateAddObjectsCombo": {
+	   "addObject" : "Kiinteä esine",
+	   "addItem" : "Käyttöesine",
+	   "addDoor" : "Ovi",
+	   "addContainer" : "Säiliö",
+	   "addObstacle" : "Este",
+	   "addImage" : "Kuva"
+	},
+
+    "createSpaceTab": {
+	   "space" : "Tila",
+	   "settings" : "Asetukset",
+	   "order" : "Järjestys",
+	   "bringToFront" : "Tuo esine eteen",
+	   "moveBehind" : "Vie esine taakse"
+	   },
+
+    "createTextsTab": {
+	   "objects" : "Esineet",
+	   "texts" : "Tekstit"
+	},
+
+    "drawTextItems" : {
+	   "nameOfObject" : "Esineen nimi",
+	   "textsDone" : "Teksteistä tehtynä"
+	},
+
+    "closeEvent": {
+	   "checkQuit" : "Haluatko varmasti poistua?",
+	   "Yes" : "Kyllä",
+	   "No" : "Ei",
+	   "closeWindowTitle" : "Poistu?"
+	},
+
+    "removeObjectsButtonClicked": {
+	   "checkDeletion" : "Haluatko varmasti poistaa esineen?",
+	   "Yes" : "Kyllä",
+	   "No" : "Ei",
+	   "removeObjectWindowTitle" : "Poista?"
+	},
+
+    "ViewWidget": {
+	   "hasNoName" : "Ei ole nimeä"
+	},
+
+    "TextItemWidget": {
+        "hasNoName" : "Ei ole nimeä"
+    },
+
+    "getImageType": {
+        "openImage" : " . Auki",
+        "closedImage" : " . Kiinni",
+        "lockedImage" : " . Lukittu",
+        "emptyImage" : " . Tyhjä",
+        "fullImage" : " . Täysi",
+        "blockingImage" : " . Estää",
+        "unblockingImage" : " . Ei estä",
+        "blockedImage" : " . Estetty"
+    },
+
+    "classTextsWidgetInit" : {
+        "textAsClicked" : "Teksti klikatessa",
+        "textAsPicked" : "Teksti poimiessa",
+        "defaultText" : "Oletusteksti puuttuville teksteille:",
+        "textsWhenObjectUsed" : "Tekstit esinettä käyttäessä muihin esineisiin",
+        "interactionShow" : "Näytä",
+        "interactionAll" : "Kaikki",
+        "interactionMissing" : "Puuttuvat",
+        "interactionDone" : "Tehdyt"
+    },
+
+    "classObject" : {
+        "generalName" : "Kiinteä esine",
+        "generalNameAdessive" : "Kiinteällä esineellä"
+        },
+
+    "classItem" : {
+        "generalName" : "Käyttöesine",
+        "generalNameAdessive" : "Käyttöesineellä"
+    },
+
+    "classContainer" : {
+        "generalName" : "Säiliö",
+        "generalNameAdessive" : "Säiliöllä"
+    },
+
+    "classDoor" : {
+        "generalName" : "Kulkureitti",
+        "generalNameAdessive" : "Kulkureitillä"
+    },
+
+    "classObstacle" : {
+        "generalName" : "Este",
+        "generalNameAdessive" : "Esteellä"
+    },
+
+    "classSequenceImage" : {
+        "generalName" : "Kuva",
+        "generalNameAdessive" : "Kuvalla"
+    },
+
+    "classMenuImage" : {
+        "generalName" : "Valikkokuva",
+        "generalNameAdessive" : "Valikkokuvalla"
+    },
+
+    "classText" : {
+        "generalName" : "Teksti",
+        "generalNameAdessive" : "Tekstillä"
+    },
+
+    "classSequence" : {
+        "generalName" : "Välianimaatio",
+        "generalNameAdessive" : "Välianimaatiolla"
+    },
+
+    "classStart" : {
+        "generalName" : "Alkukuva",
+        "generalNameAdessive" : "Alkukuvalla"
+    },
+
+    "classEnd" : {
+        "generalName" : "Loppukuva",
+        "generalNameAdessive" : "Loppukuvalla"
+    },
+
+    "classRoom" : {
+        "generalName" : "Huone",
+        "generalNameAdessive" : "Huoneella"
+    },
+
+    "classCustom" : {
+        "generalName" : "Erikoisnäkymä",
+        "generalNameAdessive" : "Erikoisnäkymällä"
+    },
+
+    "classSettingsWidget" : {
+    "noUse" : "Ei käyttöä",
+    "useToOtherObject" : "Käytä toiseen esineeseen",
+    "openSth" : "Avaa jotakin",
+    "putSmwh" : "Laita johonkin",
+    "deleteObstacle" : "Poista este",
+    "instantly" : "Välittömästi",
+    "fade" : "häivytys"
+    }
+
+}  
