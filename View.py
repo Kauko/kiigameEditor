@@ -278,8 +278,9 @@ class Start(View):
                     self.creditsButton = menu.getItemById(imageId)
                 elif (action == "none"):
                     self.emptyButton = menu.getItemById(imageId)
-        except:
-            print("NoneType-error")
+        except AttributeError as e:
+            print("View :: WARNING, Start.postInit(), NoneType-error")
+            print("        "+str(e))
 
     def getChildren(self):
         return [
@@ -344,8 +345,9 @@ class End(View):
         try:
             self.endText = getGameObject(
                 "custom", "end_texts").getRepresentingImage()
-        except:
-            print("NoneType-error")
+        except AttributeError as e:
+            print("View :: WARNING, End.postInit(), NoneType-error")
+            print("        "+str(e))
 
     def deleteChild(self, imageId):
         for image in self.endImages:
