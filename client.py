@@ -2,6 +2,8 @@ import requests
 import os
 
 
+# This class is for communicating between the server and the editor
+# The server is simply used for saving the games so they can be played
 class Client():
 
     VERBOSE = True
@@ -11,19 +13,9 @@ class Client():
         "upload": '/upload'
     }
 
-    def hello_world():
-        return requests.get(Client.SERVER_ADDRESS).content
-
-    def test_upload(self, folder_path):
-        files = Client.get_test_file(self)
-        return requests.post(Client.SERVER_ADDRESS, files=files)
-
-    def get_test_file(self):
-        return {'file1': open('../test.txt', 'rb')}
-
-    def download_test_file(self, filename):
-        return requests.get(Client.SERVER_ADDRESS+'/uploads/'+filename)
-
+    # Main function for uploading game files to the server
+    # Will construct a dict of the files, read them, and
+    # send to the server using a HTTP POST
     def upload_game_files(self, game_root):
         if self.VERBOSE:
             print("Client :: upload_game_files")
@@ -43,12 +35,16 @@ class Client():
                 "Client :: Response status code: " + str(response.status_code))
         return response
 
+    # Find the game files from the given folder, and save
+    # their names into a { <folder>: [<full_path>, <full_path>, ..]}
     def get_list_of_game_files(self, game_root):
         if self.VERBOSE:
             print("Client :: get_list_of_game_files in " + game_root)
         struct = os.walk(game_root)
         ret = {}
 
+        # Root is the "current" folder, dirs is folders in that folder,
+        # files is files in that folder
         for root, dirs, files in struct:
 
             ret[root] = []
@@ -63,6 +59,9 @@ class Client():
                     print(' - ' + f)
         return ret
 
+    # Gets the list of files from get_list_of_game_files,
+    # opens the files, and returns a dict:
+    # { <full_path>: <opened_file> }
     def build_file_dictionary(self, file_list):
         if self.VERBOSE:
             print("Client :: build_file_dictionary")
