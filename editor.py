@@ -6,7 +6,6 @@ import ScenarioData
 from ImageCache import ImageCache
 from os.path import dirname, abspath
 import ModuleLocation
-from client import Client
 
 
 # TODO: Keeping mouse down and moving it around in item combo shows items
@@ -14,9 +13,6 @@ from client import Client
 class Editor(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(Editor, self).__init__(parent)
-
-        #Remove after testing
-        print(Client.hello_world())
 
         self.editorImagePath = "%s/images/" \
             % (dirname(abspath(ModuleLocation.getLocation())))
