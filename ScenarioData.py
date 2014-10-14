@@ -6,10 +6,14 @@ import Object
 from collections import OrderedDict
 from os.path import dirname, abspath
 import ModuleLocation
+from client import Client
 
 
 class ScenarioData(object):
     def __init__(self, scenarioName):
+        self.VERBOSE = True
+        self.gamedata_folder = "gamedata"
+
         self.texts = OrderedDict()
         self.roomList = []
         self.sequenceList = []
@@ -18,10 +22,11 @@ class ScenarioData(object):
         self.startView = None
         self.endViewList = []
         self.menuList = []
+        self.scenarioName = scenarioName
 
         self.dataDir = "%s/%s/%s/"\
             % (dirname(abspath(ModuleLocation.getLocation())),
-                "gamedata", scenarioName)
+                self.gamedata_folder, scenarioName)
 
     # Load and parse game data files
     def loadScenario(self):
@@ -151,6 +156,8 @@ class ScenarioData(object):
 
     # Save scenario to JSON files
     def saveScenario(self):
+        if self.VERBOSE:
+            print("ScenarioData :: saveScenario")
         #scenarioTexts = {}
         scenarioObjects = {}
         scenarioImages = []
@@ -233,6 +240,16 @@ class ScenarioData(object):
         f = open(self.dataDir + "objects.json", "w")
         f.write(objectsJSON)
         f.close()
+
+        # Upload the game to the server
+        upload_folder = './' + self.gamedata_folder + '/' + self.scenarioName
+        if self.VERBOSE:
+            print("ScenarioData :: Uploading game files from " + upload_folder)
+            print("                ( Client wants './gamedata/<game_name>' )")
+        response = Client().upload_game_files(upload_folder)
+        if response.status_code != 200:
+            print("WARNING! Saving the game to " +
+                  "the server failed! ("+response.status_code+")")
 
     # Game object layers
     def __createLayerJSON__(self, attrs, children, className="Layer"):

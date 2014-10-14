@@ -7,7 +7,6 @@ from localizer import Localizer
 from ImageCache import ImageCache
 from os.path import dirname, abspath
 import ModuleLocation
-from client import Client
 
 
 # TODO: Keeping mouse down and moving it around in item combo shows items
@@ -15,9 +14,6 @@ from client import Client
 class Editor(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(Editor, self).__init__(parent)
-
-        #Remove after testing
-        #print(Client.hello_world())
 
         loc = Localizer.Instance()
         loc.loadTranslation()
@@ -396,7 +392,16 @@ class Editor(QtGui.QMainWindow):
     def updateSpaceTab(self):
         selectedRoom = self.left_scene.selectedItems()[0]
         #self.settingsWidget.displayOptions(selectedRoom.room)
-        self.spaceScene.clear()
+
+        try:
+            self.spaceScene.clear()
+        except AttributeError as e:
+            self.createSpaceTab()
+            print("Editor :: No attribute 'spaceScene' in updateSpaceTab()")
+            print("          Will call createSpaceTab()")
+            print("          " + str(e))
+            # createSpaceTab() calls updateSpaceTab, so return from here
+            return
 
         # Display room image and set the same scale than in the game
         pixmap = self.imageCache.createPixmap(
@@ -602,10 +607,14 @@ class Editor(QtGui.QMainWindow):
         if (selected):
             # TODO: Handle this better? Now there's a warning at the
             # beginning that textsWidget doesn't exist
-            self.textsWidget.displayTexts(selected)
-            self.texts_frame.setTitle(
-                loc.translate['textItemClicked']['texts']
-                - (selected.text()))
+            try:
+                self.textsWidget.displayTexts(selected)
+                self.texts_frame.setTitle("Tekstit - %s" % (selected.text()))
+            except AttributeError as e:
+                print("Editor :: WARNING, no attribute " +
+                      " 'textsWidget' in textItemClicked")
+                print("          " + str(e))
+                return
 
     def drawTextItems(self):
         #print ("DRAWING")
@@ -686,12 +695,16 @@ class Editor(QtGui.QMainWindow):
     # Click on a room in the main tab
     def roomClicked(self):
         self.drawRoomItems()
-        self.settingsWidget.displayOptions(
-            self.left_scene.selectedItems()[0].room)
-        self.setRemoveViewsButtonDisabled()
-        self.populateAddObjectsCombo()
-        self.setRemoveObjectsButtonDisabled()
-        self.updateSpaceTab()
+        try:
+            self.settingsWidget.displayOptions(
+                self.left_scene.selectedItems()[0].room)
+            self.setRemoveViewsButtonDisabled()
+            self.populateAddObjectsCombo()
+            self.setRemoveObjectsButtonDisabled()
+            self.updateSpaceTab()
+        except AttributeError as e:
+            print("Editor :: WARNING, missing attributes in roomClicked()")
+            print("          " + str(e))
 
     # Click on an item in the main tab room preview
     def roomItemClicked(self):
@@ -737,7 +750,13 @@ class Editor(QtGui.QMainWindow):
 
     # Draw the middle frame room items
     def drawRoomItems(self):
-        self.middle_scene.clear()
+        try:
+            self.middle_scene.clear()
+        except AttributeError as e:
+            print("Editor :: WARNING, no attribute " +
+                  " 'middle_scene' in drawRoomItems()")
+            print("          " + str(e))
+            return
 
         # There might not be a selection in left_scene
         try:
