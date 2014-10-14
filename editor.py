@@ -117,7 +117,12 @@ class Editor(QtGui.QMainWindow):
         self.mainLayout.addWidget(right_frame, 1, 4, 1, 2)
 
         self.settingsWidget = SettingsWidget.SettingsWidget(self)
-        self.settingsWidget.displayOptions(selectedRoom.room)
+        try:
+            self.settingsWidget.displayOptions(selectedRoom.room)
+        except AttributeError as e:
+            print("Editor :: WARNING, selectedRoom attr 'room' is NoneType")
+            print("          in init(), settingsWidget.displayOptions()")
+            print("          " + str(e))
 
         # Set settings widget scrollable instead resizing main window
         self.scrollAreaMain = QtGui.QScrollArea()
@@ -198,26 +203,34 @@ class Editor(QtGui.QMainWindow):
                             i, 0, QtCore.Qt.UserRole - 1)
 
     def populateAddObjectsCombo(self):
-        selectedType = self.left_scene.currentItem().room.__class__.__name__
+        try:
+            selectedType = \
+                self.left_scene.currentItem().room.__class__.__name__
 
-        # Disable adding objects in the start view
-        if (selectedType in ("Start", "End")):
-            self.addObjectsCombo.setDisabled(True)
-            self.setRemoveObjectsButtonDisabled(forceDisable=True)
-            return
+            # Disable adding objects in the start view
+            if (selectedType in ("Start", "End")):
+                self.addObjectsCombo.setDisabled(True)
+                self.setRemoveObjectsButtonDisabled(forceDisable=True)
+                return
 
-        self.addObjectsCombo.setDisabled(False)
-        self.addObjectsCombo.clear()
-        self.addObjectsCombo.addItem("Lisää esine valittuun tilaan")
+            self.addObjectsCombo.setDisabled(False)
+            self.addObjectsCombo.clear()
+            self.addObjectsCombo.addItem("Lisää esine valittuun tilaan")
 
-        if (selectedType == "Room"):
-            self.addObjectsCombo.addItem("Kiinteä esine", userData="object")
-            self.addObjectsCombo.addItem("Käyttöesine", userData="item")
-            self.addObjectsCombo.addItem("Ovi", userData="door")
-            self.addObjectsCombo.addItem("Säiliö", userData="container")
-            self.addObjectsCombo.addItem("Este", userData="obstacle")
-        elif (selectedType == "Sequence"):
-            self.addObjectsCombo.addItem("Kuva", userData="sequenceimage")
+            if (selectedType == "Room"):
+                self.addObjectsCombo.addItem(
+                    "Kiinteä esine", userData="object")
+                self.addObjectsCombo.addItem("Käyttöesine", userData="item")
+                self.addObjectsCombo.addItem("Ovi", userData="door")
+                self.addObjectsCombo.addItem("Säiliö", userData="container")
+                self.addObjectsCombo.addItem("Este", userData="obstacle")
+            elif (selectedType == "Sequence"):
+                self.addObjectsCombo.addItem("Kuva", userData="sequenceimage")
+        except AttributeError as e:
+            print("Editor :: WARNING, currentItem()'s' attribute " +
+                  " 'room' is NoneType")
+            print("          In populateAddObjectsCombo(), left_scene")
+            print("          " + str(e))
 
     def getPlaceholderImagePath(self, objectType):
         return self.editorImagePath +\
@@ -305,8 +318,12 @@ class Editor(QtGui.QMainWindow):
 
         # Another settings widget for room view
         #self.spaceSettingsWidget = SettingsWidget.SettingsWidget(self)
-        selectedRoom = self.left_scene.selectedItems()[0]
-        self.settingsWidget.displayOptions(selectedRoom.room)
+        try:
+            selectedRoom = self.left_scene.selectedItems()[0]
+            self.settingsWidget.displayOptions(selectedRoom.room)
+        except IndexError:
+            # Not a real error, there's just no selectedItems?
+            pass
 
         # Room
         left_frame = QtGui.QGroupBox("Tila")
@@ -351,66 +368,71 @@ class Editor(QtGui.QMainWindow):
         print("drop!")
 
     def updateSpaceTab(self):
-        selectedRoom = self.left_scene.selectedItems()[0]
-        #self.settingsWidget.displayOptions(selectedRoom.room)
-
         try:
-            self.spaceScene.clear()
-        except AttributeError as e:
-            self.createSpaceTab()
-            print("Editor :: No attribute 'spaceScene' in updateSpaceTab()")
-            print("          Will call createSpaceTab()")
-            print("          " + str(e))
-            # createSpaceTab() calls updateSpaceTab, so return from here
-            return
-
-        # Display room image and set the same scale than in the game
-        pixmap = self.imageCache.createPixmap(
-            selectedRoom.room.getRepresentingImage().absoluteImagePath
-            ).scaled(981, 543)
-        pixmapWidget = QtGui.QLabel()
-        pixmapWidget.setPixmap(pixmap)
-        pixmapWidget.setGeometry(0, 200, pixmap.width(), pixmap.height())
-        self.spaceScene.addPixmap(pixmap)
-        self.spaceItems = selectedRoom.room.getItems()
-
-        # Display objects
-        for item in self.spaceItems:
-            # TODO: Resolve handling text objects (issue #8)
-            #if (item.getClassname() == "Text"):
-            #   continue
-
-            img = item.getRepresentingImage()
-            if (item.getClassname() == "Text"):
-                continue
-            #print(self.scenarioData.dataDir + "/" + img.getSource())
+            selectedRoom = self.left_scene.selectedItems()[0]
+            #self.settingsWidget.displayOptions(selectedRoom.room)
 
             try:
-                scale = img.imageAttributes["scale"]
-            except:
-                scale = 1
+                self.spaceScene.clear()
+            except AttributeError as e:
+                self.createSpaceTab()
+                print("Editor :: No attribute 'spaceScene'" +
+                      " in updateSpaceTab()")
+                print("          Will call createSpaceTab()")
+                print("          " + str(e))
+                # createSpaceTab() calls updateSpaceTab, so return from here
+                return
 
-            pixmap = self.imageCache.createPixmap(img.absoluteImagePath)
-            pixmap = pixmap.scaledToHeight(pixmap.height()*scale)
-            pixItem = SpaceViewItem(pixmap, item.id, self)
-            pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
-            pixItem.setFlag(QtGui.QGraphicsItem.ItemIsSelectable)
-            pixItem.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges)
-            pixItem.setAcceptDrops(True)
+            # Display room image and set the same scale than in the game
+            pixmap = self.imageCache.createPixmap(
+                selectedRoom.room.getRepresentingImage().absoluteImagePath
+                ).scaled(981, 543)
+            pixmapWidget = QtGui.QLabel()
+            pixmapWidget.setPixmap(pixmap)
+            pixmapWidget.setGeometry(0, 200, pixmap.width(), pixmap.height())
+            self.spaceScene.addPixmap(pixmap)
+            self.spaceItems = selectedRoom.room.getItems()
 
-            inEmptyRoom = False
+            # Display objects
+            for item in self.spaceItems:
+                # TODO: Resolve handling text objects (issue #8)
+                #if (item.getClassname() == "Text"):
+                #   continue
 
-            pos = item.getPosition()
-            if not (pos):
-                inEmptyRoom = True
+                img = item.getRepresentingImage()
+                if (item.getClassname() == "Text"):
+                    continue
+                #print(self.scenarioData.dataDir + "/" + img.getSource())
 
-            if(inEmptyRoom):
-                print("In empty room")
-            else:
-                pixItem.setPos(pos[0], pos[1])
-                self.spaceScene.addItem(pixItem)
+                try:
+                    scale = img.imageAttributes["scale"]
+                except:
+                    scale = 1
 
-        selectedRoom.room.setItems(self.spaceItems)
+                pixmap = self.imageCache.createPixmap(img.absoluteImagePath)
+                pixmap = pixmap.scaledToHeight(pixmap.height()*scale)
+                pixItem = SpaceViewItem(pixmap, item.id, self)
+                pixItem.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
+                pixItem.setFlag(QtGui.QGraphicsItem.ItemIsSelectable)
+                pixItem.setFlag(QtGui.QGraphicsItem.ItemSendsGeometryChanges)
+                pixItem.setAcceptDrops(True)
+
+                inEmptyRoom = False
+
+                pos = item.getPosition()
+                if not (pos):
+                    inEmptyRoom = True
+
+                if(inEmptyRoom):
+                    print("In empty room")
+                else:
+                    pixItem.setPos(pos[0], pos[1])
+                    self.spaceScene.addItem(pixItem)
+
+            selectedRoom.room.setItems(self.spaceItems)
+        except IndexError:
+            # Not a real error, there's just no selectedItems?
+            pass
 
     def changeItemZIndex(self, change, item):
         if not (item in self.spaceItems):
@@ -548,17 +570,22 @@ class Editor(QtGui.QMainWindow):
         selectedItem = self.text_scene.itemAt(0, 0)
         self.text_scene.setCurrentItem(selectedItem)
 
-        # Texts
-        self.texts_frame = QtGui.QGroupBox(
-            "Tekstit - %s" % (selectedItem.text()))
-        self.texts_frame_layout = QtGui.QVBoxLayout()
-        self.texts_frame.setLayout(self.texts_frame_layout)
-        layout.addWidget(self.texts_frame)
+        try:
+            # Texts
+            self.texts_frame = QtGui.QGroupBox(
+                "Tekstit - %s" % (selectedItem.text()))
+            self.texts_frame_layout = QtGui.QVBoxLayout()
+            self.texts_frame.setLayout(self.texts_frame_layout)
+            layout.addWidget(self.texts_frame)
 
-        self.textsWidget = TextsWidget(self.scenarioData, self)
-        self.texts_frame_layout.addWidget(self.textsWidget)
+            self.textsWidget = TextsWidget(self.scenarioData, self)
+            self.texts_frame_layout.addWidget(self.textsWidget)
 
-        self.textsWidget.displayTexts(selectedItem)
+            self.textsWidget.displayTexts(selectedItem)
+        except AttributeError as e:
+            print("Editor :: WARNING, selectedItem has no " +
+                  " 'text' in createTextsTab()")
+            print("          " + str(e))
 
     # Click on an object in the texts tab object list
     def textItemClicked(self):
@@ -662,6 +689,8 @@ class Editor(QtGui.QMainWindow):
         except AttributeError as e:
             print("Editor :: WARNING, missing attributes in roomClicked()")
             print("          " + str(e))
+        except IndexError as e:
+            print("Editor :: " + str(e))
 
     # Click on an item in the main tab room preview
     def roomItemClicked(self):
@@ -719,6 +748,12 @@ class Editor(QtGui.QMainWindow):
         try:
             roomItems = self.left_scene.currentItem().room.getItems()
         except IndexError:
+            return
+        except AttributeError as e:
+            print("Editor :: WARNING, currentItem()'s' attribute " +
+                  " 'room' is NoneType")
+            print("          In drawRoomItems(), left_scene")
+            print("          " + str(e))
             return
 
         for item in roomItems:
@@ -806,18 +841,22 @@ class ViewWidget(QtGui.QListWidgetItem):
 
         self.room = room
 
-        if (room.nameable):
-            roomName = room.getName()
-            if not (roomName):
-                roomName = "%s ei ole nimeä" % (room.generalNameAdessive)
-        else:
-            roomName = room.generalName
+        try:
+            if (room.nameable):
+                roomName = room.getName()
+                if not (roomName):
+                    roomName = "%s ei ole nimeä" % (room.generalNameAdessive)
+            else:
+                roomName = room.generalName
 
-        self.setText(roomName)
+            self.setText(roomName)
 
-        imagePath = room.getRepresentingImage().absoluteImagePath
-        icon = QtGui.QIcon(imagePath)
-        self.setIcon(icon)
+            imagePath = room.getRepresentingImage().absoluteImagePath
+            icon = QtGui.QIcon(imagePath)
+            self.setIcon(icon)
+        except AttributeError as e:
+            print("Editor :: WARNING, ViewWidget parameter 'room' is NoneType")
+            print("          " + str(e))
 
 
 # Item widget that represents items in game views

@@ -520,7 +520,10 @@ class Room(View):
         return newObject
 
     def removeObject(self, childObject):
-        self.objectList.remove(childObject)
+        try:
+            self.objectList.remove(childObject)
+        except ValueError as e:
+            print("View :: Room.removeObject(), " + str(e))
         self.scenarioData.removeObject(childObject)
 
     def setItems(self, items):
