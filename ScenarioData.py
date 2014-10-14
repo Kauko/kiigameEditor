@@ -247,9 +247,14 @@ class ScenarioData(object):
             print("ScenarioData :: Uploading game files from " + upload_folder)
             print("                ( Client wants './gamedata/<game_name>' )")
         response = Client().upload_game_files(upload_folder)
-        if response.status_code != 200:
-            print("WARNING! Saving the game to " +
+        if response is None:
+            print("ScenarioData :: Saving the game to the server failed.")
+        elif response.status_code != 200:
+            print("ScenarioData :: WARNING! Saving the game to " +
                   "the server failed! ("+response.status_code+")")
+
+        if self.VERBOSE:
+            print("ScenarioData :: Save game successfull.")
 
     # Game object layers
     def __createLayerJSON__(self, attrs, children, className="Layer"):
