@@ -1,5 +1,8 @@
 {
-    "mainWindowTitle": "kiigame - pelieditori",
+ 
+    "Init": {
+        "mainWindowTitle": "kiigame - pelieditori"
+        },
 
     "Tabs":{
 	   "mainTab": "Päänäkymä",
@@ -31,10 +34,11 @@
 	},
 
     "populateRoomComboBox": {
-	   "hasNoName" : "Ei ole nimeä"
+	   "hasNoName" : "Huoneella ei ole nimeä"
     },
 
     "populateAddObjectsCombo": {
+       "addItemToSpace" : "Lisää esine valittuun tilaan",
 	   "addObject" : "Kiinteä esine",
 	   "addItem" : "Käyttöesine",
 	   "addDoor" : "Ovi",
@@ -53,8 +57,12 @@
 
     "createTextsTab": {
 	   "objects" : "Esineet",
-	   "texts" : "Tekstit"
+	   "texts" : "Tekstit "
 	},
+
+    "textItemsClicked": {
+        "texts" : "Tekstit "
+    },
 
     "drawTextItems" : {
 	   "nameOfObject" : "Esineen nimi",
@@ -72,11 +80,11 @@
 	   "checkDeletion" : "Haluatko varmasti poistaa esineen?",
 	   "Yes" : "Kyllä",
 	   "No" : "Ei",
-	   "removeObjectWindowTitle" : "Poista?"
+	   "delObjWindowTitle" : "Poista?"
 	},
 
     "ViewWidget": {
-	   "hasNoName" : "Ei ole nimeä"
+	   "roomHasNoName" : "Ovella ei ole nimeä"
 	},
 
     "TextItemWidget": {
