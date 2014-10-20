@@ -6,7 +6,7 @@ import os
 # The server is simply used for saving the games so they can be played
 class Client():
 
-    VERBOSE = True
+    VERBOSE = False
 
     SERVER_ADDRESS = 'http://localhost:5000'
     ROUTES = {
@@ -26,14 +26,22 @@ class Client():
         # Post the list to the server
         if self.VERBOSE:
             print("Client :: Attempting to POST")
-        response = requests.post(
-            self.SERVER_ADDRESS + self.ROUTES['upload'], files=files)
-        # Return the response so we can access,
-        # for example the status code elsewhere
-        if self.VERBOSE:
-            print(
-                "Client :: Response status code: " + str(response.status_code))
-        return response
+        try:
+            response = requests.post(
+                self.SERVER_ADDRESS + self.ROUTES['upload'], files=files)
+
+            if self.VERBOSE:
+                print(
+                    "Client :: Response status code: " +
+                    str(response.status_code))
+
+            # Return the response so we can access,
+            # for example the status code elsewhere
+            return response
+        except requests.ConnectionError as e:
+            print("Client :: ERROR!! Could not connect to server")
+            print("          " + str(e))
+            return None
 
     # Find the game files from the given folder, and save
     # their names into a { <folder>: [<full_path>, <full_path>, ..]}

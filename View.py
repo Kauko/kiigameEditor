@@ -279,13 +279,36 @@ class Start(View):
                 elif (action == "none"):
                     self.emptyButton = menu.getItemById(imageId)
         except AttributeError as e:
-            print("View :: WARNING, Start.postInit(), NoneType-error")
+            print("View.Start :: WARNING, postInit(), NoneType-error")
             print("        "+str(e))
 
     def getChildren(self):
-        return [
-            self.background, self.startButton, self.creditsButton,
-            self.emptyButton, self.beginingImage]
+        ret = []
+
+        # Put all of these in try-excepts because some attributes
+        # were missing
+        try:
+            ret.append(self.background)
+        except AttributeError as e:
+            print("View.Start :: WARNING, " + str(e))
+        try:
+            ret.append(self.startButton)
+        except AttributeError as e:
+            print("View.Start :: WARNING, " + str(e))
+        try:
+            ret.append(self.creditsButton)
+        except AttributeError as e:
+            print("View.Start :: WARNING, " + str(e))
+        try:
+            ret.append(self.emptyButton)
+        except AttributeError as e:
+            print("View.Start :: WARNING, " + str(e))
+        try:
+            ret.append(self.beginingImage)
+        except AttributeError as e:
+            print("View.Start :: WARNING, " + str(e))
+
+        return ret
 
     def getRepresentingImage(self):
         return self.background
@@ -346,7 +369,7 @@ class End(View):
             self.endText = getGameObject(
                 "custom", "end_texts").getRepresentingImage()
         except AttributeError as e:
-            print("View :: WARNING, End.postInit(), NoneType-error")
+            print("View.End :: WARNING, postInit(), NoneType-error")
             print("        "+str(e))
 
     def deleteChild(self, imageId):
@@ -497,7 +520,10 @@ class Room(View):
         return newObject
 
     def removeObject(self, childObject):
-        self.objectList.remove(childObject)
+        try:
+            self.objectList.remove(childObject)
+        except ValueError as e:
+            print("View :: Room.removeObject(), " + str(e))
         self.scenarioData.removeObject(childObject)
 
     def setItems(self, items):

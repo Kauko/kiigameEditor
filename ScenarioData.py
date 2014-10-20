@@ -2,18 +2,23 @@
 
 import json
 import View
+import sys
 import Object
 from collections import OrderedDict
 from os.path import dirname, abspath
 import ModuleLocation
 from client import Client
+import shutil
 
 
 class ScenarioData(object):
 
     def __init__(self, scenarioName):
         self.VERBOSE = True
-        self.gamedata_folder = "gamedata"
+        self.GAMEDATA_FOLDER = "gamedata"
+        self.TEMPLATE_FOLDER = "%s/%s/%s/"\
+            % (dirname(abspath(ModuleLocation.getLocation())),
+                self.GAMEDATA_FOLDER, "template")
 
         self.texts = OrderedDict()
         self.roomList = []
@@ -27,7 +32,7 @@ class ScenarioData(object):
 
         self.dataDir = "%s/%s/%s/"\
             % (dirname(abspath(ModuleLocation.getLocation())),
-                self.gamedata_folder, scenarioName)
+                self.GAMEDATA_FOLDER, scenarioName)
 
     # Load and parse game data files
     def loadScenario(self):
@@ -36,18 +41,42 @@ class ScenarioData(object):
         #self.createInteractions()
 
     def parseTexts(self):
-        with open(self.dataDir + "texts.json", encoding='utf-8') as f:
-            self.texts = json.load(f)
-            f.close()
+        try:
+            with open(self.dataDir + "texts.json", encoding='utf-8') as f:
+                self.texts = json.load(f)
+                f.close()
+        except FileNotFoundError:
+            self.createFile("texts.json", self.dataDir)
+            self.parseTexts()
+            # This return statement is pointless here right now, but if
+            # code is ever added below this except-clause, that code would
+            # be executed twice if this wasn't here
+            return
 
     def parseImages(self):
-        with open(self.dataDir + "images.json", encoding='utf-8') as f:
-            images = json.load(f)
-            f.close()
+        try:
+            with open(self.dataDir + "images.json", encoding='utf-8') as f:
+                images = json.load(f)
+                f.close()
+        except FileNotFoundError:
+            self.createFile("images.json", self.dataDir)
+            # Once images.json is created, recursively call this function again
+            self.parseImages()
+            # Once the above function call is done, we must return so that
+            # this function is not ran for the second time
+            return
 
-        with open(self.dataDir + "objects.json", encoding='utf-8') as f:
-            objects = json.load(f)
-            f.close()
+        try:
+            with open(self.dataDir + "objects.json", encoding='utf-8') as f:
+                objects = json.load(f)
+                f.close()
+        except FileNotFoundError:
+            self.createFile("objects.json", self.dataDir)
+            # Once the json is created, recursively call this function again
+            self.parseImages()
+            # Once the above function call is done, we must return so that
+            # this function is not ran for the second time
+            return
 
         # Parse objects from images.json and objects.json into categorized dict
         objectsByCat = OrderedDict()
@@ -153,7 +182,28 @@ class ScenarioData(object):
         for obj in self.roomList + self.endViewList:
             obj.postInit(self.getGameObject)
 
-        self.startView.postInit(self.getGameObject)
+        try:
+            self.startView.postInit(self.getGameObject)
+        except AttributeError as e:
+            print("ScenarioData :: WARNING, startView is NoneType " +
+                  "in parseImages")
+            print("                " + str(e))
+
+    # Creates necessary json files if they are not found
+    # Basically just copies empty json files from the templates folder
+    def createFile(self, filename, destination_folder):
+        if self.VERBOSE:
+            print("ScenarioData :: Creating " + filename + " from template.")
+            #print("     " + self.TEMPLATE_FOLDER + filename)
+            #print(" ->  " + destination_folder + filename)
+        try:
+            shutil.copy(self.TEMPLATE_FOLDER + filename,
+                        destination_folder + filename)
+        except FileNotFoundError as e:
+            print("CRITICAL ERROR, Can't read gamedata/template folder")
+            print(str(e))
+            sys.exit(0)
+        return
 
     # Save scenario to JSON files
     def saveScenario(self):
@@ -168,37 +218,49 @@ class ScenarioData(object):
                 self.endViewList + self.menuList + self.customObjectList:
             viewChildren = []
 
-            # Contents for objects.json from view
-            if ("object_name" in view.attrs):
-                scenarioObjects[view.attrs["object_name"]] = view.object
+            try:
+                # Contents for objects.json from view
+                if ("object_name" in view.attrs):
+                    scenarioObjects[view.attrs["object_name"]] = view.object
+            except AttributeError as e:
+                print("ScenarioData :: " + str(e))
 
-            # Go through objects inside views
-            for viewChild in view.getChildren():
-                #childJSON = viewChild.objectAttributes
+            try:
+                # Go through objects inside views
+                for viewChild in view.getChildren():
+                    #childJSON = viewChild.objectAttributes
+                    try:
+                        # Go through images inside objects
+                        for childImage in viewChild.images:
+                            viewChildren.append(
+                                self.__createLayerChildJSON__(
+                                    childImage.imageAttributes,
+                                    childImage.getClassname()))
 
-                # Go through images inside objects
-                for childImage in viewChild.images:
-                    viewChildren.append(
-                        self.__createLayerChildJSON__(
-                            childImage.imageAttributes,
-                            childImage.getClassname()))
+                            # Contents for objects.json from image
+                            if ("object_name" in childImage.imageAttributes):
+                                scenarioObjects[
+                                    childImage.imageAttributes["object_name"]]\
+                                    = childImage.objectAttributes["object"]
+                    except AttributeError as e:
+                        print("ScenarioData :: " + str(e))
 
-                    # Contents for objects.json from image
-                    if ("object_name" in childImage.imageAttributes):
-                        scenarioObjects[
-                            childImage.imageAttributes["object_name"]] =\
-                            childImage.objectAttributes["object"]
-
-                if (type(viewChild) == Object.JSONImage):
-                    viewChildren.append(
-                        self.__createLayerChildJSON__(
-                            viewChild.imageAttributes, viewChild.getClassname()
+                    if (type(viewChild) == Object.JSONImage):
+                        viewChildren.append(
+                            self.__createLayerChildJSON__(
+                                viewChild.imageAttributes,
+                                viewChild.getClassname()
+                                )
                             )
-                        )
+            except AttributeError as e:
+                print("ScenarioData :: " + str(e))
 
-            layerJSON = self.__createLayerJSON__(
-                view.attrs, viewChildren, view.classname)
-            scenarioImages.append(layerJSON)
+            try:
+                layerJSON = self.__createLayerJSON__(
+                    view.attrs, viewChildren, view.classname)
+                scenarioImages.append(layerJSON)
+            except AttributeError as e:
+                print("ScenarioData :: " + str(e))
 
         # Go through self.texts and add modified texts from objects
         objects = self.getAllObjects()[0]
@@ -243,14 +305,20 @@ class ScenarioData(object):
         f.close()
 
         # Upload the game to the server
-        upload_folder = './' + self.gamedata_folder + '/' + self.scenarioName
+        upload_folder = './' + self.GAMEDATA_FOLDER + '/' + self.scenarioName
         if self.VERBOSE:
             print("ScenarioData :: Uploading game files from " + upload_folder)
             print("                ( Client wants './gamedata/<game_name>' )")
+
         response = Client().upload_game_files(upload_folder)
-        if response.status_code != 200:
-            print("WARNING! Saving the game to " +
+
+        if response is None:
+            print("ScenarioData :: Saving the game to the server failed.")
+        elif response.status_code != 200:
+            print("ScenarioData :: WARNING! Saving the game to " +
                   "the server failed! ("+response.status_code+")")
+        elif self.VERBOSE:
+            print("ScenarioData :: Save game successfull.")
 
     # Game object layers
     def __createLayerJSON__(self, attrs, children, className="Layer"):
