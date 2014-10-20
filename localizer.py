@@ -16,7 +16,6 @@ def translate(parent, translation, fallback=DEFAULT_FALLBACK):
         ret = loc[parent][translation]
         #maybe this is futile, as the json file cannot be None?
         if ret is None:
-            print("homohomo")
             return fallback
         else:
             return ret
