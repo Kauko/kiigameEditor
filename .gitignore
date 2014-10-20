@@ -4,3 +4,7 @@
 .project
 .pydevproject
 .settings/
+*.*~
+*.orig
+*.pyc
+/gamedata/

@@ -1,8 +1,11 @@
+# -*- coding: UTF-8 -*-
 from PySide import QtGui, QtCore
+import localizer
 
 
 # A widget that may have an object's closed, locked and open state settings
 class ObjectImageSettings(QtGui.QWidget):
+
     def __init__(self, titleLabelText, nameLabelText,
                  canBeLocked=False, lockedText=None, parent=None):
         super(ObjectImageSettings, self).__init__(parent)
@@ -23,7 +26,9 @@ class ObjectImageSettings(QtGui.QWidget):
             lambda s: self.parent.showImageDialog(
                 lambda imagePath: self.changeImage(imagePath))
 
-        self.clickLabel = QtGui.QLabel("Teksti klikatessa")
+        #self.clickLabel = QtGui.QLabel("Teksti klikatessa")
+        self.clickLabel = QtGui.QLabel(localizer.translate(
+            'ObjectImageSettings', 'textAsClicked'))
         self.clickEdit = QtGui.QTextEdit()
         self.clickEdit.setMaximumHeight(50)
         self.clickEdit.focusOutEvent = lambda s: self.changeClickEdit()
@@ -36,7 +41,8 @@ class ObjectImageSettings(QtGui.QWidget):
             # TODO: Texts need to be set from outside
             self.lockedCheckbox = QtGui.QCheckBox(lockedText)
             self.lockedCheckbox.clicked.connect(self.changeLocked)
-            self.keyLabel = QtGui.QLabel("Mikä avaa?")
+            self.keyLabel = QtGui.QLabel(
+                localizer.translate('ObjectImageSettings', 'whatOpens'))
             self.keyCombo = self.parent.createCombobox()
 
             self.layout.addWidget(self.lockedCheckbox)
@@ -53,8 +59,10 @@ class ObjectImageSettings(QtGui.QWidget):
         objectType = objectType.lower()
         if (objectType == "item"):
             self.parent.updateItemCombobox(
-                self.keyCombo, "Avainta ei valittu!", ("item",), ("item",),
-                self.clearKey, self.changeKey)
+                self.keyCombo, localizer.translate(
+                    'ObjectImageSettings', 'keyWasNotSelected'
+                ), ("item",), ("item",), self.clearKey, self.changeKey
+            )
 
     def changeNameEdit(self):
         self.parent.changeName(self.nameEdit, self.gameImageObject)
