@@ -7,6 +7,11 @@ DEFAULT_TRANSLATION = "loc_eng.json"
 
 
 def loadTranslation(translation=DEFAULT_TRANSLATION):
+    # This apparently does not make this variable "truly global"
+    # It just tells python to not to make a new "loc" variable
+    # inside this function, but rather use the one already defined
+    # in this module
+    global loc
     loc = json.loads(open(translation).read())
     return loc
 
