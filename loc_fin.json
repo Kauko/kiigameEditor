@@ -1,0 +1,240 @@
+{
+ 
+    "Init": {
+        "mainWindowTitle": "kiigame - pelieditori"
+        },
+
+    "Tabs":{
+	   "mainTab": "Päänäkymä",
+	   "spaceTab": "Tila",
+	   "textsTab": "Tekstit"
+	},
+
+    "createMenuActions":{
+	   "new": "Uusi",
+	   "open": "Avaa",
+	   "save": "Tallenna",
+	   "quit": "Lopeta"
+	},
+
+    "createMenus":{
+	   "file": "Tiedosto"
+	},
+
+    "createMainTab":{
+	   "spaces" : "Tilat",
+	   "addSpace" : "Lisää tila",
+	   "addRoom" : "Lisää huone",
+	   "addAnimation" : "Lisää animaatio",
+	   "spaceObjects" : "Tilan objektit",
+	   "settings" : "Asetukset",
+	   "removeSelectedSpace" : "Poista valittu tila",
+	   "removeSelectedObject" : "Poista valittu esine",
+	   "changeObjectsRoom" : "Vaihda esine eri huoneeseen"
+	},
+
+    "populateRoomComboBox": {
+	   "hasNoName" : "Huoneella ei ole nimeä"
+    },
+
+    "populateAddObjectsCombo": {
+       "addItemToSpace" : "Lisää esine valittuun tilaan",
+	   "addObject" : "Kiinteä esine",
+	   "addItem" : "Käyttöesine",
+	   "addDoor" : "Ovi",
+	   "addContainer" : "Säiliö",
+	   "addObstacle" : "Este",
+	   "addImage" : "Kuva"
+	},
+
+    "createSpaceTab": {
+	   "space" : "Tila",
+	   "settings" : "Asetukset",
+	   "order" : "Järjestys",
+	   "bringToFront" : "Tuo esine eteen",
+	   "moveBehind" : "Vie esine taakse"
+	   },
+
+    "createTextsTab": {
+	   "objects" : "Esineet",
+	   "texts" : "Tekstit "
+	},
+
+    "textItemsClicked": {
+        "texts" : "Tekstit "
+    },
+
+    "drawTextItems" : {
+	   "nameOfObject" : "Esineen nimi",
+	   "textsDone" : "Teksteistä tehtynä"
+	},
+
+    "closeEvent": {
+	   "checkQuit" : "Haluatko varmasti poistua?",
+	   "Yes" : "Kyllä",
+	   "No" : "Ei",
+	   "closeWindowTitle" : "Poistu?"
+	},
+
+    "removeViewsButtonClicked": {
+        "checkDeletion" : "Haluatko varmasti poistaa näkymän?",
+        "Yes" : "Kyllä",
+        "No" : "Ei",
+        "removeViewWindowTitle" : "Poista?"
+    },
+
+    "removeObjectsButtonClicked": {
+	   "checkDeletion" : "Haluatko varmasti poistaa esineen?",
+	   "Yes" : "Kyllä",
+	   "No" : "Ei",
+	   "delObjWindowTitle" : "Poista?"
+	},
+
+    "classViewWidget": {
+	   "roomHasNoName" : "Ovella ei ole nimeä"
+	},
+
+    "classItemWidget" : {
+        "hasNoName" : "Esineellä ei ole nimeä"
+        },
+
+    "classTextItemWidget": {
+        "hasNoName" : "Tekstillä ei ole nimeä"
+    },
+
+    "getImageType": {
+        "openImage" : " . Auki",
+        "closedImage" : " . Kiinni",
+        "lockedImage" : " . Lukittu",
+        "emptyImage" : " . Tyhjä",
+        "fullImage" : " . Täysi",
+        "blockingImage" : " . Estää",
+        "unblockingImage" : " . Ei estä",
+        "blockedImage" : " . Estetty"
+    },
+
+    "classTextsWidget" : {
+        "textAsClicked" : "Teksti klikatessa",
+        "textAsPicked" : "Teksti poimiessa",
+        "defaultText" : "Oletusteksti puuttuville teksteille:",
+        "defaultTextWithoutUseText" : "Oletusteksti puuttuville teksteille:",
+        "textsWhenObjectUsed" : "Tekstit esinettä käyttäessä muihin esineisiin",
+        "interactionShow" : "Näytä",
+        "interactionAll" : "Kaikki",
+        "interactionMissing" : "Puuttuvat",
+        "interactionDone" : "Tehdyt"
+    },
+
+    "displayTexts" : {
+        "textForUsed" : "Teksti käyttökohteelle"
+    },
+
+    "classSettingsWidget" : {
+        "noUse" : "Ei käyttöä",
+        "useToOtherObject" : "Käytä toiseen esineeseen",
+        "openSth" : "Avaa jotakin",
+        "putSmwh" : "Laita johonkin",
+        "deleteObstacle" : "Poista este",
+        "instantly" : "Välittömästi",
+        "fade" : "Häivytys",
+        "name" : "Nimi",
+        "image" : "Kuva",
+        "gameEndsIfClicked" : "Peli loppuu klikatessa",
+        "music" : "Musiikki",
+        "browse" : "Selaa...",
+        "chooseMusicFile" : "Valitse musiikkitiedosto",
+        "noMusic" : "Ei musiikkia",
+        "textAsClicked" : "Teksti klikatessa",
+        "picked" : "Poiminta",
+        "textIfPicked" : "Teksti poimiessa:",
+        "usage" : "Käyttö",
+        "textIfUsed": "Teksti käyttäessä:",
+        "theseAndOtherTexts" : "Nämä ja muut tekstit",
+        "whereItGoes" : "Mihin pääsee?",
+        "spaceAtStart" : "Tila alussa",
+        "shut" : "Kiinni",
+        "open" : "Auki",
+        "openDoor" : "Avoin kulkureitti",
+        "openDoorName" : "Avoimen kulkureitin nimi",
+        "closedDoor" : "Suljettu kulkureitti",
+        "closedDoorName" : "Suljetun kulkureitin nimi",
+        "lockedDoor" : "Lukittu kulkureitti",
+        "lockedDoorName" : "Lukitun kulkureitin nimi",
+        "locked" : "Lukossa",
+        "lockedContainer" : "Lukittu säiliö",
+        "lockedContainerName" : "Lukitun säiliö nimi",
+        "openContainer" : "Avoin säiliö",
+        "openContainerName" : "Avoimen säiliön nimi",
+        "emptyContainer" : "Tyhjä säiliö",
+        "emptyContainerName" : "Tyhjän säiliön nimi",
+        "obstacleName" : "Esteen nimi",
+        "whatObstructs" : "Mitä estää?",
+        "whatGoesToContainer" : "Mikä menee säiliöön?",
+        "whatComesFromContainer" : "Mitä tulee säiliöstä",
+        "endResult" : "Lopputulos",
+        "imageShowTime" : "Kuvan näyttöaika (0-10 sekuntia)",
+        "fadeType" : "Kuvan vaihtumistapa",
+        "text" : "Teksti",
+        "removeObject" : "Poista tämä esine",
+        "removeView" : "Poista tämä näkymä",
+        "notSelected" : "Ei valittu",
+        "notAnywhere" : "Ei mihinkään",
+        "noNothing" : "Ei mitään",
+        "notAnything" : "Ei mikään",
+        "vanishDuringUse" : "Katoaako esine käyttäessä?",
+        "objectHasNoName" : "Objektilla ei ole nimeä",
+        "addRoom" : "Lisää uusi huone",
+        "roomHasNoName" : "Huoneella ei ole nimeä",
+        "addNewChoice": "Lisää uusi valinta",
+        "showMusicDialogChoose" : "'Valitse musiikkitiedosto'",
+        "showMusicDialogFiles" : "Musiikkitiedostot (*.mp3 *.ogg)",
+        "chooseBackground" : "'Valitse taustakuva'",
+        "chooseBackgroundFiles" : "Taustakuvat (*.png)"
+    },
+
+    "ObjectImageSettings" : {
+        "textAsClicked" : "Teksti klikatessa",
+        "whatOpens" : "Mikä avaa?",
+        "keyWasNotSelected" : "Avainta ei valittu!"
+    },
+
+    "classObject" : {
+        "solidObject" : "Kiinteä esine"
+    },
+
+    "classItem" : {
+        "itemName" : "Käyttöesine"
+    },
+
+    "classContainer" : {
+        "containerName" : "Säiliö"
+    },
+
+    "classDoor" : {
+        "doorName" : "Kulkureitti"
+    },
+
+    "classObstacle" : {
+        "obstacleName" : "Este"
+    },
+
+    "classJSONImage" : {
+        "jsonImageName" : "Kuva"
+    },
+
+    "classSequenceImage" : {
+        "imageSequenceName" : "Kiinteä esine"
+    },
+
+    "classMenuImage" : {
+        "menuImageName" : "Valikkokuva"
+    },
+
+    "classBeginingImage" : {
+        "startImageName" : "Alkuruutu"
+    },
+
+    "classText" : {
+        "textName" : "Teksti"
+    }
+}  
