@@ -10,6 +10,7 @@ from client import Client
 
 
 class ScenarioData(object):
+    
     def __init__(self, scenarioName):
         self.VERBOSE = True
         self.gamedata_folder = "gamedata"

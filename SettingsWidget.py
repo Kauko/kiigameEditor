@@ -1,6 +1,7 @@
 from PySide import QtGui, QtCore
 from ObjectImageSettings import ObjectImageSettings
 from ImageCache import ImageCache
+import localizer
 
 # # TODO: remove useTypes[4], set it only in container instead
 # # TODO: locked container is unfinished/buggy (Legendan kaappi)
@@ -38,14 +39,16 @@ class SettingsWidget(QtGui.QWidget):
 
        ## TODO: change to translation file
         self.useTypes = {
-            0: "Ei käyttöä",
-            1: "Käytä toiseen esineeseen",
-            2: "Avaa jotakin",
-            3: "Laita johonkin",
-            4: "Poista este"
+            0: localizer.translate('classSettingsWidget', 'noUse'),
+            1: localizer.translate('classSettingsWidget', 'useToOtherObject'),
+            2: localizer.translate('classSettingsWidget', 'openSth'),
+            3: localizer.translate('classSettingsWidget', 'putSmwh'),
+            4: localizer.translate('classSettingsWidget', 'deleteObstacle')
         }
 
-        self.fadeTypes = {0: "Välittömästi", 1: "Häivytys"}
+        self.fadeTypes = {0: localizer.translate(
+            'classSettingsWidget', 'instantly'), 1: localizer.translate(
+            'classSettingsWidget', 'fade')}
 
         self.layout = QtGui.QVBoxLayout()
         self.setLayout(self.layout)
@@ -104,12 +107,14 @@ class SettingsWidget(QtGui.QWidget):
     # Settings for the object view
     def createOptionFields(self):
         # Name
-        self.nameLabel = QtGui.QLabel("Nimi")
+        self.nameLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'name'))
         self.objectNameEdit = QtGui.QLineEdit()
         self.objectNameEdit.editingFinished.connect(self.changeName)
 
         # General image
-        self.imgTextLabel = QtGui.QLabel("Kuva")
+        self.imgTextLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'image'))
         self.objectImage = QtGui.QLabel(self)
         self.objectImage.mousePressEvent =\
             lambda s: self.showImageDialog(self.changeObjectImage)
@@ -120,14 +125,18 @@ class SettingsWidget(QtGui.QWidget):
 
         # Ending checkbox
         self.endingCheckbox = QtGui.QCheckBox()  # Set text afterwards
-        self.endingCheckbox.setText("Peli loppuu klikatessa?")
+        self.endingCheckbox.setText(localizer.translate(
+            'classSettingsWidget', 'gameEndsIfClicked'))
         self.endingCheckbox.stateChanged.connect(self.changeEndingCheckbox)
 
         # Music
-        self.musicLabel = QtGui.QLabel("Musiikki")
+        self.musicLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'music'))
 
-        self.musicBtn = QtGui.QPushButton('Selaa...', self)
-        self.musicBtn.setToolTip('Valitse musiikkitiedosto')
+        self.musicBtn = QtGui.QPushButton(localizer.translate(
+            'classSettingsWidget', 'browse'), self)
+        self.musicBtn.setToolTip(localizer.translate(
+            'classSettingsWidget', 'chooseMusicFile'))
         self.musicBtn.resize(self.musicBtn.sizeHint())
         self.musicBtn.clicked.connect(
             lambda: self.showMusicDialog(self.changeMusic))
@@ -135,7 +144,8 @@ class SettingsWidget(QtGui.QWidget):
         self.musicTextEdit = QtGui.QLineEdit()
         self.musicTextEdit.setReadOnly(True)
 
-        self.musicClear = QtGui.QPushButton('Ei musiikkia', self)
+        self.musicClear = QtGui.QPushButton(localizer.translate(
+            'classSettingsWidget', 'noMusic'), self)
         self.musicClear.clicked.connect(self.clearMusic)
 
         # Where from dropdown box
@@ -143,24 +153,28 @@ class SettingsWidget(QtGui.QWidget):
             # "Mistä kulkureiteistä tänne pääsee?")
         # TODO: whereFromCombo
 
-        self.examineTextLabel = QtGui.QLabel("Teksti klikatessa:")
+        self.examineTextLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'textAsClicked'))
         self.examineTextEdit = QtGui.QTextEdit()
         self.examineTextEdit.setMaximumHeight(50)
         self.examineTextEdit.focusOutEvent = lambda s: self.changeExamineText()
 
         # Pickup text section
-        self.pickupLabel = QtGui.QLabel("Poiminta")
+        self.pickupLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'picked'))
         self.pickupLabelLine = self.createSeparator()
         self.pickupLabelLine.setFrameStyle(
             QtGui.QFrame.HLine | QtGui.QFrame.Raised)
-        self.pickupTextLabel = QtGui.QLabel("Teksti poimiessa:")
+        self.pickupTextLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'textIfPicked'))
 
         self.pickupTextEdit = QtGui.QTextEdit()
         self.pickupTextEdit.setMaximumHeight(50)
         self.pickupTextEdit.focusOutEvent = lambda s: self.changePickupText()
 
         # Object usage
-        self.useLabel = QtGui.QLabel("Käyttö")
+        self.useLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'usage'))
         self.useLabelLine = self.createSeparator()
 
         # Object type of usage
@@ -169,83 +183,126 @@ class SettingsWidget(QtGui.QWidget):
             self.useTypeCombo.addItem(self.useTypes[i])
         self.useTypeCombo.activated.connect(self.changeItemUseType)
 
-        self.useTextLabel = QtGui.QLabel("Teksti käytettäessä:")
+        self.useTextLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'textIfUsed'))
 
         # Use target
         self.useTargetCombo = self.createCombobox()
         self.updateUseTargetCombo()
 
-        self.allTextsButton = QtGui.QPushButton("Nämä ja muut tekstit")
+        self.allTextsButton = QtGui.QPushButton(localizer.translate(
+            'classSettingsWidget', 'theseAndOtherTexts'))
         self.allTextsButton.clicked.connect(self.showAllTexts)
 
         # Door widgets
-        self.doorTransitionLabel = QtGui.QLabel("Mihin pääsee?")
+        self.doorTransitionLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'whereItGoes'))
         self.doorTransitionCombo = self.createCombobox()
         self.updateDoorTransitionCombo()
 
-        self.doorInitialStateLabel = QtGui.QLabel("Tila alussa")
+        self.doorInitialStateLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'spaceAtStart'))
         self.doorInitialStateCombo = QtGui.QComboBox(self)
-        self.doorInitialStateCombo.addItem("Kiinni")
-        self.doorInitialStateCombo.addItem("Auki")
+        self.doorInitialStateCombo.addItem(localizer.translate(
+            'classSettingsWidget', 'shut'))
+        self.doorInitialStateCombo.addItem(localizer.translate(
+            'classSettingsWidget', 'open'))
         self.doorInitialStateCombo.activated.connect(
             lambda s: self.objectComboboxHandler(
                 self.doorInitialStateCombo, self.changeDoorInitialState))
 
         self.openDoorImage = ObjectImageSettings(
-            "Avoin kulkureitti", "Avoimen kulkureitin nimi", parent=self)
+            localizer.translate(
+                'classSettingsWidget', 'openDoor'),
+            localizer.translate('classSettingsWidget', 'openDoorName'),
+            parent=self)
         self.closedDoorImage = ObjectImageSettings(
-            "Suljettu kulkureitti", "Suljetun kulkureitin nimi", parent=self)
+            localizer.translate(
+                'classSettingsWidget', 'closedDoor'),
+            localizer.translate(
+                'classSettingsWidget', 'closedDoorName'),
+            parent=self)
         self.lockedDoorImage = ObjectImageSettings(
-            "Lukittu kulkureitti", "Lukitun kulkureitin nimi", True,
-            "Lukossa", parent=self)
+            localizer.translate(
+                'classSettingsWidget', 'lockedDoor'),
+            localizer.translate(
+                'classSettingsWidget', 'lockedDoorName'),
+            True,
+            localizer.translate('classSettingsWidget', 'locked'),
+            parent=self)
 
         # Container widgets
         self.lockedContainerImage = ObjectImageSettings(
-            "Lukittu säiliö", "Lukitun säiliön nimi", True,
-            "Lukossa", parent=self)
+            localizer.translate(
+                'classSettingsWidget', 'lockedContainer'),
+            localizer.translate(
+                'classSettingsWidget', 'lockedContainerName'),
+            True,
+            localizer.translate(
+                'classSettingsWidget', 'locked'),
+            parent=self)
         self.fullContainerImage = ObjectImageSettings(
-            "Täysi säiliö", "Avoimen säiliön nimi", parent=self)
+            localizer.translate(
+                'classSettingsWidget', 'openContainer'),
+            localizer.translate(
+                'classSettingsWidget', 'openContainerName'),
+            parent=self)
         self.emptyContainerImage = ObjectImageSettings(
-            "Tyhjä säiliö", "Tyhjän säiliön nimi", parent=self)
+            localizer.translate(
+                'classSettingsWidget', 'emptyContainer'),
+            localizer.translate(
+                'classSettingsWidget', 'emptyContainerName'),
+            parent=self)
 
         # Obstacle widgets
         self.obstacleImage = ObjectImageSettings(
-            None, "Esteen nimi", False, parent=self)
-        self.obstacleBlocksLabel = QtGui.QLabel("Mitä estää?")
+            None, localizer.translate(
+                'classSettingsWidget', 'whatObstructs'),
+            False, parent=self)
+        self.obstacleBlocksLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'whatObstructs'))
         self.obstacleBlocksCombo = self.createCombobox()
         self.updateObstacleBlocksCombo()
 
-        self.whatGoesLabel = QtGui.QLabel("Mikä menee säiliöön?")
+        self.whatGoesLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'whatGoesToContainer'))
         self.whatGoesCombo = self.createCombobox()
         self.updateWhatGoesCombo()
 
-        self.whatComesLabel = QtGui.QLabel("Mitä tulee säiliöstä?")
+        self.whatComesLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'whatComesFromContainer')
+        )
         self.whatComesCombo = self.createCombobox()
         self.updateWhatComesCombo()
 
         self.useConsumeCheckbox = QtGui.QCheckBox()  # Set text afterwards
         self.useConsumeCheckbox.stateChanged.connect(self.changeUseConsume)
 
-        self.outcomeLabel = QtGui.QLabel("Lopputulos")
+        self.outcomeLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'endResult')
+        )
         self.outcomeCombobox = self.createCombobox()
         self.updateOutcomeCombobox()
 
         # Sequence
         self.sequenceTimeLabel = QtGui.QLabel(
-            "Kuvan näyttöaika (0-10 sekuntia)")
+            localizer.translate(
+                'classSettingsWidget', 'imageShowTime'))
         self.sequenceTimeEdit = QtGui.QLineEdit()
         self.sequenceTimeEdit.setInputMask("9,9")
         self.sequenceTimeEdit.focusOutEvent =\
             lambda s: self.changeSequenceTime()
 
-        self.sequenceFadeLabel = QtGui.QLabel("Kuvan vaihtumistapa")
+        self.sequenceFadeLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'fadeType'))
         self.sequenceFadeCombo = QtGui.QComboBox(self)
         for i in self.fadeTypes:
             self.sequenceFadeCombo.addItem(self.fadeTypes[i])
         self.sequenceFadeCombo.activated.connect(self.changeSequenceFadeCombo)
 
         # End
-        self.textObjectTextLabel = QtGui.QLabel("Teksti")
+        self.textObjectTextLabel = QtGui.QLabel(localizer.translate(
+            'classSettingsWidget', 'text'))
         self.textObjectTextEdit = QtGui.QLineEdit()
         self.textObjectTextEdit.focusOutEvent =\
             lambda s: self.changeTextObjectText()
@@ -316,10 +373,14 @@ class SettingsWidget(QtGui.QWidget):
         self.layout.addWidget(self.sequenceFadeCombo)
 
         # Removebuttons
-        self.removeObjectButton = QtGui.QPushButton("Poista tämä esine")
+        self.removeObjectButton = QtGui.QPushButton(
+            localizer.translate(
+                'classSettingsWidget', 'removeObject'))
         self.layout.addWidget(self.removeObjectButton)
         self.removeObjectButton.clicked.connect(lambda: self.removeObject())
-        self.removeViewButton = QtGui.QPushButton("Poista tämä näkymä")
+        self.removeViewButton = QtGui.QPushButton(
+            localizer.translate(
+                'classSettingsWidget', 'removeView'))
         self.layout.addWidget(self.removeViewButton)
         self.removeViewButton.clicked.connect(lambda: self.removeView())
 
@@ -481,33 +542,43 @@ class SettingsWidget(QtGui.QWidget):
 
     def updateUseTargetCombo(self):
         self.updateItemCombobox(
-            self.useTargetCombo, "Ei valittu", connectTo=self.changeUseTarget)
+            self.useTargetCombo, localizer.translate(
+                'classSettingsWidget', 'notSelected'),
+            connectTo=self.changeUseTarget)
 
     def updateDoorTransitionCombo(self):
         self.updateItemCombobox(
-            self.doorTransitionCombo, "Ei mihinkään", "room",
-            connectTo=self.changeDoorTransition)
+            self.doorTransitionCombo, localizer.translate(
+                'classSettingsWidget', 'notAnywhere'),
+            "room", connectTo=self.changeDoorTransition)
 
     def updateObstacleBlocksCombo(self):
         self.updateItemCombobox(
-            self.obstacleBlocksCombo, "Ei mitään", ("door",), ("door",),
+            self.obstacleBlocksCombo, localizer.translate(
+                'classSettingsWidget', 'noNothing'), ("door",), ("door",),
             noChoiceMethod=self.clearObstacleBlock,
             connectTo=self.changeObstacleBlock)
 
     def updateWhatGoesCombo(self):
         self.updateItemCombobox(
-            self.whatGoesCombo, "Ei mikään", ("item",), ("item",),
+            self.whatGoesCombo, localizer.translate(
+                'classSettingsWidget', 'notAnything'),
+            ("item",), ("item",),
             connectTo=self.changeWhatGoes)
 
     def updateWhatComesCombo(self):
         self.updateItemCombobox(
-            self.whatComesCombo, "Ei mitään", ("item",), ("item",),
+            self.whatComesCombo, localizer.translate(
+                'classSettingsWidget', 'noNothing'),
+            ("item",), ("item",),
             connectTo=self.changeWhatComes)
 
     def updateOutcomeCombobox(self):
         self.updateItemCombobox(
-            self.outcomeCombobox, "Ei valittu", ("object", "item"),
-            ("object", "item"), noChoiceMethod=self.clearOutcome,
+            self.outcomeCombobox, localizer.translate(
+                'classSettingsWidget', 'notSelected'),
+            ("object", "item"), ("object", "item"),
+            noChoiceMethod=self.clearOutcome,
             connectTo=self.changeOutcome)
 
     def changeSequenceTime(self):
@@ -565,7 +636,7 @@ class SettingsWidget(QtGui.QWidget):
     # Set the input field values for rooms
     def setRoomOptions(self, room):
         # Room name
-        self.setObjectName(room, room.generalNameAdessive)
+        self.setObjectName(room, room.generalName)
 
         # Room background
         self.setObjectImage(
@@ -708,7 +779,9 @@ class SettingsWidget(QtGui.QWidget):
         # Show extra options when selecting use on other object
         if (typeIndex == 1):
             self.useConsumeCheckbox.setText(
-                "Katoaako %s käytettäessä?" % (self.currentObject.getName()))
+                localizer.translate(
+                    'classSettingsWidget', 'vanishDuringUse')
+            )
             self.useConsumeCheckbox.show()
             self.outcomeLabel.show()
             self.outcomeCombobox.show()
@@ -805,7 +878,7 @@ class SettingsWidget(QtGui.QWidget):
             self.examineTextEdit.setText(text)
 
     # Set any game object name
-    def setObjectName(self, gameObject=None, textStart="Objektilla",
+    def setObjectName(self, gameObject=None, textStart="Object",
                       textEdit=None, overrideText=None):
         if not (gameObject):
             gameObject = self.currentObject
@@ -820,7 +893,8 @@ class SettingsWidget(QtGui.QWidget):
                 name = ""
 
             if (name is None):
-                name = "%s ei ole nimeä" % (textStart)
+                name = localizer.translate(
+                    'classSettingsWidget', 'objectHasNoName')
 
         # If textEdit is defined, set its text instead
         if (textEdit):
@@ -839,6 +913,7 @@ class SettingsWidget(QtGui.QWidget):
                 QtCore.Qt.CheckState.Unchecked)
 
     def changeWhereLocated(self, combobox):
+        # What is this used for?
         print("Change where located to", combobox.itemData(
             combobox.currentIndex()))
 
@@ -956,7 +1031,8 @@ class SettingsWidget(QtGui.QWidget):
             text = self.objectNameEdit.text()
 
         if (len(text) == 0):
-            text = "%s ei ole nimeä" % (gameObject.generalNameAdessive)
+            text = localizer.translate(
+                'classSettingsWidget', 'objectHasNoName')
 
         gameObject.setName(text)
         self.updateParent()
@@ -1066,13 +1142,15 @@ class SettingsWidget(QtGui.QWidget):
     def populateRoomCombobox(self, combobox, addChoice=True):
         if (addChoice):
             imgPixmap = self.imageCache.createPixmap(self.editor.newIconPath)
-            combobox.addItem(imgPixmap, "Lisää uusi huone")
+            combobox.addItem(imgPixmap, localizer.translate(
+                'classSettingsWidget', 'addRoom'))
 
         for room in self.editor.getRoomObjects():
             # TODO model to eliminate redundancy from getName/roomName patterns
             roomName = room.getName()
             if not (roomName):
-                roomName = "%s ei ole nimeä" % (room.generalNameAdessive)
+                roomName = localizer.translate(
+                    'classSettingsWidget', 'roomHasNoName')
             imgPixmap = self.imageCache.createPixmap(
                 room.getRepresentingImage().getRepresentingImage()
                 .absoluteImagePath)
@@ -1094,8 +1172,9 @@ class SettingsWidget(QtGui.QWidget):
             objectTypes = ("obstacle",)
 
         self.populateCombobox(
-            objectTypes, combobox, "Ei valittu", objectTypes,
-            self.clearUseTarget)
+            objectTypes, combobox, localizer.translate(
+                'classSettingsWidget', 'notSelected'),
+            objectTypes, self.clearUseTarget)
 
     # Handle item combobox item choosing callback
     def objectComboboxHandler(self, combobox, callback):
@@ -1130,8 +1209,8 @@ class SettingsWidget(QtGui.QWidget):
             imgPixmap = self.imageCache.createPixmap(self.editor.newIconPath)
             for choice in addChoices:
                 combobox.addItem(
-                    imgPixmap, "Lisää uusi %s"
-                    % (self.editor.getGeneralName(choice).lower()),
+                    imgPixmap, localizer.translate(
+                        'classSettingsWidget', 'addNewChoice'),
                     userData=choice)
                 itemCounter += 1
 
@@ -1143,8 +1222,8 @@ class SettingsWidget(QtGui.QWidget):
                 roomObject = room["room"]
                 roomName = roomObject.getName()
                 if not (roomName):
-                    roomName = "%s ei ole nimeä"\
-                        % (roomObject.generalNameAdessive)
+                    roomName = localizer.translate(
+                        'classSettingsWidget', 'roomHasNoName')
                 imgPixmap = self.imageCache.createPixmap(
                     roomObject.getRepresentingImage().getRepresentingImage()
                     .absoluteImagePath)
@@ -1173,15 +1252,19 @@ class SettingsWidget(QtGui.QWidget):
 
                     objectName = obj.getName()
                     if not (objectName):
-                        objectName = "%s ei ole nimeä"\
-                            % (obj.generalNameAdessive)
+                        objectName = localizer.translate(
+                            'classSettingsWidget', 'objectHasNoName')
                     combobox.addItem(targetIcon, objectName, userData=obj)
                     itemCounter += 1
 
     def showMusicDialog(self, callBack):
         fname, _ = QtGui.QFileDialog.getOpenFileName(
             self,
-            'Valitse musiikkitiedosto', '~', "Musiikkitiedostot (*.mp3 *.ogg)")
+            localizer.translate(
+                'classSettingsWidget', 'showMusicDialogChoose'),
+            '~', localizer.translate(
+                'classSettingsWidget', 'showMusicDialogFiles')
+            )
 
         if (len(fname) != 0):
             self.musicTextEdit.setText(fname.split("/")[-1])
@@ -1190,7 +1273,11 @@ class SettingsWidget(QtGui.QWidget):
     def showImageDialog(self, callBack):
         fname, _ = QtGui.QFileDialog.getOpenFileName(
             self,
-            'Valitse taustakuva', '~', "Taustakuvat (*.png)")
+            localizer.translate(
+                'classSettingsWidget', 'chooseBackground'),
+            '~', localizer.translate(
+                'classSettingsWidget', 'chooseBackgroundFiles')
+            )
 
         if (len(fname) != 0):
             callBack(fname)

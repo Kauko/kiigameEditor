@@ -1,11 +1,15 @@
 from random import randint
 from copy import deepcopy
+import localizer
 
 
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
-    generalName = "Kiinteä esine"
-    generalNameAdessive = "Kiinteällä esineellä"
+
+    generalName = localizer.translate(
+        'classObject', 'solidObject')
+    #generalNameAdessive = localizer.translate(
+    #    'classObject', 'solidObjectAdessive')
 
     # Generic attributes for objects
     objectAttributes = {'object': {'music': ''}, 'className': 'Image'}
@@ -161,9 +165,8 @@ class Object(object):
 
 # Pickable item
 class Item(Object):
-    generalName = "Käyttöesine"
-    generalNameAdessive = "Käyttöesineellä"
 
+    generalName = localizer.translate('classItem', 'itemName')
     # Generic attributes for items
     objectAttributes = {
         'className': 'Image',
@@ -332,8 +335,9 @@ class Item(Object):
 
 
 class Container(Object):
-    generalName = "Säiliö"
-    generalNameAdessive = "Säiliöllä"
+
+    generalName = localizer.translate(
+        'classContainer', 'containerName')
 
     # Generic attributes for containers
     objectAttributes = {
@@ -559,8 +563,9 @@ class Container(Object):
 
 
 class Door(Object):
-    generalName = "Kulkureitti"
-    generalNameAdessive = "Kulkureitillä"
+
+    generalName = localizer.translate(
+        'classDoor', 'doorName')
 
     # Generic attributes for doors
     objectAttributes = {
@@ -760,8 +765,8 @@ class Door(Object):
 
 
 class Obstacle(Object):
-    generalName = "Este"
-    generalNameAdessive = "Esteellä"
+    generalName = localizer.translate(
+        'classObstacle', 'obstacleName')
 
     # Generic attributes for obstacles
     objectAttributes = {
@@ -877,6 +882,7 @@ class Obstacle(Object):
 
 # Image object representing what is in the JSON texts
 class JSONImage(Object):
+
     imageAttributes = {
         'category': '',
         'id': '',
@@ -887,8 +893,8 @@ class JSONImage(Object):
         'y': 0
     }
 
-    generalName = "Kuva"
-    generalNameAdessive = "Kuvalla"
+    generalName = localizer.translate(
+        'classJSONImage', 'jsonImageName')
 
     # imageAttributes has to be dict, not a list as with other objects
     # objectAttributes is a dict with object, attrs and className keys
@@ -975,8 +981,9 @@ class JSONImage(Object):
 
 # Differentiate sequence images from normal images
 class SequenceImage(JSONImage):
-    generalName = "Kuva"
-    generalNameAdessive = "Kuvalla"
+
+    generalName = localizer.translate(
+        'classSequenceImage', 'imageSequenceName')
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
@@ -1002,8 +1009,9 @@ class SequenceImage(JSONImage):
 
 # Differentiate menu images from normal images
 class MenuImage(JSONImage):
-    generalName = "Valikkokuva"
-    generalNameAdessive = "Valikkokuvalla"
+
+    generalName = localizer.translate(
+        'classMenuImage', 'menuImageName')
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
@@ -1012,10 +1020,11 @@ class MenuImage(JSONImage):
 
 
 # Differentiate begining image from normal images
-# This is here mostly for the general name and adessive
+# This is here mostly for the general name
 class BeginingImage(JSONImage):
-    generalName = "Alkuruutu"
-    generalNameAdessive = "Alkuruudulla"
+
+    generalName = localizer.translate(
+        'classBeginingImage', 'startImageName')
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
@@ -1024,8 +1033,8 @@ class BeginingImage(JSONImage):
 
 
 class Text(JSONImage):
-    generalName = "Teksti"
-    generalNameAdessive = "Tekstillä"
+    generalName = localizer.translate(
+        'classText', 'textName')
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):

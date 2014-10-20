@@ -1,0 +1,240 @@
+{
+ 
+    "Init": {
+        "mainWindowTitle": "kiigame - game editor"
+        },
+
+    "Tabs":{
+       "mainTab": "Main View",
+       "spaceTab": "Space",
+       "textsTab": "Texts"
+    },
+
+    "createMenuActions": {
+       "new": "New",
+       "open": "Open",
+       "save": "Save",
+       "quit": "Quit"
+    },
+
+    "createMenus": {
+       "file": "File"
+    },
+
+    "createMainTab": {
+       "spaces" : "Spaces",
+       "addSpace" : "Add space",
+       "addRoom" : "Add Room",
+       "addAnimation" : "Add animation",
+       "spaceObjects" : "Spaces objects",
+       "settings" : "Settings",
+       "removeSelectedSpace" : "Remove selected space",
+       "removeSelectedObject" : "Remove selected object",
+       "changeObjectsRoom" : "Change object to different room"
+    },
+
+    "populateRoomComboBox": {
+       "hasNoName" : "Room has no name"
+    },
+
+    "populateAddObjectsCombo": {
+       "addItemToSpace" : "Add item to selected space",
+       "addObject" : "Object",
+       "addItem" : "Item",
+       "addDoor" : "Door",
+       "addContainer" : "Container",
+       "addObstacle" : "Obstacle",
+       "addImage" : "Image"
+    },
+
+    "createSpaceTab": {
+       "space" : "Space",
+       "settings" : "Settings",
+       "order" : "Order",
+       "bringToFront" : "Bring object to front",
+       "moveBehind" : "Move object behind"
+       },
+
+    "createTextsTab": {
+       "objects" : "Objects",
+       "texts" : "Texts "
+    },
+
+    "textItemsClicked": {
+        "texts" : "Texts "
+    },
+
+    "drawTextItems" : {
+       "nameOfObject" : "Objects name",
+       "textsDone" : "Texts done"
+    },
+
+    "closeEvent": {
+       "checkQuit" : "Are you sure you want to quit?",
+       "Yes" : "Yes",
+       "No" : "No",
+       "closeWindowTitle" : "Quit?"
+    },
+
+    "removeViewsButtonClicked": {
+        "checkDeletion" : "Are you sure you want to delete the View?",
+        "Yes" : "Yes",
+        "No" : "No",
+        "removeViewWindowTitle" : "Delete?"
+    },
+
+    "removeObjectsButtonClicked": {
+       "checkDeletion" : "Are you sure you want to delete object?",
+       "Yes" : "Yes",
+       "No" : "No",
+       "delObjWindowTitle" : "Delete?"
+    },
+
+    "classViewWidget": {
+       "roomHasNoName" : "Room has no name"
+    },
+
+     "classItemWidget": {
+        "hasNoName" : "Item has no name"
+    },
+
+    "classTextItemWidget": {
+        "hasNoName" : "Text has no name"
+    },
+
+    "getImageType": {
+        "openImage" : " . Open",
+        "closedImage" : " . Closed",
+        "lockedImage" : " . Locked",
+        "emptyImage" : " . Empty",
+        "fullImage" : " . Full",
+        "blockingImage" : " . Blocking",
+        "unblockingImage" : " . Unblocking",
+        "blockedImage" : " . Blocked"
+    },
+
+    "classTextsWidget" : {
+        "textAsClicked" : "Text when clicked",
+        "textAsPicked" : "Text when picked",
+        "defaultText" : "Default text for missing texts:",
+        "defaultTextWithoutUseText" : "Default text for missing texts",
+        "textsWhenObjectUsed" : "Text when object is used on another object",
+        "interactionShow" : "Show",
+        "interactionAll" : "All",
+        "interactionMissing" : "Missing",
+        "interactionDone" : "Done"
+    },
+
+    "displayTexts" : {
+        "textForUsed" : "Text for usable object"
+    },
+
+    "classSettingsWidget" : {
+      "noUse" : "No Use",
+      "useToOtherObject" : "Use in another object",
+      "openSth" : "Open something",
+      "putSmwh" : "Put somewhere",
+      "deleteObstacle" : "Delete obstacle",
+      "instantly" : "instantly",
+      "fade" : "Fade",
+      "name" : "Name",
+      "image" : "Image",
+      "gameEndsIfClicked" :"Game ends if clicked",
+      "music" : "Music",
+      "browse" : "Browse...",
+      "chooseMusicFile" : "Choose music file",
+      "noMusic" : "No music",
+      "textAsClicked" : "Text when clicked",
+      "picked" : "Picking",
+      "textIfPicked" : "Text when picked: ",
+      "usage" : "Usage",
+      "textIfUsed" : "Text when used:",
+      "theseAndOtherTexts" : "These and other texts",
+      "whereItGoes" : "Where it goes?",
+      "spaceAtStart" : "Space at start",
+      "shut" : "Shut",
+      "open" : "Open",
+      "openDoor" : "Open door",
+      "openDoorName" : "Name of the opened door",
+      "closedDoor" : "Closed door",
+      "closedDoorName" : "Name of the closed door",
+      "lockedDoor" : "Locked door",
+      "lockedDoorName" : "Name of the locked door",
+      "locked" : "Locked",
+      "lockedContainer" : "Locked container",
+      "lockedContainerName" : "Name of the locked container",
+      "openContainer" : "Open container",
+      "openContainerName" : "Name of the open container",
+      "emptyContainer" : "Empty container",
+      "emptyContainerName" : "Name of the empty container",
+      "obstacleName" : "Name of the obstacle",
+      "whatObstructs" : "What obstructs?",
+      "whatGoesToContainer" : "What goes to container?",
+      "whatComesFromContainer" : "What comes from container?",
+      "endResult" : "The end result",
+      "imageShowTime" : "Image showtime (0-10 seconds)",
+      "fadeType" : "Image's fade type",
+      "text" : "Text",
+      "removeObject" : "Remove this object",
+      "removeView" : "Remove this view",
+      "notSelected" : "Not selected",
+      "notAnywhere" : "Not anywhere",
+      "noNothing" : "No nothing",
+      "notAnything" : "Not anything",
+      "vanishDuringUse" : "Does the object vanish during use?",
+      "objectHasNoName" : "The object has no name",
+      "addRoom" : "Add new room",
+      "roomHasNoName" : "The room has no name",
+      "addNewChoice" : "Add new choice",
+      "showMusicDialogChoose" : "'Choose music file'",
+      "showMusicDialogFiles" : "Music files (*.mp3 *.ogg)",
+      "chooseBackground" : "'Choose background'",
+      "chooseBackgroundFiles" : "Background (*.png)"
+    },
+
+    "ObjectImageSettings" : {
+        "textAsClicked" : "Text when clicked",
+        "whatOpens" : "What opens?",
+        "keyWasNotSelected" : "Key has not been selected!"
+    },
+
+    "classObject" : {
+      "solidObject" : "Solid object"
+    },
+
+    "classItem" : {
+        "itenName" : "Item"
+    },
+
+    "classContainer" : {
+        "containerName" : "Container"
+    },
+
+    "classDoor" : {
+        "doorName" : "Door"
+    },
+
+    "classObstacle" : {
+        "obstacleName" : "Obstacle"
+    },
+
+    "classJSONImage" : {
+        "jsonImageName" : "Image"
+    },
+
+    "classSequenceImage" : {
+        "imageSequenceName" : "Animation"
+    },
+
+    "classMenuImage" : {
+        "menuImageName" : "Menu image"
+    },
+
+    "classBeginingImage" : {
+        "startImageName" : " Starting image"
+    },
+
+    "classText" : {
+        "textName" : "Text"
+    }
+}  
