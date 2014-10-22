@@ -27,8 +27,12 @@ class Client():
         if self.VERBOSE:
             print("Client :: Attempting to POST")
         try:
+            # Send the files dict to the server in
+            # Also send the "game root" in a variable
+            # game root is ./gamedata/<game_name>, but we drop the ./
             response = requests.post(
-                self.SERVER_ADDRESS + self.ROUTES['upload'], files=files)
+                self.SERVER_ADDRESS + self.ROUTES['upload'],
+                files=files, params={"root": game_root[2:]})
 
             if self.VERBOSE:
                 print(
