@@ -259,8 +259,8 @@ class Start(View):
             imageId = imageAttributes["id"]
 
             # Create objects according to its category
-            if (imageId == "begining"):
-                self.beginingImage = Object.BeginingImage(
+            if (imageId == "beginning"):
+                self.beginningImage = Object.BeginningImage(
                     self, imageAttributes, objectAttributes)
             if (imageId == "start"):
                 self.background = Object.JSONImage(
@@ -304,7 +304,7 @@ class Start(View):
         except AttributeError as e:
             print("View.Start :: WARNING, " + str(e))
         try:
-            ret.append(self.beginingImage)
+            ret.append(self.beginningImage)
         except AttributeError as e:
             print("View.Start :: WARNING, " + str(e))
 

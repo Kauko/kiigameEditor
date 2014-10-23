@@ -322,7 +322,7 @@ class Editor(QtGui.QMainWindow):
                 objectType == "SequenceImage" or objectType == "Start" or
                 objectType == "End" or objectType == "Text" or
                 objectType == "JSONImage" or objectType == "MenuImage" or
-                objectType == "BeginingImage"):
+                objectType == "BeginningImage"):
             isDisabled = True
         else:
             isDisabled = False
@@ -336,7 +336,7 @@ class Editor(QtGui.QMainWindow):
         if (objectType == "Room" or objectType == "Sequence" or
                 objectType == "SequenceImage" or objectType == "Start" or
                 objectType == "End" or objectType == "MenuImage" or
-                objectType == "BeginingImage"):
+                objectType == "BeginningImage"):
             isDisabled = False
         else:
             isDisabled = True
