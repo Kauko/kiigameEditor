@@ -7,4 +7,5 @@
 *.*~
 *.orig
 *.pyc
-/gamedata/
+gamedata/*
+!gamedata/template

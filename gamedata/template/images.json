@@ -1,0 +1,355 @@
+{
+    "attrs": {
+        "height": 643,
+        "id": "Stage",
+        "width": 981
+    },
+    "children": [
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "text_layer"
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "align": "center",
+                        "fill": "white",
+                        "fontFamily": "Chalkboard SE",
+                        "fontSize": 18,
+                        "fontStyle": "bold",
+                        "id": "interaction_text",
+                        "strokeColor": "black",
+                        "strokeWidth": 1,
+                        "x": 512,
+                        "y": 430
+                    },
+                    "className": "Text"
+                },
+                {
+                    "attrs": {
+                        "id": "speech_bubble",
+                        "visible": false,
+                        "x": 800,
+                        "y": 513
+                    },
+                    "children": [
+                        {
+                            "attrs": {
+                                "cornerRadius": 10,
+                                "fill": "#ddd",
+                                "lineJoin": "round",
+                                "pointerDirection": "right",
+                                "pointerHeight": 15,
+                                "pointerWidth": 40,
+                                "strokeColor": "black",
+                                "strokeWidth": 1
+                            },
+                            "className": "Tag"
+                        },
+                        {
+                            "attrs": {
+                                "fill": "black",
+                                "fontFamily": "Chalkboard SE",
+                                "fontSize": 14,
+                                "id": "monologue",
+                                "padding": 10,
+                                "width": "auto"
+                            },
+                            "className": "Text"
+                        }
+                    ],
+                    "className": "Label"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "inventory_layer"
+            },
+            "children": [],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "inventory_bar_layer",
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "id": "inventory_bar",
+                        "src": "images/inventory_bar.png",
+                        "y": 543
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "invArrow",
+                        "id": "inventory_left_arrow",
+                        "src": "images/inventory_left_arrow.png",
+                        "visible": false,
+                        "x": 30,
+                        "y": 550
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "invArrow",
+                        "id": "inventory_right_arrow",
+                        "src": "images/inventory_right_arrow.png",
+                        "visible": false,
+                        "x": 750,
+                        "y": 550
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "character_layer",
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "id": "character_idle_1",
+                        "src": "images/character_idle_1.png",
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "character_idle_2",
+                        "src": "images/character_idle_2.png",
+                        "visible": false,
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "character_speak_1",
+                        "src": "images/character_speak_1.png",
+                        "visible": false,
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "character_speak_2",
+                        "src": "images/character_speak_2.png",
+                        "visible": false,
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "character_panic",
+                        "src": "images/character_panic.png",
+                        "visible": false,
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "text_layer"
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "align": "center",
+                        "fill": "white",
+                        "fontFamily": "Chalkboard SE",
+                        "fontSize": 18,
+                        "fontStyle": "bold",
+                        "id": "interaction_text",
+                        "strokeColor": "black",
+                        "strokeWidth": 1,
+                        "x": 512,
+                        "y": 430
+                    },
+                    "className": "Text"
+                },
+                {
+                    "attrs": {
+                        "id": "speech_bubble",
+                        "visible": false,
+                        "x": 800,
+                        "y": 513
+                    },
+                    "children": [
+                        {
+                            "attrs": {
+                                "cornerRadius": 10,
+                                "fill": "#ddd",
+                                "lineJoin": "round",
+                                "pointerDirection": "right",
+                                "pointerHeight": 15,
+                                "pointerWidth": 40,
+                                "strokeColor": "black",
+                                "strokeWidth": 1
+                            },
+                            "className": "Tag"
+                        },
+                        {
+                            "attrs": {
+                                "fill": "black",
+                                "fontFamily": "Chalkboard SE",
+                                "fontSize": 14,
+                                "id": "monologue",
+                                "padding": 10,
+                                "width": "auto"
+                            },
+                            "className": "Text"
+                        }
+                    ],
+                    "className": "Label"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "fade_layer",
+                "opacity": 0,
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "height": 543,
+                        "id": "black_screen",
+                        "src": "images/black.png",
+                        "width": 1024
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "start",
+                "id": "start_layer",
+                "object_name": "start_layer"
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "height": 543,
+                        "id": "start",
+                        "src": "images/start.png",
+                        "width": 724
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "height": 643,
+                        "id": "beginning",
+                        "src": "images/beginning.png",
+                        "width": 1024
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "menu",
+                "id": "start_layer_menu",
+                "object_name": "start_layer_menu",
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "height": 300,
+                        "id": "start_game",
+                        "src": "images/start_game.png",
+                        "width": 257,
+                        "x": 724,
+                        "y": 0
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "height": 93,
+                        "id": "start_credits",
+                        "src": "images/start_credits.png",
+                        "width": 257,
+                        "x": 724,
+                        "y": 300
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "height": 150,
+                        "id": "start_empty",
+                        "src": "images/start_empty.png",
+                        "width": 257,
+                        "x": 724,
+                        "y": 393
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "menu",
+                "id": "end_layer_menu",
+                "object_name": "end_layer_menu",
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "id": "end_menu_main_menu",
+                        "src": "images/button_back.png",
+                        "x": 724,
+                        "y": 0
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "end_menu_restart",
+                        "src": "images/button_0_gray.png",
+                        "x": 724,
+                        "y": 100
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        }
+    ]
+}
