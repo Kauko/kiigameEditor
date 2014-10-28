@@ -8,6 +8,7 @@ class Object(object):
 
     generalName = localizer.translate(
         'classObject', 'solidObject')
+    generalNameAdessive = ""
     #generalNameAdessive = localizer.translate(
     #    'classObject', 'solidObjectAdessive')
 
@@ -167,6 +168,7 @@ class Object(object):
 class Item(Object):
 
     generalName = localizer.translate('classItem', 'itemName')
+    generalNameAdessive = ""
     # Generic attributes for items
     objectAttributes = {
         'className': 'Image',
@@ -338,6 +340,7 @@ class Container(Object):
 
     generalName = localizer.translate(
         'classContainer', 'containerName')
+    generalNameAdessive = ""
 
     # Generic attributes for containers
     objectAttributes = {
@@ -566,6 +569,7 @@ class Door(Object):
 
     generalName = localizer.translate(
         'classDoor', 'doorName')
+    generalNameAdessive = ""
 
     # Generic attributes for doors
     objectAttributes = {
@@ -767,6 +771,7 @@ class Door(Object):
 class Obstacle(Object):
     generalName = localizer.translate(
         'classObstacle', 'obstacleName')
+    generalNameAdessive = ""
 
     # Generic attributes for obstacles
     objectAttributes = {
@@ -895,6 +900,7 @@ class JSONImage(Object):
 
     generalName = localizer.translate(
         'classJSONImage', 'jsonImageName')
+    generalNameAdessive = ""
 
     # imageAttributes has to be dict, not a list as with other objects
     # objectAttributes is a dict with object, attrs and className keys
@@ -984,6 +990,7 @@ class SequenceImage(JSONImage):
 
     generalName = localizer.translate(
         'classSequenceImage', 'imageSequenceName')
+    generalNameAdessive = ""
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
@@ -1012,6 +1019,7 @@ class MenuImage(JSONImage):
 
     generalName = localizer.translate(
         'classMenuImage', 'menuImageName')
+    generalNameAdessive = ""
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
@@ -1025,6 +1033,7 @@ class BeginningImage(JSONImage):
 
     generalName = localizer.translate(
         'classBeginningImage', 'startImageName')
+    generalNameAdessive = ""
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
@@ -1035,6 +1044,7 @@ class BeginningImage(JSONImage):
 class Text(JSONImage):
     generalName = localizer.translate(
         'classText', 'textName')
+    generalNameAdessive = ""
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
