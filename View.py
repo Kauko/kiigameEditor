@@ -271,7 +271,7 @@ class Start(View):
         menu = getGameObject("menu", self.object["menu"])
         try:
             for imageId, action in menu.object["items"].items():
-                print("post", menu.object["items"].items())
+                print("View :: postInit()", menu.object["items"].items())
                 if (action == "start_game"):
                     self.startButton = menu.getItemById(imageId)
                 elif (action == "credits"):
@@ -527,6 +527,7 @@ class Room(View):
         self.scenarioData.removeObject(childObject)
 
     def setItems(self, items):
+        print("View :: setItems for " + type(self).__name__)
         self.objectList = items
 
 

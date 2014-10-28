@@ -9,6 +9,7 @@ from os.path import dirname, abspath
 import ModuleLocation
 from client import Client
 import shutil
+import os
 
 
 class ScenarioData(object):
@@ -197,6 +198,11 @@ class ScenarioData(object):
             #print("     " + self.TEMPLATE_FOLDER + filename)
             #print(" ->  " + destination_folder + filename)
         try:
+            if not os.path.exists(destination_folder):
+                if self.VERBOSE:
+                    print("ScenarioData :: Creating folder " +
+                          destination_folder)
+                os.makedirs(destination_folder)
             shutil.copy(self.TEMPLATE_FOLDER + filename,
                         destination_folder + filename)
         except FileNotFoundError as e:
