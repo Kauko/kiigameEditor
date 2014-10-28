@@ -48,6 +48,7 @@ class Editor(QtGui.QMainWindow):
         self.createMainTab()
         self.createSpaceTab()
         self.createTextsTab()
+        self.createAdventureTab()
 
         self.tabWidget.addTab(
             self.mainTab, localizer.translate('Tabs', 'mainTab'))
@@ -55,20 +56,22 @@ class Editor(QtGui.QMainWindow):
             self.spaceTab, localizer.translate('Tabs', 'spaceTab'))
         self.tabWidget.addTab(
             self.textsTab, localizer.translate('Tabs', 'textsTab'))
+        self.tabWidget.addTab(
+            self.adventureTab, localizer.translate('Tabs', 'adventureTab'))
         self.tabWidget.currentChanged.connect(self.onTabChanged)
 
     def createMenuActions(self):
         self.newAct = QtGui.QAction(
             localizer.translate('createMenuActions', 'new'), self)
         self.newAct = QtGui.QAction(
-            localizer.translate('createMenuAction', 'new'), self)
+            localizer.translate('createMenuActions', 'new'), self)
         self.openAct = QtGui.QAction(
-            localizer.translate('createMenuAction', 'open'), self)
+            localizer.translate('createMenuActions', 'open'), self)
         self.saveAct = QtGui.QAction(
-            localizer.translate('createMenuAction', 'save'), self)
+            localizer.translate('createMenuActions', 'save'), self)
         self.saveAct.triggered.connect(self.scenarioData.saveScenario)
         self.exitAct = QtGui.QAction(
-            localizer.translate('createMenuAction', 'quit'), self)
+            localizer.translate('createMenuActions', 'quit'), self)
         self.exitAct.triggered.connect(self.close)
 
     def createMenus(self):
@@ -627,6 +630,40 @@ class Editor(QtGui.QMainWindow):
                   " 'text' in createTextsTab()")
             print("          " + str(e))
 
+    def createAdventureTab(self):
+
+        self.adventureTab = QtGui.QWidget()
+
+        layout = QtGui.QGridLayout(self)
+
+        #Make a line edit to show and edit the name of the adventure
+        self.nameLabel = QtGui.QLabel(localizer.translate(
+            'createAdventureTab', 'adventureName'))
+
+        show = QtGui.QLineEdit()
+        saveButton = QtGui.QPushButton("Save Changes")
+
+        layout.setSpacing(10)
+        #layout.setDirection(layout.TopToBottom)
+
+        layout.addWidget(self.nameLabel, 1, 0)
+        layout.addWidget(show, 1, 1)
+        layout.addWidget(saveButton, 2, 0)
+        #layout.addWidget(showT, 1, 1, 0)
+
+        self.adventureTab.setLayout(layout)
+
+        show.textChanged[str].connect(self.onAdventureNameChanged)
+        saveButton.clicked.connect(self.saveGame)
+
+    def onAdventureNameChanged(self, text):
+        print(text)
+        self.scenarioData.setProposedScenarioName(text)
+
+    def saveGame(self):
+        print('hajoa paskaasi HÄHÄÄ')
+        self.scenarioData.setCurrentScenarioName()
+
     # Click on an object in the texts tab object list
     def textItemClicked(self):
         selected = self.text_scene.currentItem()
@@ -1115,7 +1152,7 @@ class TextsWidget(QtGui.QWidget):
         self.displayMissingButton.clicked.connect(
             lambda: self.displayAllInteractions("missing"))
         self.displayDoneButton = QtGui.QRadioButton(localizer.translate(
-            'classTextsWidget', 'interacionDone'))
+            'classTextsWidget', 'interactionDone'))
         self.displayDoneButton.clicked.connect(
             lambda: self.displayAllInteractions("done"))
 

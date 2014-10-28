@@ -28,7 +28,8 @@ class ScenarioData(object):
         self.startView = None
         self.endViewList = []
         self.menuList = []
-        self.scenarioName = scenarioName
+        self.currentScenarioName = scenarioName
+        self.proposedScenarioName = None
 
         self.dataDir = "%s/%s/%s/"\
             % (dirname(abspath(ModuleLocation.getLocation())),
@@ -52,6 +53,17 @@ class ScenarioData(object):
             # code is ever added below this except-clause, that code would
             # be executed twice if this wasn't here
             return
+
+    def setProposedScenarioName(self, textName):
+        #self.oldScenarioName = self.oldScenarioName
+        print(textName)
+        self.proposedScenarioName = textName
+
+    def setCurrentScenarioName(self):
+        #self.oldScenarioName = self.oldScenarioName
+        print(self.currentScenarioName)
+        self.currentScenarioName = self.proposedScenarioName
+        print(self.currentScenarioName)
 
     def parseImages(self):
         try:
