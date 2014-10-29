@@ -631,7 +631,8 @@ class Editor(QtGui.QMainWindow):
             print("          " + str(e))
 
     def createAdventureTab(self):
-
+        #creates adventureTab, with the gridlayout and widgets
+        #to be used to create adventure and change its name
         self.adventureTab = QtGui.QWidget()
 
         layout = QtGui.QGridLayout(self)
@@ -644,25 +645,29 @@ class Editor(QtGui.QMainWindow):
         saveButton = QtGui.QPushButton("Save Changes")
 
         layout.setSpacing(10)
-        #layout.setDirection(layout.TopToBottom)
 
+        #set the grids used for the widgets
         layout.addWidget(self.nameLabel, 1, 0)
         layout.addWidget(show, 1, 1)
         layout.addWidget(saveButton, 2, 0)
-        #layout.addWidget(showT, 1, 1, 0)
 
         self.adventureTab.setLayout(layout)
 
+        #connect the qlineedit to onAdventureNameChanged function
         show.textChanged[str].connect(self.onAdventureNameChanged)
+
         saveButton.clicked.connect(self.saveGame)
 
     def onAdventureNameChanged(self, text):
-        print(text)
+        #is called when text in qlinedit changes
+        #updated to proposedScenarioName variable in ScenarioData
         self.scenarioData.setProposedScenarioName(text)
 
     def saveGame(self):
-        print('hajoa paskaasi HÄHÄÄ')
+        #changes the current scenario name to the one in
+        #qlinedit
         self.scenarioData.setCurrentScenarioName()
+        self.scenarioData.changeDirName()
 
     # Click on an object in the texts tab object list
     def textItemClicked(self):

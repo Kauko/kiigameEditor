@@ -42,6 +42,15 @@ class ScenarioData(object):
         self.parseImages()
         #self.createInteractions()
 
+    def changeDirName(self):
+        #TODO: check that there is a directory, before changing
+        #its name wit os.rename
+        newDataDir = "%s/%s/%s/"\
+            % (dirname(abspath(ModuleLocation.getLocation())),
+                self.GAMEDATA_FOLDER, self.currentScenarioName)
+        os.rename(self.dataDir, newDataDir)
+        self.dataDir = newDataDir
+
     def parseTexts(self):
         try:
             with open(self.dataDir + "texts.json", encoding='utf-8') as f:
