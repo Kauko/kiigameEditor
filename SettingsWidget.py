@@ -94,7 +94,7 @@ class SettingsWidget(QtGui.QWidget):
             self.setJSONImageOptions(gameObject)
         elif (objectType == "MenuImage"):
             self.setJSONImageOptions(gameObject)
-        elif (objectType == "BeginingImage"):
+        elif (objectType == "BeginningImage"):
             self.setJSONImageOptions(gameObject)
 
     def showWidgets(self, objectType):
@@ -431,7 +431,7 @@ class SettingsWidget(QtGui.QWidget):
                 self.textObjectTextLabel,
                 self.textObjectTextEdit
             ],
-            "BeginingImage": [
+            "BeginningImage": [
                 self.imgTextLabel,
                 self.objectImage,
             ],

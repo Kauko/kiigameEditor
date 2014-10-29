@@ -1025,17 +1025,17 @@ class MenuImage(JSONImage):
             __init__(parentView, imageAttributes, objectAttributes, imageId)
 
 
-# Differentiate begining image from normal images
+# Differentiate beginning image from normal images
 # This is here mostly for the general name
-class BeginingImage(JSONImage):
+class BeginningImage(JSONImage):
 
     generalName = localizer.translate(
-        'classBeginingImage', 'startImageName')
+        'classBeginningImage', 'startImageName')
     generalNameAdessive = ""
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
-        super(BeginingImage, self).\
+        super(BeginningImage, self).\
             __init__(parentView, imageAttributes, objectAttributes, imageId)
 
 

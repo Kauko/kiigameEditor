@@ -1,0 +1,557 @@
+{
+    "attrs": {
+        "height": 643,
+        "id": "Stage",
+        "width": 981
+    },
+    "children": [
+        {
+            "attrs": {
+                "category": "room",
+                "id": "object_layer_locker_room_1",
+                "object_name": "locker_room_1",
+                "start": true,
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "category": "room_background",
+                        "height": 543,
+                        "id": "locker_room_1",
+                        "src": "images/locker_room_1.png",
+                        "width": 981
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "object",
+                        "id": "tactic_board_1",
+                        "src": "images/tactic_board_1.png",
+                        "visible": true,
+                        "x": 565,
+                        "y": 130
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "object",
+                        "id": "locker_room_1_blood",
+                        "src": "images/locker_room_1_blood.png",
+                        "x": 83,
+                        "y": 383
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "reward",
+                        "id": "book_reward_3",
+                        "src": "images/book_reward_3.png",
+                        "visible": false
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "secret",
+                        "id": "reward_1",
+                        "reward": "book_reward_1",
+                        "src": "images/reward_1.png",
+                        "x": 480,
+                        "y": 61
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "object",
+                        "id": "tactic_board_2",
+                        "src": "images/tactic_board_2.png",
+                        "visible": false,
+                        "x": 565,
+                        "y": 130
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "object",
+                        "id": "tactic_board_3",
+                        "src": "images/tactic_board_3.png",
+                        "visible": false,
+                        "x": 565,
+                        "y": 130
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "reward",
+                        "id": "book_reward_2",
+                        "src": "images/book_reward_2.png",
+                        "visible": false
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "object",
+                        "id": "book_stephenking",
+                        "src": "images/book_stephenking.png",
+                        "x": 600,
+                        "y": 280
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "item",
+                        "id": "tactic_board_wiper",
+                        "object_name": "tactic_board_wiper",
+                        "scale": 0.6,
+                        "src": "images/tactic_board_wiper.png",
+                        "x": 680,
+                        "y": 390
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "reward",
+                        "id": "book_reward_1",
+                        "src": "images/book_reward_1.png",
+                        "visible": false
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "start",
+                "id": "start_layer",
+                "object_name": "start_layer"
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "height": 543,
+                        "id": "start",
+                        "src": "images/start.png",
+                        "width": 724
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "end",
+                "id": "end_layer",
+                "object_name": "end_layer",
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "id": "end_picture",
+                        "src": "images/end_picture_0.png"
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "custom",
+                "id": "oikotiet",
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "category": "door",
+                        "id": "oikotie",
+                        "object_name": "oikotie_onneen",
+                        "src": "images/shower_door_to_locker_room_1.png",
+                        "x": 691,
+                        "y": 136
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "door",
+                        "id": "oikotie_locker_room2",
+                        "object_name": "oikotie_locker_room2",
+                        "src": "images/shower_door_to_locker_room_1.png",
+                        "x": 691,
+                        "y": 136
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "custom",
+                "id": "input_layer",
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "id": "input_background",
+                        "src": "images/input_background.png",
+                        "x": 200,
+                        "y": 50
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_6",
+                        "src": "images/button_6.png",
+                        "x": 392,
+                        "y": 191
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_9",
+                        "src": "images/button_9.png",
+                        "x": 392,
+                        "y": 277
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_8",
+                        "src": "images/button_8.png",
+                        "x": 306,
+                        "y": 277
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_5",
+                        "src": "images/button_5.png",
+                        "x": 306,
+                        "y": 191
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_4",
+                        "src": "images/button_4.png",
+                        "x": 220,
+                        "y": 191
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "object",
+                        "id": "jersey",
+                        "src": "images/icehockey_jersey.png",
+                        "x": 530,
+                        "y": 125
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_ok_gray",
+                        "src": "images/button_ok_gray.png",
+                        "visible": true,
+                        "x": 500,
+                        "y": 277
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_1",
+                        "src": "images/button_1.png",
+                        "x": 220,
+                        "y": 105
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_0",
+                        "src": "images/button_0.png",
+                        "x": 220,
+                        "y": 363
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_3",
+                        "src": "images/button_3.png",
+                        "x": 392,
+                        "y": 105
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_2",
+                        "src": "images/button_2.png",
+                        "x": 306,
+                        "y": 105
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_ok",
+                        "src": "images/button_ok.png",
+                        "x": 500,
+                        "y": 277
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_back_gray",
+                        "src": "images/button_back_gray.png",
+                        "visible": true,
+                        "x": 305,
+                        "y": 363
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_7",
+                        "src": "images/button_7.png",
+                        "x": 220,
+                        "y": 277
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_0_gray",
+                        "src": "images/button_0_gray.png",
+                        "visible": true,
+                        "x": 220,
+                        "y": 363
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "button_back",
+                        "src": "images/button_back.png",
+                        "x": 305,
+                        "y": 363
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "text_layer"
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "align": "center",
+                        "fill": "white",
+                        "fontFamily": "Chalkboard SE",
+                        "fontSize": 18,
+                        "fontStyle": "bold",
+                        "id": "interaction_text",
+                        "strokeColor": "black",
+                        "strokeWidth": 1,
+                        "x": 512,
+                        "y": 430
+                    },
+                    "className": "Text"
+                },
+                {
+                    "attrs": {
+                        "id": "speech_bubble",
+                        "visible": false,
+                        "x": 800,
+                        "y": 513
+                    },
+                    "children": [
+                        {
+                            "attrs": {
+                                "cornerRadius": 10,
+                                "fill": "#ddd",
+                                "lineJoin": "round",
+                                "pointerDirection": "right",
+                                "pointerHeight": 15,
+                                "pointerWidth": 40,
+                                "strokeColor": "black",
+                                "strokeWidth": 1
+                            },
+                            "className": "Tag"
+                        },
+                        {
+                            "attrs": {
+                                "fill": "black",
+                                "fontFamily": "Chalkboard SE",
+                                "fontSize": 14,
+                                "id": "monologue",
+                                "padding": 10,
+                                "width": "auto"
+                            },
+                            "className": "Text"
+                        }
+                    ],
+                    "className": "Label"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "inventory_bar_layer",
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "id": "inventory_bar",
+                        "src": "images/inventory_bar.png",
+                        "y": 543
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "invArrow",
+                        "id": "inventory_left_arrow",
+                        "src": "images/inventory_left_arrow.png",
+                        "visible": false,
+                        "x": 30,
+                        "y": 550
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "category": "invArrow",
+                        "id": "inventory_right_arrow",
+                        "src": "images/inventory_right_arrow.png",
+                        "visible": false,
+                        "x": 750,
+                        "y": 550
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "inventory_layer"
+            },
+            "children": [],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "character_layer",
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "id": "character_idle_1",
+                        "src": "images/character_idle_1.png",
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "character_idle_2",
+                        "src": "images/character_idle_2.png",
+                        "visible": false,
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "character_speak_1",
+                        "src": "images/character_speak_1.png",
+                        "visible": false,
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "character_speak_2",
+                        "src": "images/character_speak_2.png",
+                        "visible": false,
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                },
+                {
+                    "attrs": {
+                        "id": "character_panic",
+                        "src": "images/character_panic.png",
+                        "visible": false,
+                        "x": 764,
+                        "y": 443
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        },
+        {
+            "attrs": {
+                "category": "misc",
+                "id": "fade_layer",
+                "opacity": 0,
+                "visible": false
+            },
+            "children": [
+                {
+                    "attrs": {
+                        "height": 543,
+                        "id": "black_screen",
+                        "src": "images/black.png",
+                        "width": 1024
+                    },
+                    "className": "Image"
+                }
+            ],
+            "className": "Layer"
+        }
+    ],
+    "className": "Stage"
+}

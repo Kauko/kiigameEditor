@@ -260,8 +260,8 @@ class Start(View):
             imageId = imageAttributes["id"]
 
             # Create objects according to its category
-            if (imageId == "begining"):
-                self.beginingImage = Object.BeginingImage(
+            if (imageId == "beginning"):
+                self.beginningImage = Object.BeginningImage(
                     self, imageAttributes, objectAttributes)
             if (imageId == "start"):
                 self.background = Object.JSONImage(
@@ -272,7 +272,7 @@ class Start(View):
         menu = getGameObject("menu", self.object["menu"])
         try:
             for imageId, action in menu.object["items"].items():
-                print("post", menu.object["items"].items())
+                print("View :: postInit()", menu.object["items"].items())
                 if (action == "start_game"):
                     self.startButton = menu.getItemById(imageId)
                 elif (action == "credits"):
@@ -305,7 +305,7 @@ class Start(View):
         except AttributeError as e:
             print("View.Start :: WARNING, " + str(e))
         try:
-            ret.append(self.beginingImage)
+            ret.append(self.beginningImage)
         except AttributeError as e:
             print("View.Start :: WARNING, " + str(e))
 
@@ -528,6 +528,7 @@ class Room(View):
         self.scenarioData.removeObject(childObject)
 
     def setItems(self, items):
+        print("View :: setItems for " + type(self).__name__)
         self.objectList = items
 
 

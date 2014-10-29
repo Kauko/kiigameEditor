@@ -1,0 +1,38 @@
+{
+    "end_layer": {
+        "category": "end",
+        "menu": "end_layer_menu",
+        "music": "audio/loppu_musax_mono_20131213.ogg",
+        "sequence": "outro_layer"
+    },
+    "locker_room_1": {
+        "music": "audio/alku_musax_mono_20131213.ogg"
+    },
+    "oikotie_locker_room2": {
+        "blocked": false,
+        "category": "door",
+        "locked": false,
+        "open_image": "oikotie_locker_room2",
+        "state": "open",
+        "transition": "object_layer_locker_room_2"
+    },
+    "oikotie_onneen": {
+        "blocked": false,
+        "category": "door",
+        "ending": "end_layer",
+        "locked": false,
+        "open_image": "oikotie",
+        "state": "open",
+        "transition": "object_layer_locker_room_1"
+    },
+    "start_layer": {
+        "menu": "start_layer_menu",
+        "music": "audio/alku_musax_mono_20131213.ogg",
+        "music_fade": true
+    },
+    "tactic_board_wiper": {
+        "category": "item",
+        "outcome": "tactic_board_2",
+        "trigger": "tactic_board_1"
+    }
+}
