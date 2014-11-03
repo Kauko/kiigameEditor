@@ -1,4 +1,5 @@
 import Object
+import localizer
 from random import randint
 
 
@@ -133,8 +134,8 @@ class Sequence(View):
         'className': 'Layer'
     }
 
-    generalName = "Välianimaatio"
-    generalNameAdessive = "Välianimaatiolla"
+    generalName = localizer.translate(
+        'classSequence', 'sequenceName')
 
     def __init__(self, scenarioData, sequenceId,
                  sequenceAttributes, sequenceImages):
@@ -245,8 +246,8 @@ class Sequence(View):
 
 # Start menu
 class Start(View):
-    generalName = "Alkukuva"
-    generalNameAdessive = "Alkukuvalla"
+    generalName = localizer.translate(
+        'classStart', 'startImage')
 
     def __init__(self, scenarioData, startAttributes, startImages):
         super(Start, self).__init__(scenarioData, startAttributes, "start")
@@ -336,8 +337,8 @@ class End(View):
         }
     }
 
-    generalName = "Pelin loppukuva"
-    generalNameAdessive = "Loppukuvalla"
+    generalName = localizer.translate(
+        'classEnd', 'endName')
 
     def __init__(self, scenarioData, endId, endAttributes, endImages):
         if not (endAttributes):
@@ -408,8 +409,8 @@ class Room(View):
         }
     }
 
-    generalName = "Huone"
-    generalNameAdessive = "Huoneella"
+    generalName = localizer.translate(
+        'classRoom', 'roomName')
 
     def __init__(self, scenarioData, roomId, roomAttributes, roomImages):
         if not (roomAttributes):
@@ -533,8 +534,8 @@ class Room(View):
 
 # Custom view for custom layers
 class Custom(View):
-    generalName = "Erikoisnäkymä"
-    generalNameAdessive = "Erikoisnäkymällä"
+    generalName = localizer.translate(
+        'classCustom', 'customName')
 
     def __init__(self, scenarioData, viewId, viewAttributes, viewImages):
         super(Custom, self).__init__(scenarioData, viewAttributes, viewId)

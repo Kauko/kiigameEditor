@@ -55,6 +55,10 @@
 	   "moveBehind" : "Vie esine taakse"
 	   },
 
+    "createAdventureTab" : {
+        "adventureName" : "Seikkailun nimi :"
+    },
+
     "createTextsTab": {
 	   "objects" : "Esineet",
 	   "texts" : "Tekstit "
@@ -236,5 +240,29 @@
 
     "classText" : {
         "textName" : "Teksti"
+    },
+
+    "classAdventure" : {
+        "adventureName" : "Uusi seikkailu"
+    },
+
+    "classSequence" : {
+        "sequenceName" : "Välianimaatio"
+    },
+
+    "classStart" : {
+      "startImage" : "Alkukuva"
+    },
+
+    "classEnd" : {
+      "endName" : "Pelin loppukuva"
+    },
+
+    "classRoom" : {
+      "roomName" : "Huone"
+    },
+
+    "classCustom" : {
+      "customName" : "Erikoisnäkymä"
     }
 }  

@@ -9,8 +9,6 @@ class Object(object):
     generalName = localizer.translate(
         'classObject', 'solidObject')
     generalNameAdessive = ""
-    #generalNameAdessive = localizer.translate(
-    #    'classObject', 'solidObjectAdessive')
 
     # Generic attributes for objects
     objectAttributes = {'object': {'music': ''}, 'className': 'Image'}

@@ -29,7 +29,8 @@ class ScenarioData(object):
         self.startView = None
         self.endViewList = []
         self.menuList = []
-        self.scenarioName = scenarioName
+        self.currentScenarioName = scenarioName
+        self.proposedScenarioName = None
 
         self.dataDir = "%s/%s/%s/"\
             % (dirname(abspath(ModuleLocation.getLocation())),
@@ -40,6 +41,23 @@ class ScenarioData(object):
         self.parseTexts()
         self.parseImages()
         #self.createInteractions()
+
+    def changeDirName(self):
+        if os.path.isdir(self.dataDir):
+            newDataDir = "%s/%s/%s/"\
+                % (dirname(abspath(ModuleLocation.getLocation())),
+                    self.GAMEDATA_FOLDER, self.currentScenarioName)
+            os.rename(self.dataDir, newDataDir)
+            self.dataDir = newDataDir
+            if os.path.isdir(self.dataDir):
+                if self.VERBOSE:
+                    print("ScenarioData :: Adventure folder changed.")
+            else:
+                print("ScenarioData :: CRITICAL WARNING! No directory " +
+                      self.dataDir + " after renaming the folder??")
+        else:
+            print("ScenarioData :: CRITICAL WARNING! No directory " +
+                  self.dataDir + "??")
 
     def parseTexts(self):
         try:
@@ -53,6 +71,12 @@ class ScenarioData(object):
             # code is ever added below this except-clause, that code would
             # be executed twice if this wasn't here
             return
+
+    def setProposedScenarioName(self, textName):
+        self.proposedScenarioName = textName
+
+    def setCurrentScenarioName(self):
+        self.currentScenarioName = self.proposedScenarioName
 
     def parseImages(self):
         try:
