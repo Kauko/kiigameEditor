@@ -18,7 +18,7 @@ class Editor(QtGui.QMainWindow):
 
         self.editorImagePath = "%s/images/" \
             % (dirname(abspath(ModuleLocation.getLocation())))
-        self.scenarioData = ScenarioData.ScenarioData("latkazombit")
+        self.scenarioData = ScenarioData.ScenarioData("joku_muu")
         self.scenarioData.loadScenario()
 
         self.imageCache = ImageCache()
@@ -656,14 +656,14 @@ class Editor(QtGui.QMainWindow):
         #connect the qlineedit to onAdventureNameChanged function
         show.textChanged[str].connect(self.onAdventureNameChanged)
 
-        saveButton.clicked.connect(self.saveGame)
+        saveButton.clicked.connect(self.saveNewAdventureName)
 
     def onAdventureNameChanged(self, text):
         #is called when text in qlinedit changes
         #updated to proposedScenarioName variable in ScenarioData
         self.scenarioData.setProposedScenarioName(text)
 
-    def saveGame(self):
+    def saveNewAdventureName(self):
         #changes the current scenario name to the one in
         #qlinedit
         self.scenarioData.setCurrentScenarioName()

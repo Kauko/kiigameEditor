@@ -43,13 +43,21 @@ class ScenarioData(object):
         #self.createInteractions()
 
     def changeDirName(self):
-        #TODO: check that there is a directory, before changing
-        #its name wit os.rename
-        newDataDir = "%s/%s/%s/"\
-            % (dirname(abspath(ModuleLocation.getLocation())),
-                self.GAMEDATA_FOLDER, self.currentScenarioName)
-        os.rename(self.dataDir, newDataDir)
-        self.dataDir = newDataDir
+        if os.path.isdir(self.dataDir):
+            newDataDir = "%s/%s/%s/"\
+                % (dirname(abspath(ModuleLocation.getLocation())),
+                    self.GAMEDATA_FOLDER, self.currentScenarioName)
+            os.rename(self.dataDir, newDataDir)
+            self.dataDir = newDataDir
+            if os.path.isdir(self.dataDir):
+                if self.VERBOSE:
+                    print("ScenarioData :: Adventure folder changed.")
+            else:
+                print("ScenarioData :: CRITICAL WARNING! No directory " +
+                      self.dataDir + " after renaming the folder??")
+        else:
+            print("ScenarioData :: CRITICAL WARNING! No directory " +
+                  self.dataDir + "??")
 
     def parseTexts(self):
         try:
@@ -65,15 +73,10 @@ class ScenarioData(object):
             return
 
     def setProposedScenarioName(self, textName):
-        #self.oldScenarioName = self.oldScenarioName
-        print(textName)
         self.proposedScenarioName = textName
 
     def setCurrentScenarioName(self):
-        #self.oldScenarioName = self.oldScenarioName
-        print(self.currentScenarioName)
         self.currentScenarioName = self.proposedScenarioName
-        print(self.currentScenarioName)
 
     def parseImages(self):
         try:
