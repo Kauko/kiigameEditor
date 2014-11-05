@@ -28,11 +28,17 @@ import localizer
 # TODO: Object types should be exactly as they are in the object!
 # TODO: "X ei ole nimeä" common delegate
 
+DEBUG = True
+
 
 # Item and room settings widget used in editor
 class SettingsWidget(QtGui.QWidget):
+
     def __init__(self, parent=None):
         super(SettingsWidget, self).__init__(parent)
+
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At __init__")
 
         self.currentObject = None
         self.lastObjectType = None
@@ -62,6 +68,8 @@ class SettingsWidget(QtGui.QWidget):
         self.createOptionFields()
 
     def displayOptions(self, gameObject):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At displayOptions")
         self.currentObject = gameObject
 
         objectType = gameObject.__class__.__name__
@@ -98,6 +106,8 @@ class SettingsWidget(QtGui.QWidget):
             self.setJSONImageOptions(gameObject)
 
     def showWidgets(self, objectType):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At showWidgets")
         if (self.lastObjectType):
             for item in self.itemSettings[self.lastObjectType]:
                 item.hide()
@@ -106,6 +116,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Settings for the object view
     def createOptionFields(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At createOptionFields")
         # Name
         self.nameLabel = QtGui.QLabel(localizer.translate(
             'classSettingsWidget', 'name'))
@@ -521,6 +533,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Update comboboxes having objectType objects
     def updateComboboxes(self, objectType):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateComboboxes")
         objectType = objectType.lower()
         if (objectType == "room"):
             self.updateDoorTransitionCombo()
@@ -541,18 +555,24 @@ class SettingsWidget(QtGui.QWidget):
         self.lockedContainerImage.updateComboboxes(objectType)
 
     def updateUseTargetCombo(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateUseTargetCombo")
         self.updateItemCombobox(
             self.useTargetCombo, localizer.translate(
                 'classSettingsWidget', 'notSelected'),
             connectTo=self.changeUseTarget)
 
     def updateDoorTransitionCombo(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateDoorTransitionCombo")
         self.updateItemCombobox(
             self.doorTransitionCombo, localizer.translate(
                 'classSettingsWidget', 'notAnywhere'),
             "room", connectTo=self.changeDoorTransition)
 
     def updateObstacleBlocksCombo(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateObstacleBlocksCombo")
         self.updateItemCombobox(
             self.obstacleBlocksCombo, localizer.translate(
                 'classSettingsWidget', 'noNothing'), ("door",), ("door",),
@@ -560,6 +580,8 @@ class SettingsWidget(QtGui.QWidget):
             connectTo=self.changeObstacleBlock)
 
     def updateWhatGoesCombo(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateWhatGoesCombo")
         self.updateItemCombobox(
             self.whatGoesCombo, localizer.translate(
                 'classSettingsWidget', 'notAnything'),
@@ -567,6 +589,8 @@ class SettingsWidget(QtGui.QWidget):
             connectTo=self.changeWhatGoes)
 
     def updateWhatComesCombo(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateWhatComesCombo")
         self.updateItemCombobox(
             self.whatComesCombo, localizer.translate(
                 'classSettingsWidget', 'noNothing'),
@@ -574,6 +598,8 @@ class SettingsWidget(QtGui.QWidget):
             connectTo=self.changeWhatComes)
 
     def updateOutcomeCombobox(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateOutcomeCombobox")
         self.updateItemCombobox(
             self.outcomeCombobox, localizer.translate(
                 'classSettingsWidget', 'notSelected'),
@@ -582,26 +608,38 @@ class SettingsWidget(QtGui.QWidget):
             connectTo=self.changeOutcome)
 
     def changeSequenceTime(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeSequenceTime")
         time = int(float(self.sequenceTimeEdit.text().replace(",", "."))*1000)
         self.currentObject.setShowTime(time)
 
     def changeSequenceFadeCombo(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeSequenceFadeCombo")
         doFade = (self.sequenceFadeCombo.currentIndex() is True)
         self.currentObject.setDoFade(doFade)
 
     def changeTextObjectText(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeTextObjectText")
         self.currentObject.setText(self.textObjectTextEdit.text())
 
     def changeEndingCheckbox(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeEndingCheckbox")
         self.currentObject.setIsEnding(self.endingCheckbox.isChecked())
 
     # Start menu
     def setStartOptions(self, startObject):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setStartOptions")
         # Start music
         self.setObjectMusic(startObject)
 
     # End view
     def setEndOptions(self, endObject):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setEndOptions")
         # End name
         self.setObjectName(overrideText=endObject.generalName)
 
@@ -612,10 +650,14 @@ class SettingsWidget(QtGui.QWidget):
 
     # Text object
     def setTextOptions(self, textObject):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setTextOptions")
         self.textObjectTextEdit.setText(textObject.getText())
 
     # Set either currentObject or the given object's music
     def setObjectMusic(self, gameObject=None):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setObjectMusic")
         if not (gameObject):
             gameObject = self.currentObject
 
@@ -628,6 +670,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Generic JSON images
     def setJSONImageOptions(self, imageObject):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setJSONImageOptions")
         # Image
         self.setObjectImage(
             imageObject.getRepresentingImage()
@@ -635,6 +679,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Set the input field values for rooms
     def setRoomOptions(self, room):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setRoomOptions")
         # Room name
         self.setObjectName(room, room.generalName)
 
@@ -647,6 +693,8 @@ class SettingsWidget(QtGui.QWidget):
         self.setObjectMusic(room)
 
     def setSequenceOptions(self, sequence):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setSequenceOptions")
         # Sequence name
         self.setObjectName(sequence, sequence.generalNameAdessive)
 
@@ -659,6 +707,8 @@ class SettingsWidget(QtGui.QWidget):
         self.setObjectMusic(sequence)
 
     def setSequenceImageOptions(self, sequenceImage):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setSequenceImageOptions")
         # Image
         self.setObjectImage(
             sequenceImage.getRepresentingImage()
@@ -680,6 +730,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Set the input field values for items
     def setItemOptions(self, item):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setItemOptions")
         imageObject = item.getRepresentingImage().getRepresentingImage()
 
         # Object name
@@ -726,6 +778,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Set the input field values for generic objects
     def setGenericOptions(self, genericObject):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setGenericOptions")
         # Object name
         self.setObjectName(genericObject, genericObject.generalNameAdessive)
 
@@ -745,6 +799,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Set the input field values for containers
     def setContainerOptions(self, container):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setContainerOptions")
         # Set image settings for each image
         self.fullContainerImage.setSettings(container, container.fullImage)
         self.lockedContainerImage.setSettings(container, container.lockedImage)
@@ -756,9 +812,13 @@ class SettingsWidget(QtGui.QWidget):
 
     # Set the input field values for obstacles
     def setObstacleOptions(self, obstacle):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setObstacleOptions")
         self.obstacleImage.setSettings(obstacle, obstacle.blockingImage)
 
     def setObjectImage(self, imagePath, objectImage=None):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setObjectImage")
         imgPixmap = self.imageCache.createPixmap(imagePath)
 
         # TODO: Have spacing for smaller items
@@ -772,6 +832,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Set item use type
     def setItemUseType(self, typeIndex):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setItemUseType")
         self.useTypeCombo.setCurrentIndex(typeIndex)
 
         self.updateUseTargetCombobox(typeIndex, self.useTargetCombo)
@@ -808,6 +870,8 @@ class SettingsWidget(QtGui.QWidget):
 
     #  Set item use target
     def setItemUseTarget(self, useItem):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setItemUseTarget")
         if (useItem):
             # Find the combobox item with the given item
             for i in range(self.useTargetCombo.count()):
@@ -817,6 +881,8 @@ class SettingsWidget(QtGui.QWidget):
         self.useTargetCombo.setCurrentIndex(0)
 
     def setItemOutcome(self, outcomeItem):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setItemOutcome")
         if (outcomeItem):
             # Find the combobox item with the given item
             for i in range(self.outcomeCombobox.count()):
@@ -827,6 +893,8 @@ class SettingsWidget(QtGui.QWidget):
         self.outcomeCombobox.setCurrentIndex(0)
 
     def setDoorInitialState(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setDoorInitialState")
         # Door open
         if (self.currentObject.closedImage or self.currentObject.lockedImage):
             self.doorInitialStateCombo.setCurrentIndex(0)
@@ -837,6 +905,8 @@ class SettingsWidget(QtGui.QWidget):
         self.changeDoorInitialState()
 
     def setDoorOptions(self, doorObject):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setDoorOptions")
         # Set each image's settings
         self.closedDoorImage.setSettings(doorObject, doorObject.closedImage)
         self.lockedDoorImage.setSettings(doorObject, doorObject.lockedImage)
@@ -850,6 +920,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Set use item for items
     def setUseText(self, textEdit=None, item=None):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setUseText")
         if (self.useTypeCombo.currentIndex() == 0):
             return
 
@@ -867,6 +939,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Set examine text for the given object
     def setExamineText(self, gameObject, textEdit=None):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setExamineText")
         try:
             text = gameObject.getExamineText()
         except AttributeError:
@@ -880,6 +954,8 @@ class SettingsWidget(QtGui.QWidget):
     # Set any game object name
     def setObjectName(self, gameObject=None, textStart="Object",
                       textEdit=None, overrideText=None):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setObjectName")
         if not (gameObject):
             gameObject = self.currentObject
 
@@ -903,6 +979,8 @@ class SettingsWidget(QtGui.QWidget):
             self.objectNameEdit.setText(name)
 
     def setUseConsume(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setUseConsume")
         isConsumed = self.useConsumeCheckbox.isChecked()
         self.currentObject.setConsume(isConsumed)
 
@@ -913,21 +991,29 @@ class SettingsWidget(QtGui.QWidget):
                 QtCore.Qt.CheckState.Unchecked)
 
     def changeWhereLocated(self, combobox):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeWhereLocated")
         # What is this used for?
         print("Change where located to", combobox.itemData(
             combobox.currentIndex()))
 
     # Text that comes after using an item
     def changeUseText(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeUseText")
         # TODO: Disable text field if no target is selected
 
         self.currentObject.setUseText(
             self.useTextEdit.toPlainText())
 
     def changePickupText(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changePickupText")
         self.currentObject.setPickupText(self.pickupTextEdit.toPlainText())
 
     def changeExamineText(self, textEdit=None, gameObject=None):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeExamineText")
         if not (gameObject):
             gameObject = self.currentObject
 
@@ -937,6 +1023,8 @@ class SettingsWidget(QtGui.QWidget):
         gameObject.setExamineText(textEdit.toPlainText())
 
     def changeDoorInitialState(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeDoorInitialState")
         # Initially closed, all states (closed, locked, open) are possible
         if (self.doorInitialStateCombo.currentIndex() == 0):
             self.closedDoorImage.setDisabled(False)
@@ -960,6 +1048,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Change the image of a gameobject
     def changeObjectImage(self, imagePath, image=None, gameObject=None):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeObjectImage")
         # If no image, a default image var will be used
         # TODO: Copy the chosen image to the 'images' folder of the scenario?
         self.currentObject.getRepresentingImage().setSource(imagePath)
@@ -975,52 +1065,78 @@ class SettingsWidget(QtGui.QWidget):
 
     # Change music
     def changeMusic(self, imagePath):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeMusic")
         self.currentObject.setMusic(imagePath)
 
     def changeUseConsume(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeUseConsume")
         self.currentObject.setConsume(self.useConsumeCheckbox.isChecked())
 
     def changeOutcome(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeOutcome")
         self.currentObject.setOutcome(
             self.outcomeCombobox.itemData(self.outcomeCombobox.currentIndex()))
 
     def clearOutcome(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At clearOutcome")
         self.currentObject.setOutcome(None)
 
     def clearUseTarget(self):
-        print("Clear useTarget!")
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At clearUseTarget")
         # TODO: This is run even when populating the combobox
         #self.currentObject.clearTarget()
 
     def changeObstacleBlock(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeObstacleBlock")
         self.currentObject.setBlockTarget(
             self.obstacleBlocksCombo.itemData(
                 self.obstacleBlocksCombo.currentIndex()))
 
     def clearObstacleBlock(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At clearObstacleBlock")
         self.currentObject.clearBlockTarget()
 
     def changeWhatGoes(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeWhatGoes")
         self.currentObject.setInItem(
             self.whatGoesCombo.itemData(self.whatGoesCombo.currentIndex()))
 
     def clearWhatGoes(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At clearWhatGoes")
         self.currentObject.clearInItem()
 
     def changeWhatComes(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeWhatComes")
         self.currentObject.setOutItem(
             self.whatComesCombo.itemData(
                 self.whatComesCombo.currentIndex()))
 
     def clearWhatComes(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At clearWhatComes")
         self.currentObject.clearOutItem()
 
     def changeDoorTransition(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeDoorTransition")
         self.currentObject.setTransition(
             self.doorTransitionCombo.itemData(
                 self.doorTransitionCombo.currentIndex()))
 
     def changeName(self, textEdit=None, gameObject=None):
+
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeName")
 
         if not (gameObject):
             gameObject = self.currentObject
@@ -1039,6 +1155,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Update parent tab elements
     def updateParent(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateParent")
         if (self.currentObject.__class__.__name__ in ("Room", "Sequence")):
             self.editor.drawRooms()
         else:
@@ -1046,12 +1164,16 @@ class SettingsWidget(QtGui.QWidget):
 
     # Change object use type
     def changeItemUseType(self, index):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeItemUseType")
         self.setItemUseType(index)
         self.setItemUseTarget(None)
         self.setItemOutcome(None)
 
     # Set item use target
     def changeUseTarget(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At changeUseTarget")
         index = self.useTargetCombo.currentIndex()
 
         targetType = self.useTargetCombo.itemData(index).__class__.__name__
@@ -1087,26 +1209,38 @@ class SettingsWidget(QtGui.QWidget):
 
     # Create new game object
     def createObject(self, objectType):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At createObject")
         self.editor.createObject(objectType)
         self.updateComboboxes(objectType)
 
     def removeObject(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At removeObject")
         self.editor.removeObjectsButtonClicked()
 
     def removeView(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At removeView")
         self.editor.removeViewsButtonClicked()
 
     def showAllTexts(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At showAllTexts")
         # TODO: Select the actual object
         self.editor.tabWidget.setCurrentIndex(2)
         #self.currentObject.
 
     def clearMusic(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At clearMusic")
         self.currentObject.clearMusic()
         self.musicTextEdit.clear()
 
     # Sets the index of a combobox according to given targetObject
     def setComboboxIndex(self, targetObject, combobox):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At setComboboxIndex")
         # Find the combobox item with the given item
         for i in range(combobox.count()):
             if (combobox.itemData(i) == targetObject):
@@ -1116,6 +1250,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Create and return a plain combobox
     def createCombobox(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At createCombobox")
         combobox = QtGui.QComboBox(self)
         combobox.setIconSize(QtCore.QSize(50, 50))
         return combobox
@@ -1124,6 +1260,8 @@ class SettingsWidget(QtGui.QWidget):
     def updateItemCombobox(self, combobox, noChoiceText, objectTypes=None,
                            addChoices=None, noChoiceMethod=None,
                            connectTo=None):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateItemCombobox")
         if not (objectTypes):
             objectTypes = ("object", "item", "door", "container", "obstacle")
 
@@ -1140,6 +1278,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Populate a given combobox with game rooms
     def populateRoomCombobox(self, combobox, addChoice=True):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At populateRoomCombobox")
         if (addChoice):
             imgPixmap = self.imageCache.createPixmap(self.editor.newIconPath)
             combobox.addItem(imgPixmap, localizer.translate(
@@ -1160,6 +1300,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Create use target combobox
     def updateUseTargetCombobox(self, useType, combobox):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At updateUseTargetCombobox")
         if (useType == 0):
             objectTypes = ()
         elif (useType == 1):
@@ -1178,6 +1320,8 @@ class SettingsWidget(QtGui.QWidget):
 
     # Handle item combobox item choosing callback
     def objectComboboxHandler(self, combobox, callback):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At objectComboboxHandler")
         target = combobox.itemData(combobox.currentIndex())
         targetType = target.__class__.__name__
 
@@ -1193,6 +1337,8 @@ class SettingsWidget(QtGui.QWidget):
     # categorized by game rooms
     def populateCombobox(self, objectTypes, combobox, noChoiceText=None,
                          addChoices=None, noChoiceMethod=None):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At populateRoomCombobox")
         combobox.clear()
 
         itemCounter = 0
@@ -1258,6 +1404,8 @@ class SettingsWidget(QtGui.QWidget):
                     itemCounter += 1
 
     def showMusicDialog(self, callBack):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At showMusicDialog")
         fname, _ = QtGui.QFileDialog.getOpenFileName(
             self,
             localizer.translate(
@@ -1271,6 +1419,8 @@ class SettingsWidget(QtGui.QWidget):
             callBack(fname)
 
     def showImageDialog(self, callBack):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At showImageDialog")
         fname, _ = QtGui.QFileDialog.getOpenFileName(
             self,
             localizer.translate(
@@ -1283,6 +1433,8 @@ class SettingsWidget(QtGui.QWidget):
             callBack(fname)
 
     def createSeparator(self):
+        if DEBUG:
+            print("   [D] " + "SettingsWidget :: At createSeparator")
         label = QtGui.QLabel("")
         label.setFrameStyle(QtGui.QFrame.HLine | QtGui.QFrame.Raised)
         return label

@@ -2,6 +2,8 @@
 from PySide import QtGui, QtCore
 import localizer
 
+DEBUG = True
+
 
 # A widget that may have an object's closed, locked and open state settings
 class ObjectImageSettings(QtGui.QWidget):
@@ -9,6 +11,9 @@ class ObjectImageSettings(QtGui.QWidget):
     def __init__(self, titleLabelText, nameLabelText,
                  canBeLocked=False, lockedText=None, parent=None):
         super(ObjectImageSettings, self).__init__(parent)
+
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At ObjectImageSettings")
 
         self.layout = QtGui.QVBoxLayout()
         self.setLayout(self.layout)
@@ -56,6 +61,8 @@ class ObjectImageSettings(QtGui.QWidget):
         self.layout.addWidget(self.clickEdit)
 
     def updateComboboxes(self, objectType):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At updateComboboxes")
         objectType = objectType.lower()
         if (objectType == "item"):
             self.parent.updateItemCombobox(
@@ -65,15 +72,23 @@ class ObjectImageSettings(QtGui.QWidget):
             )
 
     def changeNameEdit(self):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At changeNameEdit")
         self.parent.changeName(self.nameEdit, self.gameImageObject)
 
     def changeClickEdit(self):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At changeClickEdit")
         self.parent.changeExamineText(self.clickEdit, self.gameImageObject)
 
     def clearKey(self):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At clearKey")
         self.gameObject.clearKey()
 
     def changeKey(self):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At changeKey")
         keyObject = self.keyCombo.itemData(self.keyCombo.currentIndex())
         if (keyObject):
             self.gameObject.clearKey()
@@ -85,6 +100,8 @@ class ObjectImageSettings(QtGui.QWidget):
             return
 
     def changeLocked(self):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At changeLocked")
         if (self.lockedCheckbox.isChecked()):
             self.gameObject.setLocked(True)
 
@@ -106,6 +123,8 @@ class ObjectImageSettings(QtGui.QWidget):
 
     # Disable widget parts if checkbox says so
     def setLockedDisabled(self):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At setLockedDisabled")
         notLocked = not self.lockedCheckbox.isChecked()
         self.nameLabel.setDisabled(notLocked)
         self.nameEdit.setDisabled(notLocked)
@@ -116,6 +135,8 @@ class ObjectImageSettings(QtGui.QWidget):
         self.clickEdit.setDisabled(notLocked)
 
     def changeImage(self, imagePath):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At changeImage")
         self.parent.setObjectImage(imagePath, self.image)
         self.gameImageObject.setSource(imagePath)
         self.parent.updateParent()
@@ -123,6 +144,8 @@ class ObjectImageSettings(QtGui.QWidget):
 
     # Set the whole widget's enabled status
     def setDisabled(self, isDisabled):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At setDisabled")
         super(ObjectImageSettings, self).setDisabled(isDisabled)
 
         # If disabled, clear image and clear text fields
@@ -133,6 +156,8 @@ class ObjectImageSettings(QtGui.QWidget):
             self.clickEdit.setText("")
 
     def setImage(self):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At setImage")
         if (self.gameImageObject):
             imagePath =\
                 self.gameImageObject.getRepresentingImage().absoluteImagePath
@@ -147,6 +172,8 @@ class ObjectImageSettings(QtGui.QWidget):
         self.parent.setObjectImage(imagePath, self.image)
 
     def setSettings(self, gameObject, gameImageObject):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At setSettings")
         self.gameObject = gameObject
         self.gameImageObject = gameImageObject
         self.objectType = self.gameObject.__class__.__name__
@@ -181,4 +208,6 @@ class ObjectImageSettings(QtGui.QWidget):
 
     # Set the correct key item in keyCombo
     def setKey(self):
+        if DEBUG:
+            print("   [D] " + "ObjectImageSettings :: At setKey")
         self.parent.setComboboxIndex(self.gameObject.key, self.keyCombo)

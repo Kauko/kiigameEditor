@@ -2,6 +2,8 @@ import Object
 import localizer
 from random import randint
 
+DEBUG = True
+
 
 # Virtual class for views
 class View(object):
@@ -9,6 +11,8 @@ class View(object):
     usedIds = []
 
     def createUniqueId(newId=None):
+        if DEBUG:
+            print("   [D] "+"View :: At createUniqueId")
         if not (newId):
             newId = str(randint(0, 1000000000))
 
@@ -30,6 +34,9 @@ class View(object):
             newId = "%s_duplicate_%i" % (originalId, failCount)
 
     def __init__(self, scenarioData, viewAttributes, viewId=None):
+
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At View.__init__")
         if (viewId):
             self.id = View.createUniqueId(viewId)
         else:
@@ -51,54 +58,86 @@ class View(object):
 
     # Should be overriden by other view classes
     def getChildren(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At View.getChildren")
         return
 
     # Should be overriden by other view classes
     def getItems(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At View.getItems")
         return
 
     # Should be overriden by other view classes
     def getItemById(self, itemId):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At View.getItemById")
         return
 
     def getName(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At View.getName")
         try:
             return self.texts["name"]
         except:
             return None
 
     def setName(self, name):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At View.setName")
         self.texts["name"] = name
 
     def getMusic(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At View.getMusic")
         try:
             return self.object["music"]
         except KeyError:
             return
 
     def setMusic(self, filePath):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At View.setMusic")
         self.object["music"] = "audio/"+filePath.split("/")[-1]
 
     def clearMusic(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At View.clearMusic")
         del self.object["music"]
 
     # Post-init should be overriden by views
     def postInit(self, getGameObject):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At View.postInit")
         return
 
     # Remove given object
     # Should be overriden by other view classes
     def removeObject(self, childObject):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At View.removeObject")
         return
 
     def createPlaceholderImage(self, imagePath):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At View.createPlaceholderImage")
         self.placeholderImage = Object.JSONImage(self, None, None, self.id)
         self.placeholderImage.setSource(imagePath)
 
 
 class Menu(View):
+
     def __init__(self, scenarioData, menuId, menuAttributes, menuImages):
         super(Menu, self).__init__(scenarioData, menuAttributes, menuId)
+
+
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At Menu.__init__")
 
         self.menuImages = []
         for imageId in menuImages:
@@ -108,11 +147,17 @@ class Menu(View):
             self.menuImages.append(menuImage)
 
     def getItemById(self, itemId):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Menu.getItemById")
         for item in self.menuImages:
             if (item.id == itemId):
                 return item
 
     def getChildren(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Menu.getChildren")
         return self.menuImages
 
 
@@ -145,6 +190,11 @@ class Sequence(View):
         super(Sequence, self).\
             __init__(scenarioData, sequenceAttributes, sequenceId)
 
+
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.__init__")
+
         self.sequenceImages = []
 
         if not (sequenceImages):
@@ -158,47 +208,74 @@ class Sequence(View):
             self.sequenceImages.append(sequenceImage)
 
     def deleteChild(self, imageId):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.deleteChild")
         for image in self.images:
             if (image.id == imageId):
                 self.images.remove(image)
 
     def getChildren(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.getChildren")
         return self.sequenceImages
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.getRepresentingImage")
         if (len(self.sequenceImages) == 0):
             return self.placeholderImage
         return self.sequenceImages[0]
 
     def getItems(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.getItems")
         return self.getChildren()
 
     # Get the display time for the given image
     def getShowTime(self, imageId):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.getShowTime")
         for i in self.object["images"]:
             if (self.object["images"][i]["id"] == imageId):
                 return self.object["images"][i]["show_time"]
 
     # Set the display time for the given image
     def setShowTime(self, imageId, milliseconds):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.setShowTime")
         for i in self.object["images"]:
             if (self.object["images"][i]["id"] == imageId):
                 self.object["images"][i]["show_time"] = milliseconds
 
     # Get the fade type for the given image
     def getDoFade(self, imageId):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.getDoFade")
         for i in self.object["images"]:
             if (self.object["images"][i]["id"] == imageId):
                 return self.object["images"][i]["do_fade"]
 
     # Set the fade type for the given image
     def setDoFade(self, imageId, doFade):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.setDoFade")
         for i in self.object["images"]:
             if (self.object["images"][i]["id"] == imageId):
                 self.object["images"][i]["do_fade"] = doFade
 
     # Create new item
     def addImage(self, objectAttributes=None, imageAttributes=None):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.addImage")
         imageId = self.id + "_image"
         newObject = Object.SequenceImage(
             self, objectAttributes, imageAttributes, imageId)
@@ -210,6 +287,9 @@ class Sequence(View):
 
     # Create a new image entry to object
     def createImageEntry(self, imageId):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.createImageEntry")
         images = self.object["images"]
         images[str(len(images) + 1)] = {
             'show_time': 0,
@@ -219,6 +299,9 @@ class Sequence(View):
 
     # Remove an image entry from objects
     def removeImageEntry(self, index):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.removeImageEntry")
         images = self.object["images"]
         del images[str(index)]
 
@@ -229,6 +312,9 @@ class Sequence(View):
 
     # Remove a image from the sequence
     def removeObject(self, item):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Sequence.removeObject")
         images = self.object["images"]
 
         # Remove from the entry
@@ -252,6 +338,11 @@ class Start(View):
     def __init__(self, scenarioData, startAttributes, startImages):
         super(Start, self).__init__(scenarioData, startAttributes, "start")
 
+
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Start.__init__")
+
         self.nameable = False
 
         for imageId in startImages:
@@ -268,6 +359,9 @@ class Start(View):
                     self, imageAttributes, objectAttributes)
 
     def postInit(self, getGameObject):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Start.postInit")
         # Create menu items
         menu = getGameObject("menu", self.object["menu"])
         try:
@@ -284,6 +378,9 @@ class Start(View):
             print("        "+str(e))
 
     def getChildren(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Start.getChildren")
         ret = []
 
         # Put all of these in try-excepts because some attributes
@@ -312,9 +409,15 @@ class Start(View):
         return ret
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Start.getRepresentingImage")
         return self.background
 
     def getItems(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Start.getItems")
         return self.getChildren()
 
 
@@ -346,6 +449,10 @@ class End(View):
 
         super(End, self).__init__(scenarioData, endAttributes, endId)
 
+
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At End.__init__")
+
         self.endImages = []
         self.endText = None
 
@@ -364,6 +471,8 @@ class End(View):
                     self, imageAttributes, objectAttributes))
 
     def postInit(self, getGameObject):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At End.postInit")
         # Create text item
         # TODO: Connect texts and ends in kiigame to get rid of hard coded ID
         try:
@@ -374,19 +483,30 @@ class End(View):
             print("        "+str(e))
 
     def deleteChild(self, imageId):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At End.deleteChild")
         for image in self.endImages:
             if (image.id == imageId):
                 self.endImages.remove(image)
 
     def getChildren(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At End.getChildren")
         return self.endImages
 
     def getItems(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At End.getItems")
         if (self.endText):
             return self.endText,
         return ()
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At End.getRepresentingImage")
         if (len(self.endImages) == 0):
             return self.placeholderImage
         return self.endImages[0]
@@ -417,6 +537,10 @@ class Room(View):
             roomAttributes = Room.roomAttributes
 
         super(Room, self).__init__(scenarioData, roomAttributes, roomId)
+
+
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At Room.__init__")
 
         self.objectList = []
         self.background = None
@@ -457,27 +581,43 @@ class Room(View):
                     Object.Object(self, imageId, images, imageAttributes))
 
     def deleteChild(self, objectId):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Room.deleteChild")
         for obj in self.objectList:
             if (obj.id == objectId):
                 self.objectList.remove(obj)
 
     def getChildren(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Room.getChildren")
         return [self.background] + self.objectList
 
     def getItems(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At Room.getItems")
         return self.objectList
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Room.getRepresentingImage")
         if (self.background):
             return self.background
         return self.placeholderImage
 
     def postInit(self, getGameObject):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At Room.postInit")
         for obj in self.objectList:
             obj.postInit(getGameObject)
 
     # Create new generic object
     def addObject(self, objectAttributes=None, imageAttributes=None):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Room.addObject")
         imageId = self.id + "_object"
         newObject = Object.Object(
             self, imageId, imageAttributes, objectAttributes)
@@ -486,6 +626,8 @@ class Room(View):
 
     # Create new item
     def addItem(self, objectAttributes=None, imageAttributes=None):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At Room.addItem")
         imageId = self.id + "_item"
         newObject = Object.Item(
             self, imageId, imageAttributes, objectAttributes)
@@ -494,10 +636,15 @@ class Room(View):
 
     # Move an existing item here
     def moveItem(self, item):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At Room.moveItem")
         self.objectList.append(item)
 
     # Create new container
     def addContainer(self, objectAttributes=None, imageAttributes=None):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Room.addContainer")
         imageId = self.id + "_container"
         newObject = Object.Container(
             self, imageId, imageAttributes, objectAttributes)
@@ -506,6 +653,8 @@ class Room(View):
 
     # Create new door
     def addDoor(self, objectAttributes=None, imageAttributes=None):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At Room.addDoor")
         imageId = self.id + "_door"
         newObject = Object.Door(
             self, imageId, imageAttributes, objectAttributes)
@@ -514,6 +663,9 @@ class Room(View):
 
     # Create new obstacle
     def addObstacle(self, objectAttributes=None, imageAttributes=None):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Room.addObstacle")
         imageId = self.id + "_container"
         newObject = Object.Obstacle(
             self, imageId, imageAttributes, objectAttributes)
@@ -521,6 +673,9 @@ class Room(View):
         return newObject
 
     def removeObject(self, childObject):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Room.removeObject")
         try:
             self.objectList.remove(childObject)
         except ValueError as e:
@@ -528,6 +683,8 @@ class Room(View):
         self.scenarioData.removeObject(childObject)
 
     def setItems(self, items):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ + " :: At Room.setItems")
         print("View :: setItems for " + type(self).__name__)
         self.objectList = items
 
@@ -539,6 +696,10 @@ class Custom(View):
 
     def __init__(self, scenarioData, viewId, viewAttributes, viewImages):
         super(Custom, self).__init__(scenarioData, viewAttributes, viewId)
+
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Custom.__init__")
 
         self.objectList = []
         for imageId in viewImages:
@@ -554,15 +715,27 @@ class Custom(View):
             self.objectList.append(newObject)
 
     def deleteChild(self, objectId):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Custom.deleteChild")
         for obj in self.objectList:
             if (obj.id == objectId):
                 self.objectList.remove(obj)
 
     def getChildren(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Custom.getChildren")
         return self.objectList
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Custom.getRepresentingImage")
         return self.objectList[0]  # .getRepresentingImage()
 
     def getItems(self):
+        if DEBUG:
+            print("   [D] " + self.__class__.__name__ +
+                  " :: At Custom.getItems")
         return self.objectList

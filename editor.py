@@ -8,6 +8,8 @@ from ImageCache import ImageCache
 from os.path import dirname, abspath
 import ModuleLocation
 
+DEBUG = True
+
 
 # TODO: Keeping mouse down and moving it around in item combo shows items
 #       one step behind
@@ -16,9 +18,12 @@ class Editor(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(Editor, self).__init__(parent)
 
+        if DEBUG:
+            print("   [D] " + "Editor :: At __init__")
+
         self.editorImagePath = "%s/images/" \
             % (dirname(abspath(ModuleLocation.getLocation())))
-        self.scenarioData = ScenarioData.ScenarioData("joku_muu")
+        self.scenarioData = ScenarioData.ScenarioData("latkazombit")
         self.scenarioData.loadScenario()
 
         self.imageCache = ImageCache()
@@ -60,7 +65,15 @@ class Editor(QtGui.QMainWindow):
             self.adventureTab, localizer.translate('Tabs', 'adventureTab'))
         self.tabWidget.currentChanged.connect(self.onTabChanged)
 
+        print("")
+        print("***************************")
+        print("*** EDITOR :: INIT DONE ***")
+        print("***************************")
+        print("")
+
     def createMenuActions(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At createMenuActions")
         self.newAct = QtGui.QAction(
             localizer.translate('createMenuActions', 'new'), self)
         self.newAct = QtGui.QAction(
@@ -75,6 +88,8 @@ class Editor(QtGui.QMainWindow):
         self.exitAct.triggered.connect(self.close)
 
     def createMenus(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At createMenus")
         fileMenu = self.menuBar().addMenu(
             localizer.translate('createMenus', 'file'))
         fileMenu.addAction(self.newAct)
@@ -84,6 +99,8 @@ class Editor(QtGui.QMainWindow):
         fileMenu.addAction(self.exitAct)
 
     def createMainTab(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At createMainTab")
         self.mainTab = QtGui.QWidget()
 
         self.mainLayout = QtGui.QGridLayout()
@@ -198,9 +215,13 @@ class Editor(QtGui.QMainWindow):
         self.drawRoomItems()
 
     def comboDoubleClicked(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At comboDoubleClicked")
         self.tabWidget.setCurrentIndex(1)
 
     def populateRoomsComboBox(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At populateRoomsComboBox")
         self.roomsCombobox.clear()
         for room in self.getRoomObjects():
             roomName = room.getName()
@@ -213,6 +234,8 @@ class Editor(QtGui.QMainWindow):
             self.roomsCombobox.addItem(roomIcon, roomName, userData=room)
 
     def disableItemsRoomInRoomsCombobox(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At disableItemsRoomInRoomsCombobox")
         # First, enable all the items
         for i in range(0, self.roomsCombobox.count()):
             self.roomsCombobox.setItemData(i, 33, QtCore.Qt.UserRole - 1)
@@ -229,6 +252,8 @@ class Editor(QtGui.QMainWindow):
                             i, 0, QtCore.Qt.UserRole - 1)
 
     def populateAddObjectsCombo(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At populateAddObjectsCombo")
         try:
             selectedType = \
                 self.left_scene.currentItem().room.__class__.__name__
@@ -269,10 +294,14 @@ class Editor(QtGui.QMainWindow):
             print("          " + str(e))
 
     def getPlaceholderImagePath(self, objectType):
+        if DEBUG:
+            print("   [D] " + "Editor :: At getPlaceholderImagePath")
         return self.editorImagePath +\
             self.placeholderImages[objectType.capitalize()]
 
     def addViewsComboChanged(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At addViewsComboChanged")
         selected = self.addViewsCombo.itemData(
             self.addViewsCombo.currentIndex())
         if not (selected in ("room", "sequence", "end")):
@@ -280,6 +309,8 @@ class Editor(QtGui.QMainWindow):
         self.createView(selected)
 
     def removeView(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At removeView")
         # Remove from game data
         selected = self.left_scene.currentItem()
         self.scenarioData.removeView(selected.room)
@@ -291,14 +322,18 @@ class Editor(QtGui.QMainWindow):
         self.drawRoomItems()
 
     def addObjectsComboChanged(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At addObjectsComboChanged")
         selected = self.addObjectsCombo.itemData(
             self.addObjectsCombo.currentIndex())
         if not (selected in ("object", "item", "door",
-                "container", "obstacle", "sequenceimage")):
+                             "container", "obstacle", "sequenceimage")):
             return
         self.createObject(selected)
 
     def roomsComboboxChanged(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At roomsComboboxChanged")
         selectedRoom = self.roomsCombobox.itemData(
             self.roomsCombobox.currentIndex())
         selectedItem = self.settingsWidget.currentObject
@@ -310,6 +345,8 @@ class Editor(QtGui.QMainWindow):
         self.drawRoomItems()
 
     def removeObject(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At removeObject")
         # Remove from the room
         selected = self.settingsWidget.currentObject
         selected.parentView.removeObject(selected)
@@ -319,6 +356,8 @@ class Editor(QtGui.QMainWindow):
         self.drawRoomItems()
 
     def setRemoveObjectsButtonDisabled(self, forceDisable=False):
+        if DEBUG:
+            print("   [D] " + "Editor :: At setRemoveObjectsButtonDisabled")
         selected = self.settingsWidget.currentObject
         objectType = selected.__class__.__name__
         if (objectType == "Room" or objectType == "Sequence" or
@@ -334,6 +373,8 @@ class Editor(QtGui.QMainWindow):
         self.roomsCombobox.setDisabled(isDisabled)
 
     def setRemoveViewsButtonDisabled(self, forceDisable=False):
+        if DEBUG:
+            print("   [D] " + "Editor :: At setRemoveViewsButtonDisabled")
         selected = self.settingsWidget.currentObject
         objectType = selected.__class__.__name__
         if (objectType == "Room" or objectType == "Sequence" or
@@ -347,6 +388,8 @@ class Editor(QtGui.QMainWindow):
         self.removeViewsButton.setDisabled(isDisabled)
 
     def createSpaceTab(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At createSpaceTab")
         self.spaceTab = QtGui.QWidget()
 
         self.spaceLayout = QtGui.QGridLayout()
@@ -406,9 +449,13 @@ class Editor(QtGui.QMainWindow):
         self.updateSpaceTab()
 
     def drop(self, event):
-        print("drop!")
+        if DEBUG:
+            print("   [D] " + "Editor :: At drop")
+        print("Editor :: Drop not implemented..")
 
     def updateSpaceTab(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At updateSpaceTab")
         try:
             selectedRoom = self.left_scene.selectedItems()[0]
             #self.settingsWidget.displayOptions(selectedRoom.room)
@@ -476,6 +523,8 @@ class Editor(QtGui.QMainWindow):
             pass
 
     def changeItemZIndex(self, change, item):
+        if DEBUG:
+            print("   [D] " + "Editor :: At changeItemZIndex")
         if not (item in self.spaceItems):
             return
 
@@ -492,6 +541,8 @@ class Editor(QtGui.QMainWindow):
         # TODO: Re-select the item that was moved
 
     def onTabChanged(self, index):
+        if DEBUG:
+            print("   [D] " + "Editor :: At onTabChanged")
         # Main tab
         if (index == 0):
             #self.right_frame_layout_main.addWidget(self.scrollAreaMain)
@@ -517,6 +568,8 @@ class Editor(QtGui.QMainWindow):
             self.drawTextItems
 
     def createObject(self, objectType):
+        if DEBUG:
+            print("   [D] " + "Editor :: At createObject")
         try:
             selectedRoom = self.left_scene.selectedItems()[0]
         except IndexError:
@@ -559,6 +612,8 @@ class Editor(QtGui.QMainWindow):
         self.updateSpaceTab()
 
     def createView(self, objectType):
+        if DEBUG:
+            print("   [D] " + "Editor :: At createView")
 
         # Create the new view and the placeholder image
         if (objectType == "room"):
@@ -586,6 +641,8 @@ class Editor(QtGui.QMainWindow):
         self.populateRoomsComboBox()
 
     def createTextsTab(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At createTextsTab")
         self.textsTab = QtGui.QWidget()
 
         layout = QtGui.QHBoxLayout()
@@ -631,6 +688,8 @@ class Editor(QtGui.QMainWindow):
             print("          " + str(e))
 
     def createAdventureTab(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At createAdventureTab")
         #creates adventureTab, with the gridlayout and widgets
         #to be used to create adventure and change its name
         self.adventureTab = QtGui.QWidget()
@@ -659,11 +718,15 @@ class Editor(QtGui.QMainWindow):
         saveButton.clicked.connect(self.saveNewAdventureName)
 
     def onAdventureNameChanged(self, text):
+        if DEBUG:
+            print("   [D] " + "Editor :: At onAdventureNameChanged")
         #is called when text in qlinedit changes
         #updated to proposedScenarioName variable in ScenarioData
         self.scenarioData.setProposedScenarioName(text)
 
     def saveNewAdventureName(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At saveNewAdventureName")
         #changes the current scenario name to the one in
         #qlinedit
         self.scenarioData.setCurrentScenarioName()
@@ -671,6 +734,8 @@ class Editor(QtGui.QMainWindow):
 
     # Click on an object in the texts tab object list
     def textItemClicked(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At textItemClicked")
         selected = self.text_scene.currentItem()
         if (selected):
             # TODO: Handle this better? Now there's a warning at the
@@ -687,6 +752,8 @@ class Editor(QtGui.QMainWindow):
                 return
 
     def drawTextItems(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At drawTextItems")
         #print ("DRAWING")
         textItems = self.scenarioData.getAllObjects()
         secretCount = textItems.pop()
@@ -764,6 +831,8 @@ class Editor(QtGui.QMainWindow):
 
     # Click on a room in the main tab
     def roomClicked(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At roomClicked")
         self.drawRoomItems()
         try:
             self.settingsWidget.displayOptions(
@@ -780,6 +849,8 @@ class Editor(QtGui.QMainWindow):
 
     # Click on an item in the main tab room preview
     def roomItemClicked(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At roomItemClicked")
         # TODO: Clear when suitable (like when no items in the view)
         selected = self.middle_scene.currentItem()
         if (selected):
@@ -791,6 +862,8 @@ class Editor(QtGui.QMainWindow):
 
     # Draw the leftmost frame items
     def drawRooms(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At drawRooms")
         self.left_scene.clear()
 
         # Rooms
@@ -822,6 +895,8 @@ class Editor(QtGui.QMainWindow):
 
     # Draw the middle frame room items
     def drawRoomItems(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At drawRoomItems")
         try:
             self.middle_scene.clear()
         except AttributeError as e:
@@ -852,6 +927,8 @@ class Editor(QtGui.QMainWindow):
 
     # Override the normal closing event to ask if the user really wants to exit
     def closeEvent(self, event):
+        if DEBUG:
+            print("   [D] " + "Editor :: At closeEvent")
         # We need to define our own buttons to always get them in Finnish
         msgBox = QtGui.QMessageBox()
         msgBox.setText(
@@ -874,6 +951,8 @@ class Editor(QtGui.QMainWindow):
 
     # Ask confirmation when removing views
     def removeViewsButtonClicked(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At removeViewsButtonClicked")
         # We need to define our own buttons to always get them in Finnish
         msgBox = QtGui.QMessageBox()
         msgBox.setText(localizer.translate(
@@ -899,6 +978,8 @@ class Editor(QtGui.QMainWindow):
 
     # Ask confirmation when removing views
     def removeObjectsButtonClicked(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At removeObjectsButtonClicked")
         # We need to define our own buttons to always get them in Finnish
         msgBox = QtGui.QMessageBox()
         msgBox.setText(
@@ -922,21 +1003,31 @@ class Editor(QtGui.QMainWindow):
             return
 
     def getImageDir(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At getImageDir")
         return self.scenarioData.dataDir
 
     def getRoomObjects(self):
+        if DEBUG:
+            print("   [D] " + "Editor :: At getRoomObjects")
         return self.scenarioData.getRooms()
 
     # Get given types of objects found in rooms
     def getObjectsByType(self, objectType):
+        if DEBUG:
+            print("   [D] " + "Editor :: At getObjectsByType")
         return self.scenarioData.getObjectsByType(objectType)
 
     # Get the target object that is triggered by the given item
     def getItemUse(self, item):
+        if DEBUG:
+            print("   [D] " + "Editor :: At getItemUse")
         return item.getUse()
 
     # Get the general object name for an object type
     def getGeneralName(self, objectType):
+        if DEBUG:
+            print("   [D] " + "Editor :: At getGeneralName")
         return self.scenarioData.getGeneralName(objectType)
 
 
@@ -946,6 +1037,9 @@ class ViewWidget(QtGui.QListWidgetItem):
     def __init__(self, room, imageDir, parent=None):
         super(ViewWidget, self).__init__(parent)
         self.room = room
+
+        if DEBUG:
+            print("   [D] " + "ViewWidget :: At __init__")
 
         try:
             if (room.nameable):
@@ -971,6 +1065,9 @@ class ItemWidget(QtGui.QListWidgetItem):
 
     def __init__(self, item, imagePath=None, parent=None):
         super(ItemWidget, self).__init__(parent)
+
+        if DEBUG:
+            print("   [D] " + "ItemWidget :: At __init__")
 
         # Row size, especially height
         self.setSizeHint(QtCore.QSize(100, 100))
@@ -998,6 +1095,8 @@ class TextItemWidget(QtGui.QTableWidgetItem):
 
     def __init__(self, textItem, parentItem, imageDir, cellSize, parent=None):
         super(TextItemWidget, self).__init__(parent)
+        if DEBUG:
+            print("   [D] " + "TextItemWidget :: At __init__")
 
         # Row size, especially height
         self.setSizeHint(QtCore.QSize(cellSize, cellSize))
@@ -1034,6 +1133,8 @@ class TextItemWidget(QtGui.QTableWidgetItem):
         self.setIcon(icon)
 
     def getImageType(self):
+        if DEBUG:
+            print("   [D] " + "TextItemWidget :: At getImageType")
         for attribute in dir(self.parentItem):
             if (self.textItem == getattr(self.parentItem, attribute)):
                 if (attribute == "openImage"):
@@ -1087,6 +1188,9 @@ class TextsWidget(QtGui.QWidget):
 
     def __init__(self, scenarioData, parent=None):
         super(TextsWidget, self).__init__(parent)
+
+        if DEBUG:
+            print("   [D] " + "TextsWidget :: At __init__")
 
         self.parent = parent
         self.scenarioData = scenarioData
@@ -1162,6 +1266,9 @@ class TextsWidget(QtGui.QWidget):
             lambda: self.displayAllInteractions("done"))
 
     def displayTexts(self, item):
+        if DEBUG:
+            print("   [D] " + "TextsWidget :: At displayTexts")
+
         self.currentItem = item
         self.layout.addWidget(self.clickTextLabel, 0, 0)
         self.layout.addWidget(self.clickTextEdit, 1, 0)
@@ -1267,6 +1374,8 @@ class TextsWidget(QtGui.QWidget):
                 setting.hide()
 
     def changeText(self, textType, gameObject=None, textEdit=None):
+        if DEBUG:
+            print("   [D] " + "TextsWidget :: At changeText")
         if not (gameObject):
             gameObject = self.currentItem
 
@@ -1291,6 +1400,8 @@ class TextsWidget(QtGui.QWidget):
         self.parent.drawTextItems()
 
     def changeInteractionText(self, row, column):
+        if DEBUG:
+            print("   [D] " + "TextsWidget :: At changeInteractionText")
         # TODO: Disable editing on first column
         if not (column == 0):
             targetObject = self.text_scene.item(row, 0)
@@ -1303,6 +1414,8 @@ class TextsWidget(QtGui.QWidget):
                 pass
 
     def displayAllInteractions(self, displayOption):
+        if DEBUG:
+            print("   [D] " + "TextsWidget :: At displayAllInteractions")
         self.text_scene.clear()
         targets = self.scenarioData.getAllObjects()[0]
         self.text_scene.setSortingEnabled(False)
@@ -1343,11 +1456,15 @@ class TextsWidget(QtGui.QWidget):
 class SpaceViewItem(QtGui.QGraphicsPixmapItem):
 
     def __init__(self, pixmap, name, parent=None):
+        if DEBUG:
+            print("   [D] " + "SpaceViewItem :: At __init__")
         super(SpaceViewItem, self).__init__(pixmap)
         self.name = name
         self.parent = parent
 
     def mousePressEvent(self, event):
+        if DEBUG:
+            print("   [D] " + "SpaceViewItem :: At mousePressEvent")
         try:
             roomItems = self.parent.left_scene.currentItem().room.getItems()
         except IndexError:
@@ -1368,10 +1485,13 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
         QtGui.QGraphicsItem.mousePressEvent(self, event)
 
     def dragMoveEvent(self, event):
-        print("dropp")
+        if DEBUG:
+            print("   [D] " + "SpaceViewItem :: At dragMoveEvent")
         QtGui.QGraphicsItem.dragMoveEvent(self, event)
 
     def mouseReleaseEvent(self, event):
+        if DEBUG:
+            print("   [D] " + "SpaceViewItem :: At mouseReleaseEvent")
         #itemList = self.parent.spaceScene.collidingItems(self)
         #for item in itemList:
         #   print ("ITEMIIT", item.widget())
@@ -1380,10 +1500,13 @@ class SpaceViewItem(QtGui.QGraphicsPixmapItem):
         QtGui.QGraphicsItem.mouseReleaseEvent(self, event)
 
     def dropEvent(self, event):
-        print("DROOOOP")
+        if DEBUG:
+            print("   [D] " + "SpaceViewItem :: At dropEvent")
         QtGui.QGraphicsItem.dropEvent(self, event)
 
     def getName(self):
+        if DEBUG:
+            print("   [D] " + "SpaceViewItem :: At getName")
         return self.name
 
 if __name__ == '__main__':

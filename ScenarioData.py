@@ -11,10 +11,14 @@ from client import Client
 import shutil
 import os
 
+DEBUG = True
+
 
 class ScenarioData(object):
 
     def __init__(self, scenarioName):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At __init__")
         self.VERBOSE = True
         self.GAMEDATA_FOLDER = "gamedata"
         self.TEMPLATE_FOLDER = "%s/%s/%s/"\
@@ -38,11 +42,15 @@ class ScenarioData(object):
 
     # Load and parse game data files
     def loadScenario(self):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At loadScenario")
         self.parseTexts()
         self.parseImages()
         #self.createInteractions()
 
     def changeDirName(self):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At changeDirName")
         if os.path.isdir(self.dataDir):
             newDataDir = "%s/%s/%s/"\
                 % (dirname(abspath(ModuleLocation.getLocation())),
@@ -60,6 +68,8 @@ class ScenarioData(object):
                   self.dataDir + "??")
 
     def parseTexts(self):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At parseTexts")
         try:
             with open(self.dataDir + "texts.json", encoding='utf-8') as f:
                 self.texts = json.load(f)
@@ -73,12 +83,18 @@ class ScenarioData(object):
             return
 
     def setProposedScenarioName(self, textName):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At setProposedScenarioName")
         self.proposedScenarioName = textName
 
     def setCurrentScenarioName(self):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At setCurrentScenarioName")
         self.currentScenarioName = self.proposedScenarioName
 
     def parseImages(self):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At parseImages")
         try:
             with open(self.dataDir + "images.json", encoding='utf-8') as f:
                 images = json.load(f)
@@ -217,6 +233,8 @@ class ScenarioData(object):
     # Creates necessary json files if they are not found
     # Basically just copies empty json files from the templates folder
     def createFile(self, filename, destination_folder):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At createFile")
         if self.VERBOSE:
             print("ScenarioData :: Creating " + filename + " from template.")
             #print("     " + self.TEMPLATE_FOLDER + filename)
@@ -237,6 +255,8 @@ class ScenarioData(object):
 
     # Save scenario to JSON files
     def saveScenario(self):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At saveScenario")
         if self.VERBOSE:
             print("ScenarioData :: saveScenario")
         #scenarioTexts = {}
@@ -352,37 +372,53 @@ class ScenarioData(object):
 
     # Game object layers
     def __createLayerJSON__(self, attrs, children, className="Layer"):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At __createLayerJSON__")
         return {"attrs": attrs, "className": className, "children": children}
 
     # Single items for game layers
     def __createLayerChildJSON__(self, attrs, className="Image"):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At __createLayerChildJSON__")
         return {"attrs": attrs, "className": className}
 
     def getRoom(self, roomId):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getRoom")
         for room in self.roomList:
             if (room.id == roomId):
                 return room
 
     def getRooms(self):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getRooms")
         return self.roomList
 
     def getRoomBackLoc(self, i):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getRoomBackLoc")
         room = self.roomList[i]
         loc = self.dataDir + room.background.imageAttributes['src']
         return loc
 
     def getSequence(self, sequenceId):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getSequence")
         for sequence in self.sequenceList:
             if (sequence.id == sequenceId):
                 return sequence
 
     def getObject(self, objectId):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getObject")
         for room in self.roomList:
             for obj in room.objectList:
                 if (obj.id == objectId):
                     return obj
 
     def getJSONObject(self, imageId):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getJSONObject")
         objects = self.getAllObjects()[0]
         for obj in objects:
             images = obj.getImages()
@@ -391,12 +427,16 @@ class ScenarioData(object):
                     return img
 
     def getCustomObject(self, objectId):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getCustomObject")
         for obj in self.customObjectList:
             if (obj.id == objectId):
                 return obj
 
     # Get given types of objects found in rooms
     def getObjectsByType(self, objectTypes):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getObjectsByType")
         retObjects = []
         if (type(objectTypes) != list or type(objectTypes) != tuple):
             objectTypes = (objectTypes)
@@ -411,6 +451,8 @@ class ScenarioData(object):
         return retObjects
 
     def getGeneralName(self, objectType):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getGeneralName")
         objectType = objectType.lower()
         if (objectType == "object"):
             return Object.Object.generalName
@@ -425,6 +467,8 @@ class ScenarioData(object):
 
     # Get room, sequence or other object
     def getGameObject(self, objectType, objectId):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getGameObject")
         objectType = objectType.lower()
 
         if (objectType == "room"):
@@ -440,6 +484,8 @@ class ScenarioData(object):
 
     # Get all right type of objects, amount of images and secrets,
     def getAllObjects(self):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getAllObjects")
         retObjects = []
         imgCount = 0
         secretCount = 0
@@ -459,11 +505,15 @@ class ScenarioData(object):
         return [retObjects, imgCount, secretCount]
 
     def getMenu(self, menuId):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At getMenu")
         for menu in self.menuList:
             if (menu.id == menuId):
                 return menu
 
     def deleteObject(self, objectId):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At deleteObject")
         for obj in self.objectList:
             if obj.id == objectId:
                 self.objectList.remove(obj)
@@ -474,37 +524,51 @@ class ScenarioData(object):
                 room.deleteObject(objectId)
 
     def addEnd(self, endId, endAttributes, endImages):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At addEnd")
         newView = View.End(self, endId, endAttributes, endImages)
         self.endViewList.append(newView)
         return newView
 
     def addStart(self, startAttributes, startImages):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At addStart")
         newView = View.Start(self, startAttributes, startImages)
         self.startView = newView
         return newView
 
     def addSequence(self, sequenceId, sequenceAttributes, sequenceImages):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At addSequence")
         newView = View.Sequence(
             self, sequenceId, sequenceAttributes, sequenceImages)
         self.sequenceList.append(newView)
         return newView
 
     def addRoom(self, roomId, roomAttributes, roomImages):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At addRoom")
         newView = View.Room(self, roomId, roomAttributes, roomImages)
         self.roomList.append(newView)
         return newView
 
     def addCustomView(self, viewId, viewAttributes, viewImages):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At addCustomView")
         newView = View.Custom(self, viewId, viewAttributes, viewImages)
         self.customObjectList.append(newView)
         return newView
 
     def addMenu(self, menuId, menuAttributes, menuImages):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At addMenu")
         newView = View.Menu(self, menuId, menuAttributes, menuImages)
         self.menuList.append(newView)
         return newView
 
     def removeObject(self, gameObject):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At removeObject")
         # Remove object text references in other objects
         # Objects include secrets
         if (gameObject.__class__.__name__ in ("Item", "Object")):
@@ -515,6 +579,8 @@ class ScenarioData(object):
 
     # TODO: Remove menu, ends, starts, custom objects
     def removeView(self, viewObject):
+        if DEBUG:
+            print("   [D] " + "ScenarioData :: At removeView")
         viewType = viewObject.__class__.__name__
 
         if (viewType == "Room"):

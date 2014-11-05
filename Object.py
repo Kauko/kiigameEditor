@@ -2,6 +2,8 @@ from random import randint
 from copy import deepcopy
 import localizer
 
+DEBUG = True
+
 
 # Class for generic game objects and upper class for all the other objects
 class Object(object):
@@ -17,6 +19,8 @@ class Object(object):
     usedIds = []
 
     def createUniqueId(newId=None):
+        if DEBUG:
+            print("   [D] "+"Object :: At createUniqueId")
         if not (newId):
             newId = str(randint(0, 1000000000))
 
@@ -39,6 +43,8 @@ class Object(object):
             newId = "%s_duplicate_%i" % (originalId, failCount)
 
     def __init__(self, parentView, objectId, images, objectAttributes):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Object.__init__")
         if not (objectAttributes):
             objectAttributes = Object.objectAttributes
         if not (images):
@@ -81,48 +87,80 @@ class Object(object):
     # Fill in attributes from objects that were missing during __init__
     # Every item needs to implement this
     def postInit(self, getGameObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Object.postInit")
         return
 
     def getImages(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.getImages")
         return self.images
 
     def getImage(self, imageId):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Object.getImage")
         for image in self.images:
             if (image.id == imageId):
                 return image
         return None
 
     def getClassname(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.getClassname")
         return self.objectAttributes["className"]
 
     def getName(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Object.getName")
         return self.getRepresentingImage().getName()
 
     def setName(self, name):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Object.setName")
         self.getRepresentingImage().setName(name)
 
     def getPosition(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.getPosition")
         return self.getRepresentingImage().getCoordinates()
 
     def setPosition(self, position):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.setPosition")
         #print ("Position set to: ", position.x(), position.y())
         self.getRepresentingImage().setCoordinates(position.x(), position.y())
 
     def initPosition(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.initPosition")
         self.getRepresentingImage().setCoordinates(0, 0)
 
     # Returns of the most "representing" image for an item such as open door
     # instead closed door image
     # Every item needs to override this to act properly
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.getRepresentingImage")
         return self.images[0]
 
     # Get the image activated by the given item
     # Should be overriden by other objects
     def getUseImage(self, useItem):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.getUseImage")
         return self.images[0]
 
     def getExamineText(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.getExamineText")
         try:
             return self.getRepresentingImage().texts["examine"]
         except:
@@ -130,15 +168,24 @@ class Object(object):
 
     # Set item's examine (click) text
     def setExamineText(self, examineText):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.setExamineText")
         self.getRepresentingImage().texts["examine"] = examineText
 
     # Remove this object
     def removeObject(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.removeObject")
         self.parentView.removeObject(self)
 
     # Set whether clicking the object game will end
     # TODO: Set end layer too instead of having it hardcoded
     def setIsEnding(self, isEnding):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.setIsEnding")
         if (isEnding):
             self.objectAttributes["object"]["ending"] = "end_layer"
         else:
@@ -148,12 +195,18 @@ class Object(object):
                 return
 
     def getIsEnding(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.getIsEnding")
         if ("ending" in self.objectAttributes["object"]):
             return True
         return False
 
     # Remove text with the given text key
     def removeText(self, textKey):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Object.removeText")
         newTexts = dict(self.texts)
         try:
             del newTexts[textKey]
@@ -178,6 +231,8 @@ class Item(Object):
         }
 
     def __init__(self, parentView, itemId, images, objectAttributes):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Item.__init__")
         if not (objectAttributes):
             objectAttributes = Item.objectAttributes
         if not (images):
@@ -195,6 +250,8 @@ class Item(Object):
         self.comesFrom = None
 
     def postInit(self, getGameObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Item.postInit")
         try:
             self.trigger = getGameObject(
                 "object", self.objectAttributes["object"]["trigger"])
@@ -209,12 +266,17 @@ class Item(Object):
             pass
 
     def getPickupText(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.getPickupText")
         try:
             return self.texts["pickup"]
         except:
             return
 
     def getUse(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Item.getUse")
         if (self.target):
             return self.target
         elif (self.goesInto):
@@ -223,9 +285,14 @@ class Item(Object):
             return self.comesFrom
 
     def setTarget(self, target):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Item.setTarget")
         self.target = target
 
     def setGoesInto(self, target):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.setGoesInto")
         self.goesInto = target
         self.comesFrom = None
         self.trigger = None
@@ -233,6 +300,9 @@ class Item(Object):
         self.outcome = None
 
     def setComesFrom(self, target):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.setComesFrom")
         self.goesInto = None
         self.comesFrom = target
         self.trigger = None
@@ -240,11 +310,17 @@ class Item(Object):
         self.outcome = None
 
     def clearTrigger(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.clearTrigger")
         self.trigger = None
         self.target = None
         self.outcome = None
 
     def clearTarget(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.clearTarget")
         targetType = self.target.__class__.__name__
         if (targetType in ("Door", "Container")):
             self.target.setLocked(False)
@@ -259,11 +335,16 @@ class Item(Object):
 
     # Set the item use text if target is defined
     def setUseText(self, useText):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Item.setUseText")
         if (self.target):
             self.texts[self.target.id] = useText
 
     # Set item's pickup text
     def setPickupText(self, pickupText):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.setPickupText")
         if (pickupText == ""):
             self.removeText("pickup")
         else:
@@ -274,28 +355,42 @@ class Item(Object):
 
     # Set item's default text
     def setDefaultText(self, defaultText):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.setDefaultText")
         if (defaultText == ""):
             self.removeText("default")
         else:
             self.texts["default"] = defaultText
 
     def setInteractionText(self, targetId, interactionText):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.setInteractionText")
         if (interactionText == ""):
             self.removeText(targetId)
         else:
             self.texts[targetId] = interactionText
 
     def setOutcome(self, outcomeObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Item.setOutcome")
         self.outcome = outcomeObject
 
     def setConsume(self, isConsumed):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Item.setConsume")
         self.objectAttributes["object"]["consume"] = isConsumed
 
     def getConsume(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Item.getConsume")
         return self.objectAttributes["object"]["consume"]
 
     # Get the text displayed when this item is used on its target
     def getUseText(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Item.getUseText")
         useImage = self.target.getUseImage(self)
         try:
             return self.texts[useImage.id]
@@ -305,11 +400,17 @@ class Item(Object):
 
     # Get the image activated by the given item
     def getUseImage(self, useItem):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.getUseImage")
         return self.images[0]
 
     # Set the object triggered by this item
     # objectRole=0 act as a key, =1 act as inItem, =2, act as outItem
     def setTargetObject(self, targetObject, objectRole=0):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Item.setTargetObject")
         if not (targetObject):
             return
 
@@ -356,6 +457,10 @@ class Container(Object):
     }
 
     def __init__(self, parentView, itemId, images, objectAttributes):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.__init__")
+
         if not (objectAttributes):
             objectAttributes = Container.objectAttributes
         if not (images):
@@ -406,6 +511,9 @@ class Container(Object):
         self.outItem = None
 
     def postInit(self, getGameObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.postInit")
         try:
             self.setKey(getGameObject(
                 "object", self.objectAttributes["object"]["key"]))
@@ -428,19 +536,31 @@ class Container(Object):
             pass
 
     def getImages(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.getImages")
         images = [self.emptyImage, self.lockedImage, self.fullImage]
         return list(filter((None).__ne__, images))
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.getRepresentingImage")
         if self.emptyImage is None:
             self.emptyImage = self.images[0]
         return self.emptyImage
 
     def setRepresentingImage(self, img):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.setRepresentingImage")
         self.emptyImage = img
 
     # Get the image activated by the given item
     def getUseImage(self, useItem):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.getUseImage")
         if (self.key == useItem):
             return self.lockedImage
         elif (self.inItem == useItem):
@@ -450,6 +570,9 @@ class Container(Object):
 
     # Returns True if container is locked, otherwise False
     def isLocked(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.isLocked")
         try:
             if (self.objectAttributes["object"]["locked"] is True):
                 return True
@@ -461,17 +584,29 @@ class Container(Object):
         return False
 
     def setIsLocked(self, isLocked):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.setIsLocked")
         self.objectAttributes["object"]["locked"] = isLocked
 
     # Returns what unblocks the container
     def getKey(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.getKey")
         return self.key
 
     def setKey(self, keyObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.setKey")
         self.key = keyObject
         self.key.setTarget(self)
 
     def setInItem(self, inItemObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.setInItem")
         # Clear old inItem
         if (self.inItem):
             self.inItem.clearTarget()
@@ -486,6 +621,9 @@ class Container(Object):
         self.objectAttributes["object"]["in"] = self.inItem.id
 
     def clearInItem(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.clearInItem")
         if (self.inItem):
             self.inItem.clearTarget()
         self.inItem = None
@@ -496,6 +634,9 @@ class Container(Object):
             return
 
     def setOutItem(self, outItemObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.setOutItem")
         # Clear old outItem
         if (self.outItem):
             self.outItem.clearTarget()
@@ -510,6 +651,9 @@ class Container(Object):
         self.objectAttributes["object"]["out"] = self.outItem.id
 
     def clearOutItem(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.clearOutItem")
         if (self.outItem):
             self.outItem.clearTarget()
         self.outItem = None
@@ -522,6 +666,9 @@ class Container(Object):
     # Set or remove locked state with images etc.
     # When setting locked=True, other parameters can be given
     def setLocked(self, setLocked, imagePath=None, keyObject=None):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.setLocked")
         if (self.key):
             self.key = None
 
@@ -558,6 +705,9 @@ class Container(Object):
 
     # Nullify current key
     def clearKey(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Container.clearKey")
         if (self.key):
             self.key.clearTarget()
         self.key = None
@@ -583,6 +733,9 @@ class Door(Object):
     }
 
     def __init__(self, parentView, itemId, images, objectAttributes):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Door.__init__")
+
         if not (objectAttributes):
             objectAttributes = Door.objectAttributes
         if not (images):
@@ -641,6 +794,8 @@ class Door(Object):
         self.transition = None
 
     def postInit(self, getGameObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Door.postInit")
         try:
             self.setKey(
                 getGameObject(
@@ -657,6 +812,8 @@ class Door(Object):
     # Set or remove locked state with images etc.
     # When setting locked=True, other parameters can be given
     def setLocked(self, setLocked, imagePath=None, keyObject=None):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Door.setLocked")
         if (self.key):
             self.key = None
 
@@ -696,6 +853,8 @@ class Door(Object):
 
     # If closed, add closed image. If not closed, remove closed image
     def setClosed(self, setClosed):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Door.setClosed")
         if (setClosed):
             imageObject = JSONImage(
                 self.parentView, None, self.objectAttributes, imageId=self.id)
@@ -716,6 +875,8 @@ class Door(Object):
             self.closedImage = None
 
     def getImages(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Door.getImages")
         images = [
             self.closedImage,
             self.lockedImage,
@@ -725,24 +886,38 @@ class Door(Object):
         return list(filter((None).__ne__, images))
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Door.getRepresentingImage")
         if self.openImage is None:
             self.openImage = self.images[0]
         return self.openImage
 
     def setRepresentingImage(self, img):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Door.setRepresentingImage")
         self.openImage = img
 
     # Get the image activated by the given item
     def getUseImage(self, useItem):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Door.getUseImage")
         if (self.key == useItem):
             return self.lockedImage
 
     def setTransition(self, roomObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Door.setTransition")
         self.objectAttributes["object"]["transition"] = roomObject.id
         self.transition = roomObject
 
     # Returns True if door is locked, otherwise False
     def isLocked(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Door.isLocked")
         try:
             if (self.objectAttributes["object"]["locked"] is True):
                 return True
@@ -753,14 +928,21 @@ class Door(Object):
         return False
 
     def setIsLocked(self, isLocked):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Door.setIsLocked")
         self.objectAttributes["object"]["locked"] = isLocked
 
     def setKey(self, keyObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Door.setKey")
         self.key = keyObject
         self.key.setTarget(self)
 
     # Nullify current key
     def clearKey(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Door.clearKey")
         if (self.key):
             self.key.clearTarget()
         self.key = None
@@ -792,6 +974,9 @@ class Obstacle(Object):
 
         super(Obstacle, self).\
             __init__(parentView, itemId, images, objectAttributes)
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.__init__")
         # Create the available image objects
         try:
             self.blockingImage = self.getImage(
@@ -829,6 +1014,9 @@ class Obstacle(Object):
         self.trigger = None
 
     def postInit(self, getGameObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.postInit")
         try:
             self.blockTarget = getGameObject(
                 "object", self.objectAttributes["object"]["target"])
@@ -842,40 +1030,66 @@ class Obstacle(Object):
             pass
 
     def getImages(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.getImages")
         images = [self.blockingImage, self.unblockingImage]
         return list(filter((None).__ne__, images))
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.getRepresentingImage")
         if self.blockingImage is None:
             self.blockingImage = self.images[0]
         return self.blockingImage
 
     def setRepresentingImage(self, img):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.setRepresentingImage")
         self.blockingImage = img
 
     # Get the image activated by the given item
     def getUseImage(self, useItem):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.getUseImage")
         if (self.trigger == useItem):
             return self.blockingImage
 
     # Returns what unblocks the obstacle
     def getKey(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Obstacle.getKey")
         return self.trigger
 
     # Set which object blocks
     def setTrigger(self, triggerObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.setTrigger")
         self.trigger = triggerObject
         self.trigger.setTarget(self)
 
     def clearTrigger(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.clearTrigger")
         self.trigger.clearTarget()
         self.trigger = None
 
     def setBlockTarget(self, targetObject):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.setBlockTarget")
         self.blockTarget = targetObject
         self.objectAttributes["object"]["target"] = targetObject.id
 
     def clearBlockTarget(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Obstacle.clearBlockTarget")
         self.blockTarget = None
         try:
             del self.objectAttributes["object"]["target"]
@@ -905,6 +1119,10 @@ class JSONImage(Object):
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
 
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.__init__")
+
         if not (imageAttributes):
             imageAttributes = deepcopy(JSONImage.imageAttributes)
             self.absoluteImagePath = None
@@ -923,39 +1141,61 @@ class JSONImage(Object):
                 % (parentView.scenarioData.dataDir, self.getFileName())
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.getRepresentingImage")
         if (len(self.imageAttributes["src"]) == 0):
             return self.placeholderImage
         else:
             return self
 
     def getName(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.getName")
         try:
             return self.texts["name"]
         except KeyError:
             return None
 
     def setName(self, name):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.setName")
         self.texts["name"] = name
 
     def getID(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At JSONImage.getID")
         try:
             return self.id
         except:
             print("Warning: imageID not found.")
 
     def setID(self, newID):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At JSONImage.setID")
         self.id = newID
 
     def getFileName(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.getFileName")
         # TODO: self.getSource() returns None?
         return self.imageAttributes["src"].split("/")[-1]
 
     def getSource(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.getSource")
         if (len(self.imageAttributes["src"]) == 0):
             return self.placeholderImage.getSource()
         return self.imageAttributes["src"]
 
     def setSource(self, absoluteImagePath):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.setSource")
         # Cut the plain filename out of the name
         self.imageAttributes["src"] =\
             "images/"+absoluteImagePath.split("/")[-1]
@@ -963,13 +1203,22 @@ class JSONImage(Object):
         self.absoluteImagePath = absoluteImagePath
 
     def setObjectName(self, objectName):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.setObjectName")
         self.imageAttributes["object_name"] = objectName
 
     def setCoordinates(self, x, y):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.setCoordinates")
         self.imageAttributes["x"] = x
         self.imageAttributes["y"] = y
 
     def getCoordinates(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.getCoordinates")
         #print(self.id, self.imageAttributes)
         try:
             return (self.imageAttributes["x"], self.imageAttributes["y"])
@@ -977,9 +1226,15 @@ class JSONImage(Object):
             return
 
     def setCategory(self, category):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.setCategory")
         self.imageAttributes["category"] = category
 
     def setObjectId(self, objectId):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At JSONImage.setObjectId")
         self.imageAttributes["id"] = objectId
 
 
@@ -995,20 +1250,36 @@ class SequenceImage(JSONImage):
         super(SequenceImage, self).\
             __init__(parentView, imageAttributes, objectAttributes, imageId)
 
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At SequenceImage.__init__")
+
     # Get the display time for this image
     def getShowTime(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At SequenceImage.getShowTime")
         return self.parentView.getShowTime(self.id)
 
     # Set the display time for this image
     def setShowTime(self, milliseconds):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At SequenceImage.setShowTime")
         self.parentView.setShowTime(self.id, milliseconds)
 
     # Get the fade type for this image
     def getDoFade(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At SequenceImage.getDoFade")
         return self.parentView.getDoFade(self.id)
 
     # Set the fade type for this image
     def setDoFade(self, doFade):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At SequenceImage.setDoFade")
         return self.parentView.setDoFade(self.id, doFade)
 
 
@@ -1021,6 +1292,9 @@ class MenuImage(JSONImage):
 
     def __init__(self, parentView, imageAttributes,
                  objectAttributes, imageId=None):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At MenuImage.__init__")
         super(MenuImage, self).\
             __init__(parentView, imageAttributes, objectAttributes, imageId)
 
@@ -1038,6 +1312,10 @@ class BeginningImage(JSONImage):
         super(BeginningImage, self).\
             __init__(parentView, imageAttributes, objectAttributes, imageId)
 
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At BeginningImage.__init__")
+
 
 class Text(JSONImage):
     generalName = localizer.translate(
@@ -1049,32 +1327,54 @@ class Text(JSONImage):
         super(Text, self).\
             __init__(parentView, imageAttributes, objectAttributes, imageId)
 
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Text.__init__")
+
     def getSource(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Text.getSource")
         return
 
     # No setting source for a text
     def setSource(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Text.setSource")
         return
 
     def getFileName(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Text.getFileName")
         return
 
     def getText(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Text.getText")
         try:
             return self.imageAttributes["text"]
         except KeyError:
             return
 
     def setText(self, text):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ + " :: At Text.setText")
         self.imageAttributes["text"] = text
 
     def getRepresentingImage(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At Text.getRepresentingImage")
         return self
 
 
 # Placeholder image to be used by other images
 class PlaceholderImage(JSONImage):
+
     def __init__(self, parent):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At PlaceholderImage.__init__")
+
         self.parent = parent
         self.imageAttributes = deepcopy(JSONImage.imageAttributes)
         self.absoluteImagePath = None
@@ -1082,6 +1382,9 @@ class PlaceholderImage(JSONImage):
         self.id = parent.id
 
     def setSource(self, absoluteImagePath):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At PlaceholderImage.setSource")
 
         # Cut the plain filename out of the name
         self.imageAttributes["src"] =\
@@ -1090,7 +1393,13 @@ class PlaceholderImage(JSONImage):
         self.absoluteImagePath = absoluteImagePath
 
     def getName(self):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At PlaceholderImage.getName")
         return self.parent.getName()
 
     def setName(self, name):
+        if DEBUG:
+            print("   [D] "+self.__class__.__name__ +
+                  " :: At PlaceholderImage.setName")
         return self.parent.setName(name)
